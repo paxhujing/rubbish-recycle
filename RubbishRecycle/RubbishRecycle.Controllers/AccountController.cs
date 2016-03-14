@@ -56,7 +56,7 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("SetClientSecretKey")]
-        public HttpResponseMessage SetClientSecretKey(String account,String password)
+        public HttpResponseMessage SetClientSecretKey()
         {
             System.Net.HttpStatusCode statusCode = System.Net.HttpStatusCode.OK;
             String reasonPhrase = String.Empty;
