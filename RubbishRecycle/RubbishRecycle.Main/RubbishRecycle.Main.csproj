@@ -116,11 +116,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Account.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -137,6 +135,16 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\RubbishRecycle.Controllers\RubbishRecycle.Controllers.csproj">
+      <Project>{6829283a-55c3-489f-b8c8-0f45c3c3fe22}</Project>
+      <Name>RubbishRecycle.Controllers</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RubbishRecycle.Models\RubbishRecycle.Models.csproj">
+      <Project>{0d3991e1-cf5c-4b6d-ab87-e2cbd724f3e8}</Project>
+      <Name>RubbishRecycle.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

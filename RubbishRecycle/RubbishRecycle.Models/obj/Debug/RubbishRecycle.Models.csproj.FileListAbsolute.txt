@@ -1,0 +1,5 @@
+F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Models\bin\Debug\RubbishRecycle.Models.dll
+F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Models\bin\Debug\RubbishRecycle.Models.pdb
+F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Models\obj\Debug\RubbishRecycle.Models.csprojResolveAssemblyReference.cache
+F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Models\obj\Debug\RubbishRecycle.Models.dll
+F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Models\obj\Debug\RubbishRecycle.Models.pdb
