@@ -2,13 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace RubbishRecycle.Controllers.Assets
 {
-    public class AccountTokenManager : Collection<AccountToken>
+    internal class AccountTokenManager : Collection<AccountToken>
     {
         #region Fields
 
@@ -26,7 +28,7 @@ namespace RubbishRecycle.Controllers.Assets
         #endregion
 
         #region Methods
-        
+
 
         #endregion
     }
