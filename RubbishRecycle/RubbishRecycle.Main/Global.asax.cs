@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using RubbishRecycle.Main.App_Start;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,14 @@ namespace RubbishRecycle.Main
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
-            JsonMediaTypeFormatter jsonFormatter = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
-            jsonFormatter.Indent = true;
-            jsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-            jsonFormatter.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
+            GlobalConfiguration.Configuration.Formatters.Add(new TextPlainFormatter());
+            //JsonMediaTypeFormatter jsonFormatter = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
+            //jsonFormatter.Indent = true;
+            //jsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+            //jsonFormatter.SerializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.None;
 
-            GlobalConfiguration.Configuration.Formatters.Clear();
-            GlobalConfiguration.Configuration.Formatters.Add(jsonFormatter);
+            //GlobalConfiguration.Configuration.Formatters.Clear();
+            //GlobalConfiguration.Configuration.Formatters.Add(jsonFormatter);
         }
     }
 }

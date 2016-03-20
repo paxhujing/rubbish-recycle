@@ -19,7 +19,7 @@ namespace RubbishRecycle.Controllers.Assets
         /// <param name="context">安全上下文。</param>
         public AccountToken(String token, AccountSecurityContext context)
         {
-            this._context = context;
+            this._securityContext = context;
             this._token = token;
             this._roles = new List<String>(1);
         }
@@ -53,13 +53,13 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Context
 
-        private readonly AccountSecurityContext _context;
+        private readonly AccountSecurityContext _securityContext;
         /// <summary>
         /// 安全上下文。
         /// </summary>
-        public AccountSecurityContext Context
+        public AccountSecurityContext SecurityContext
         {
-            get { return this._context; }
+            get { return this._securityContext; }
         }
 
         #endregion

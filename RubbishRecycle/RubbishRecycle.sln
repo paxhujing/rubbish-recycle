@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubbishRecycle.Controllers"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubbishRecycle.Models", "RubbishRecycle.Models\RubbishRecycle.Models.csproj", "{0D3991E1-CF5C-4B6D-AB87-E2CBD724F3E8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RubbishRecycle.Test", "RubbishRecycle.Test\RubbishRecycle.Test.csproj", "{30FF165C-CA79-40A2-B86C-D03E93105235}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{0D3991E1-CF5C-4B6D-AB87-E2CBD724F3E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0D3991E1-CF5C-4B6D-AB87-E2CBD724F3E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0D3991E1-CF5C-4B6D-AB87-E2CBD724F3E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30FF165C-CA79-40A2-B86C-D03E93105235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30FF165C-CA79-40A2-B86C-D03E93105235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30FF165C-CA79-40A2-B86C-D03E93105235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30FF165C-CA79-40A2-B86C-D03E93105235}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
