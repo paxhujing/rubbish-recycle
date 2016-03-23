@@ -112,7 +112,7 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public HttpResponseMessage Login([FromBody]String encryptedSecretKey,[FromUri]AccountType accountType)
+        public HttpResponseMessage Login([FromBody]String encryptedSecretKey,[FromUri]String role)
         {
             KeyValuePair<String, String> account;
             if (TryGetAccountAndPassword(base.ActionContext, out account))
@@ -123,7 +123,7 @@ namespace RubbishRecycle.Controllers
                     Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
                     if (secretKey != null && secretKey.Length != 0)
                     {
-                        return InitAccountToken(secretKey,account,accountType);
+                        return InitAccountToken(secretKey,account, role);
                     }
                 }
             }
@@ -133,7 +133,7 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Register")]
-        public HttpResponseMessage Register([FromBody]String encryptedSecretKey, [FromUri]AccountType accountType)
+        public HttpResponseMessage Register([FromBody]String encryptedSecretKey, [FromUri]String role)
         {
             KeyValuePair<String, String> account;
             if (TryGetAccountAndPassword(base.ActionContext, out account))
@@ -144,7 +144,7 @@ namespace RubbishRecycle.Controllers
                     Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
                     if (secretKey != null && secretKey.Length != 0)
                     {
-                        return InitAccountToken(secretKey, account, accountType);
+                        return InitAccountToken(secretKey, account, role);
                     }
                 }
             }
@@ -213,10 +213,10 @@ namespace RubbishRecycle.Controllers
         /// <param name="account"></param>
         /// <param name="accountType"></param>
         /// <returns></returns>
-        private HttpResponseMessage InitAccountToken(Byte[] secretKey, KeyValuePair<String, String> account, AccountType accountType)
+        private HttpResponseMessage InitAccountToken(Byte[] secretKey, KeyValuePair<String, String> account, String role)
         {
             AccountToken accountToken = CreateAccountToken(secretKey, account.Key, account.Value);
-            accountToken.Roles.Add(accountType == AccountType.Saler ? "saler" : "buyer");
+            accountToken.Roles.Add(role == "saler" ? "saler" : "buyer");
             AccountTokenManager.Manager.Add(accountToken);
             HttpResponseMessage response = base.ActionContext.Request.CreateResponse(accountToken.Token);
             response.Headers.Add("IV", AccountController.GlobalIVBase64String);

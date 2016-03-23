@@ -7,33 +7,25 @@ using System.Threading.Tasks;
 namespace RubbishRecycle.Models
 {
     /// <summary>
-    /// 废品类型
+    /// 订单状态。
     /// </summary>
-    public enum RubbishType : byte
+    public enum OrderState : byte
     {
         /// <summary>
-        /// 纸类。
+        /// 审核中。
         /// </summary>
-        Paper,
+        Reviewing,
         /// <summary>
-        /// 塑料。
+        /// 待确认。
         /// </summary>
-        Plastic,
+        Waiting,
         /// <summary>
-        /// 玻璃。
+        /// 已过期。
         /// </summary>
-        Glass,
+        Expired,
         /// <summary>
-        /// 金属。
+        /// 已完成。
         /// </summary>
-        Metal,
-        /// <summary>
-        /// 布料。
-        /// </summary>
-        Cloth,
-        /// <summary>
-        /// 其它。
-        /// </summary>
-        Other = Byte.MaxValue
+        Finished
     }
 }

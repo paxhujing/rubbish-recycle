@@ -12,18 +12,24 @@ namespace RubbishRecycle.Models
     public class Account
     {
         [Key]
+        [Column("id")]
         public Int32 Id { get; set; }
 
         [MaxLength(20)]
         [Required(AllowEmptyStrings = false)]
+        [Column("name")]
         public String Name { get; set; }
 
         [MaxLength(20)]
         [Required(AllowEmptyStrings = false)]
+        [Column("password")]
         public String Password { get; set; }
 
-        public AccountType Type { get; set; }
+        [MaxLength(255)]
+        [Column("roles")]
+        public IEnumerable<String> Roles { get; set; }
 
+        [Column("last_login")]
         public DateTime LastLogin { get; set; }
     }
 }

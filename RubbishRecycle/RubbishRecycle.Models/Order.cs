@@ -13,27 +13,44 @@ namespace RubbishRecycle.Models
     public class Order
     {
         [Key]
+        [Column("id")]
         public Int32 Id { get; private set; }
 
+        [Column("saler_id")]
         public Int32 SalerId { get; set; }
 
-        public RubbishType Type { get; set; }
+        [Column("order_confirm_id")]
+        public Int32? OrderConfirmId { get; set; }
 
+        [Column("rubbish_type_id")]
+        public Int32 RubbishTypeId { get; set; }
+
+        [Column("quantity_unit_id")]
+        public Int32 QuantityUnitId { get; set; }
+
+        [Column("quantity")]
         public Double Quantity { get; set; }
 
-        public QuantityUnit Unit { get; set; }
+        [Column("photo")]
+        public Byte[] Photo { get; set; }
 
-        public DateTime Expire { get; set; }
+        [Column("create_time")]
+        public DateTime CreateTime { get; set; }
 
-        public Int32 BuyerId { get; set; }
-
-        public Double Price { get; set; }
+        [Column("expire_time")]
+        public DateTime ExpireTime { get; set; }
 
         [MaxLength(255)]
-        public String Address { get; set; }
+        [Column("trading_address")]
+        public String TradingAddress { get; set; }
 
-        public DateTime Timestamp { get; set; }
+        [Column("order_state")]
+        public OrderState State { get; set; }
 
-        public Byte[] Photo { get; set; }
+        [Column("except_trading_time")]
+        public DateTime ExceptTradingTime { get; set; }
+
+        [Column("confirm_code")]
+        public String ConfirmCode { get; set; }
     }
 }

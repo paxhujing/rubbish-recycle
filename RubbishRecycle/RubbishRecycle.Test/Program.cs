@@ -18,7 +18,7 @@ namespace RubbishRecycle.Test
     class Program
     {
         //static readonly Uri BaseAddress = new Uri("http://localhost:49811");
-        static readonly Uri BaseAddress = new Uri("http://192.168.1.103:8080");
+        static readonly Uri BaseAddress = new Uri("http://139.196.241.167");
 
         static readonly RijndaelManaged AESProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
 
@@ -55,7 +55,7 @@ namespace RubbishRecycle.Test
 
         static String RequestCommunication(HttpClient client)
         {
-            Uri uri = new Uri(Program.BaseAddress, "api/account/RequestCommunication");
+            Uri uri = new Uri(Program.BaseAddress, "api/account/RequestCommunication?isHexEncode=false");
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = client.SendAsync(request).Result;
