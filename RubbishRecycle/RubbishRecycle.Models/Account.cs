@@ -22,6 +22,8 @@ namespace RubbishRecycle.Models
         [Required(AllowEmptyStrings = false)]
         public String Password { get; set; }
 
+        public AccountType Type { get; set; }
+
         public DateTime LastLogin { get; set; }
     }
 }
