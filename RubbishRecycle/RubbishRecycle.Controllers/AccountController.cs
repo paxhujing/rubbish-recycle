@@ -75,12 +75,38 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public XmlDocument RequestCommunication()
+        public String RequestCommunication(Boolean isHexEncode = true)
         {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(AccountController.GlobalPublicKey);
-            return doc;
-            //return AccountController.GlobalPublicKey;
+            String temp = JsonConvert.SerializeXmlNode(doc);
+
+            if (isHexEncode)
+            {
+                dynamic obj = JsonConvert.DeserializeObject(temp);
+
+                String exponentStr = obj.RSAKeyValue.Exponent;
+                exponentStr = ToHexEncode(Convert.FromBase64String(exponentStr));
+
+                String modulusStr = obj.RSAKeyValue.Modulus;
+                modulusStr = ToHexEncode(Convert.FromBase64String(modulusStr));
+
+                var rsakeyvalue =
+                new
+                {
+                    RSAKeyValue =
+                    new
+                    {
+                        Exponent = exponentStr,
+                        Modulus = modulusStr
+                    }
+                };
+                return JsonConvert.SerializeObject(rsakeyvalue);
+            }
+            else
+            {
+                return temp;
+            }
         }
 
         [AllowAnonymous]
@@ -269,6 +295,11 @@ namespace RubbishRecycle.Controllers
             {
                 return null;
             }
+        }
+
+        private static String ToHexEncode(Byte[] bytes)
+        {
+            return BitConverter.ToString(bytes).Replace("-", String.Empty);
         }
 
         #endregion
