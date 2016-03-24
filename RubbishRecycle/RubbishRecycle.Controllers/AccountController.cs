@@ -75,38 +75,9 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public Object RequestCommunication(Boolean isHexEncode = true)
+        public String RequestCommunication()
         {
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(AccountController.GlobalPublicKey);
-
-            if (isHexEncode)
-            {
-                String temp = JsonConvert.SerializeXmlNode(doc);
-                dynamic obj = JsonConvert.DeserializeObject(temp);
-
-                String exponentStr = obj.RSAKeyValue.Exponent;
-                exponentStr = ToHexEncode(Convert.FromBase64String(exponentStr));
-
-                String modulusStr = obj.RSAKeyValue.Modulus;
-                modulusStr = ToHexEncode(Convert.FromBase64String(modulusStr));
-
-                var rsakeyvalue =
-                new
-                {
-                    RSAKeyValue =
-                    new
-                    {
-                        Exponent = exponentStr,
-                        Modulus = modulusStr
-                    }
-                };
-                return rsakeyvalue;
-            }
-            else
-            {
-                return doc;
-            }
+            return AccountController.GlobalPublicKey;
         }
 
         [AllowAnonymous]
@@ -239,7 +210,7 @@ namespace RubbishRecycle.Controllers
                 if (!String.IsNullOrEmpty(arg))
                 {
                     Byte[] data = Convert.FromBase64String(arg);
-                    data = AccountController.RSAProvider.Decrypt(data, true);
+                    data = AccountController.RSAProvider.Decrypt(data, false);
                     String temp = Encoding.UTF8.GetString(data);
                     String[] accountAndPassword = temp.Split(':');
                     if (accountAndPassword.Length == 2)
@@ -261,7 +232,7 @@ namespace RubbishRecycle.Controllers
         private Byte[] GetClientSecretKey(String encryptedSecretKey)
         {
             Byte[] data = Convert.FromBase64String(encryptedSecretKey);
-            data = AccountController.RSAProvider.Decrypt(data, true);
+            data = AccountController.RSAProvider.Decrypt(data, false);
             return data;
         }
 
