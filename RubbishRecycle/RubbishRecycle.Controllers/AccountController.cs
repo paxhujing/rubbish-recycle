@@ -239,7 +239,7 @@ namespace RubbishRecycle.Controllers
                 if (!String.IsNullOrEmpty(arg))
                 {
                     Byte[] data = Convert.FromBase64String(arg);
-                    data = AccountController.RSAProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA1);
+                    data = AccountController.RSAProvider.Decrypt(data, true);
                     String temp = Encoding.UTF8.GetString(data);
                     String[] accountAndPassword = temp.Split(':');
                     if (accountAndPassword.Length == 2)
@@ -261,7 +261,7 @@ namespace RubbishRecycle.Controllers
         private Byte[] GetClientSecretKey(String encryptedSecretKey)
         {
             Byte[] data = Convert.FromBase64String(encryptedSecretKey);
-            data = AccountController.RSAProvider.Decrypt(data, RSAEncryptionPadding.OaepSHA1);
+            data = AccountController.RSAProvider.Decrypt(data, true);
             return data;
         }
 
