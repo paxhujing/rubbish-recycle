@@ -75,14 +75,14 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public String RequestCommunication(Boolean isHexEncode = true)
+        public Object RequestCommunication(Boolean isHexEncode = true)
         {
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(AccountController.GlobalPublicKey);
-            String temp = JsonConvert.SerializeXmlNode(doc);
 
             if (isHexEncode)
             {
+                String temp = JsonConvert.SerializeXmlNode(doc);
                 dynamic obj = JsonConvert.DeserializeObject(temp);
 
                 String exponentStr = obj.RSAKeyValue.Exponent;
@@ -101,11 +101,11 @@ namespace RubbishRecycle.Controllers
                         Modulus = modulusStr
                     }
                 };
-                return JsonConvert.SerializeObject(rsakeyvalue);
+                return rsakeyvalue;
             }
             else
             {
-                return temp;
+                return doc;
             }
         }
 
