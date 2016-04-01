@@ -20,12 +20,20 @@ namespace RubbishRecycle.Models
         /// </summary>
         Waiting,
         /// <summary>
-        /// 已过期。
+        /// 过期。
         /// </summary>
-        Expired,
+        Expire,
         /// <summary>
-        /// 已完成。
+        /// 确定。
         /// </summary>
-        Finished
+        Confirm,
+        /// <summary>
+        /// 完成。
+        /// </summary>
+        Finish,
+        /// <summary>
+        /// 取消。
+        /// </summary>
+        Cancel,
     }
 }

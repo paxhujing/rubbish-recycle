@@ -55,15 +55,12 @@ namespace RubbishRecycle.Test
 
         static String RequestCommunication(HttpClient client)
         {
-            Uri uri = new Uri(Program.BaseAddress, "api/account/RequestCommunication?isHexEncode=false");
+            Uri uri = new Uri(Program.BaseAddress, "api/account/RequestCommunication");
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = client.SendAsync(request).Result;
-            //String publicKey = response.Content.ReadAsStringAsync().Result;
-            //return publicKey;
-            String str = response.Content.ReadAsStringAsync().Result;
-            XmlNode xn = JsonConvert.DeserializeXmlNode(str);
-            return xn.InnerXml;
+            String publicKey = response.Content.ReadAsStringAsync().Result;
+            return publicKey;
         }
 
         static String Register(HttpClient client, String publicKey, out String iv)

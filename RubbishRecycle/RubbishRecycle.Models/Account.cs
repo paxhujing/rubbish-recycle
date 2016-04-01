@@ -12,8 +12,9 @@ namespace RubbishRecycle.Models
     public class Account
     {
         [Key]
+        [MaxLength(36)]
         [Column("id")]
-        public Int32 Id { get; set; }
+        public String Id { get; set; }
 
         [MaxLength(20)]
         [Required(AllowEmptyStrings = false)]
@@ -25,11 +26,14 @@ namespace RubbishRecycle.Models
         [Column("password")]
         public String Password { get; set; }
 
-        [MaxLength(255)]
-        [Column("roles")]
-        public IEnumerable<String> Roles { get; set; }
+        [MaxLength(10)]
+        [Column("role")]
+        public String Role { get; set; }
 
         [Column("last_login")]
         public DateTime LastLogin { get; set; }
+
+        [Column("credit")]
+        public Int32 Credit { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
@@ -10,14 +11,17 @@ namespace RubbishRecycle.Models
     [Table("order_confirm")]
     public class OrderConfirm
     {
+        [MaxLength(36)]
         [Column("id")]
-        public Int32 Id { get; set; }
+        public String Id { get; set; }
 
+        [MaxLength(36)]
         [Column("order_id")]
-        public Int32 OrderId { get; set; }
+        public String OrderId { get; set; }
 
+        [MaxLength(36)]
         [Column("buyer_id")]
-        public Int32 BuyerId { get; set; }
+        public String BuyerId { get; set; }
 
         [Column("price")]
         public Double Price { get; set; }

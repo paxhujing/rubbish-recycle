@@ -13,14 +13,17 @@ namespace RubbishRecycle.Models
     public class Order
     {
         [Key]
+        [MaxLength(36)]
         [Column("id")]
-        public Int32 Id { get; private set; }
+        public String Id { get; private set; }
 
+        [MaxLength(36)]
         [Column("saler_id")]
-        public Int32 SalerId { get; set; }
+        public String SalerId { get; set; }
 
+        [MaxLength(36)]
         [Column("order_confirm_id")]
-        public Int32? OrderConfirmId { get; set; }
+        public String OrderConfirmId { get; set; }
 
         [Column("rubbish_type_id")]
         public Int32 RubbishTypeId { get; set; }

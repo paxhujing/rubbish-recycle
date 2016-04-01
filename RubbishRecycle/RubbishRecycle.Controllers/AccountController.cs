@@ -85,20 +85,22 @@ namespace RubbishRecycle.Controllers
         [Route("Login")]
         public HttpResponseMessage Login([FromBody]String encryptedSecretKey,[FromUri]String role)
         {
-            KeyValuePair<String, String> account;
-            if (TryGetAccountAndPassword(base.ActionContext, out account))
+            Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
+            if (secretKey != null)
             {
-                //验证用户
-                if (VerifyAccount(account.Key, account.Value))
+                KeyValuePair<String, String> accountInfo;
+                if (TryGetAccountAndPassword(base.ActionContext, out accountInfo))
                 {
-                    Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
-                    if (secretKey != null && secretKey.Length != 0)
+                    //验证用户
+                    Account account = VerifyAccount(accountInfo.Key, accountInfo.Value, role);
+                    if (account != null)
                     {
-                        return InitAccountToken(secretKey,account, role);
+                        //生成Token
+                        return InitAccountToken(secretKey, account);
                     }
                 }
             }
-            throw new HttpResponseException(HttpStatusCode.NotAcceptable);
+            throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
 
         [AllowAnonymous]
@@ -106,16 +108,20 @@ namespace RubbishRecycle.Controllers
         [Route("Register")]
         public HttpResponseMessage Register([FromBody]String encryptedSecretKey, [FromUri]String role)
         {
-            KeyValuePair<String, String> account;
-            if (TryGetAccountAndPassword(base.ActionContext, out account))
+            if (role == "saler" || role == "buyer")
             {
-                //验证用户
-                if (RegisterAccount(account.Key, account.Value))
+                Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
+                if (secretKey != null)
                 {
-                    Byte[] secretKey = GetClientSecretKey(encryptedSecretKey);
-                    if (secretKey != null && secretKey.Length != 0)
+                    KeyValuePair<String, String> accountInfo;
+                    if (TryGetAccountAndPassword(base.ActionContext, out accountInfo))
                     {
-                        return InitAccountToken(secretKey, account, role);
+                        Account account = RegisterAccount(accountInfo.Key, accountInfo.Value, role);
+                        //验证用户
+                        if (account != null)
+                        {
+                            return InitAccountToken(secretKey, account);
+                        }
                     }
                 }
             }
@@ -147,18 +153,20 @@ namespace RubbishRecycle.Controllers
         /// </summary>
         /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="role"></param>
         /// <returns></returns>
-        private Boolean RegisterAccount(String name, String password)
+        private Account RegisterAccount(String name, String password,String role)
         {
             using (RubbishRecycleContext context = new RubbishRecycleContext())
             {
                 Account account = new Account();
                 account.Name = name;
                 account.Password = password;
-                account.LastLogin = DateTime.Now.Date;
+                account.Role = role;
+                account.LastLogin = DateTime.Now;
                 context.Accounts.Add(account);
                 Int32 result = context.SaveChanges();
-                return result != 0;
+                return result != 0 ? account : null;
             }
         }
 
@@ -167,13 +175,14 @@ namespace RubbishRecycle.Controllers
         /// </summary>
         /// <param name="name"></param>
         /// <param name="password"></param>
+        /// <param name="role"></param>
         /// <returns></returns>
-        private Boolean VerifyAccount(String name, String password)
+        private Account VerifyAccount(String name, String password,String role)
         {
             using (RubbishRecycleContext context = new RubbishRecycleContext())
             {
-                Account account = context.Accounts.FirstOrDefault(x => x.Name == name && x.Password == password);
-                return account != null;
+                Account account = context.Accounts.FirstOrDefault(x => x.Name == name && x.Password == password && x.Role == role);
+                return account;
             }
         }
 
@@ -184,10 +193,10 @@ namespace RubbishRecycle.Controllers
         /// <param name="account"></param>
         /// <param name="accountType"></param>
         /// <returns></returns>
-        private HttpResponseMessage InitAccountToken(Byte[] secretKey, KeyValuePair<String, String> account, String role)
+        private HttpResponseMessage InitAccountToken(Byte[] secretKey, Account account)
         {
-            AccountToken accountToken = CreateAccountToken(secretKey, account.Key, account.Value);
-            accountToken.Roles.Add(role == "saler" ? "saler" : "buyer");
+            AccountToken accountToken = CreateAccountToken(secretKey, account);
+            accountToken.Roles.Add(account.Role);
             AccountTokenManager.Manager.Add(accountToken);
             HttpResponseMessage response = base.ActionContext.Request.CreateResponse(accountToken.Token);
             response.Headers.Add("IV", AccountController.GlobalIVBase64String);
@@ -242,7 +251,7 @@ namespace RubbishRecycle.Controllers
         /// <param name="actionContext"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        private AccountToken CreateAccountToken(Byte[] secretKey, String account, String password)
+        private AccountToken CreateAccountToken(Byte[] secretKey, Account account)
         {
             try
             {
@@ -251,7 +260,7 @@ namespace RubbishRecycle.Controllers
                 ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, AccountController.GlobalIV);
                 AccountSecurityContext context = new AccountSecurityContext(encryptor, decryptor);
                 //生成令牌
-                String temp = String.Format("{0}-{1}-{2}:{3}", secretKey.GetHashCode(), DateTime.Now.Ticks, account, password);
+                String temp = String.Format("{0}-{1}-{2}:{3}", secretKey.GetHashCode(), DateTime.Now.Ticks, account.Name, account.Password);
                 Byte[] data = Encoding.UTF8.GetBytes(temp);
                 data = AccountController.MD5Provider.ComputeHash(data);
                 String token = Convert.ToBase64String(data);
@@ -266,11 +275,6 @@ namespace RubbishRecycle.Controllers
             {
                 return null;
             }
-        }
-
-        private static String ToHexEncode(Byte[] bytes)
-        {
-            return BitConverter.ToString(bytes).Replace("-", String.Empty);
         }
 
         #endregion
