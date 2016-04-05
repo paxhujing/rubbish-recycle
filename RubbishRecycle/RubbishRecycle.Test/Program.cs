@@ -17,8 +17,8 @@ namespace RubbishRecycle.Test
 {
     class Program
     {
-        //static readonly Uri BaseAddress = new Uri("http://localhost:49811");
-        static readonly Uri BaseAddress = new Uri("http://139.196.241.167");
+        static readonly Uri BaseAddress = new Uri("http://localhost:49811");
+        //static readonly Uri BaseAddress = new Uri("http://139.196.241.167");
 
         static readonly RijndaelManaged AESProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
 
@@ -35,9 +35,9 @@ namespace RubbishRecycle.Test
             String iv = null;
             //Token = Register(client, publicKey, out iv);
             Token = Login(client, publicKey, out iv);
-            Console.WriteLine("token: {0};IV: {1}", Token, iv);
-            String json = GetAccountInfo(client);
-            Console.WriteLine("json: {0}", json);
+            //Console.WriteLine("token: {0};IV: {1}", Token, iv);
+            //String json = GetAccountInfo(client);
+            //Console.WriteLine("json: {0}", json);
 
             Console.ReadKey();
         }
@@ -55,7 +55,7 @@ namespace RubbishRecycle.Test
 
         static String RequestCommunication(HttpClient client)
         {
-            Uri uri = new Uri(Program.BaseAddress, "api/account/RequestCommunication");
+            Uri uri = new Uri(Program.BaseAddress, "api/account/init/RequestCommunication");
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, uri);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = client.SendAsync(request).Result;
@@ -90,27 +90,32 @@ namespace RubbishRecycle.Test
 
         static String Login(HttpClient client, String publicKey, out String iv)
         {
+            LoginInfo li = new LoginInfo();
+            li.SecretKey = Program.SecretKey;
+            li.Name = "123456";
+            li.Password = "123456";
+
+            String json = JsonConvert.SerializeObject(li);
+
             RSACryptoServiceProvider provider = new RSACryptoServiceProvider();
             provider.FromXmlString(publicKey);
 
-            String account = "123456:123456";
-            Byte[] data = Encoding.UTF8.GetBytes(account);
-            data = provider.Encrypt(data, true);
-            account = Convert.ToBase64String(data);
+            //Byte[] data = Encoding.UTF8.GetBytes(json);
+            //data = provider.Encrypt(data, false);
+            //json = Convert.ToBase64String(data);
 
-            data = provider.Encrypt(Program.SecretKey, true);
-            String secretKey = Convert.ToBase64String(data);
-
-            Uri uri = new Uri(Program.BaseAddress, "api/account/Login?accountType=0");
+            Uri uri = new Uri(Program.BaseAddress, "api/account/init/Login");
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, uri);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
-            request.Content = new StringContent(secretKey);
-            request.Headers.Authorization = new AuthenticationHeaderValue("basic", account);
+            //request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+            request.Content = new StringContent(json,Encoding.UTF8,"application/json");
             HttpResponseMessage response = client.SendAsync(request).Result;
-            iv = response.Headers.GetValues("IV").First();
-            Byte[] encryptIV = Convert.FromBase64String(iv);
-            Program.AESProvider.IV = encryptIV;
-            return response.Content.ReadAsStringAsync().Result;
+
+            //iv = response.Headers.GetValues("IV").First();
+            //Byte[] encryptIV = Convert.FromBase64String(iv);
+            //Program.AESProvider.IV = encryptIV;
+            iv = null;
+            return null;
+            //return response.Content.ReadAsStringAsync().Result;
         }
 
         static String GetAccountInfo(HttpClient client)

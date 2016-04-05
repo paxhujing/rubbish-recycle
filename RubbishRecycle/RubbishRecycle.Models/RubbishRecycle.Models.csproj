@@ -42,10 +42,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="AccountRole.cs" />
+    <Compile Include="AccountType.cs" />
+    <Compile Include="LoginInfo.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderConfirm.cs" />
     <Compile Include="OrderState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RegisterInfo.cs" />
+    <Compile Include="Role.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

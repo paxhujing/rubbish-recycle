@@ -1,6 +1,5 @@
 ﻿using MySql.Data.MySqlClient;
 using RubbishRecycle.Controllers.Assets;
-using RubbishRecycle.Controllers.Assets.DB;
 using RubbishRecycle.Models;
 using System;
 using System.Collections.Generic;
@@ -36,39 +35,42 @@ namespace RubbishRecycle.Controllers
         [HttpGet]
         public IEnumerable<Order> GetOrders()
         {
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                return context.Orders;
-            }
+            //using (RubbishRecycleContext context = new RubbishRecycleContext())
+            //{
+            //    return context.Orders;
+            //}
+            throw new NotImplementedException();
         }
 
         [RubbishRecycleAuthorize(Roles = "Saler")]
         [Route("GetOrderById")]
         [HttpGet]
-        public Order GetOrderById(Int32 id)
+        public Order GetOrderById(String id)
         {
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                Order order = context.Orders.FirstOrDefault(x => x.Id == id);
-                if (order == null)
-                {
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-                }
-                return order;
-            }
+            //using (RubbishRecycleContext context = new RubbishRecycleContext())
+            //{
+            //    Order order = context.Orders.FirstOrDefault(x => x.Id == id);
+            //    if (order == null)
+            //    {
+            //        throw new HttpResponseException(HttpStatusCode.NotFound);
+            //    }
+            //    return order;
+            //}
+            throw new NotImplementedException();
         }
 
         [RubbishRecycleAuthorize(Roles = "Saler")]
         [Route("AddOrder")]
         [HttpPost]
-        public Int32 AddOrder(Order order)
+        public String AddOrder(Order order)
         {
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                Order added = context.Orders.Add(order);
-                context.SaveChanges();
-                return added.Id;
-            }
+            //using (RubbishRecycleContext context = new RubbishRecycleContext())
+            //{
+            //    Order added = context.Orders.Add(order);
+            //    context.SaveChanges();
+            //    return added.Id;
+            throw new NotImplementedException();
+            //}
         }
 
         [RubbishRecycleAuthorize(Roles = "Saler")]
@@ -76,11 +78,12 @@ namespace RubbishRecycle.Controllers
         [HttpDelete]
         public void RemoveOrder(Order order)
         {
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                context.Orders.Remove(order);
-                context.SaveChanges();
-            }
+            //using (RubbishRecycleContext context = new RubbishRecycleContext())
+            //{
+            //    context.Orders.Remove(order);
+            //    context.SaveChanges();
+            //}
+            throw new NotImplementedException();
         }
 
         #endregion

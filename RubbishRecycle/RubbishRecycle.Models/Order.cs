@@ -55,5 +55,10 @@ namespace RubbishRecycle.Models
 
         [Column("confirm_code")]
         public String ConfirmCode { get; set; }
+
+        [MaxLength(100)]
+        [Required(AllowEmptyStrings = false)]
+        [Column("description")]
+        public String Description { get; set; }
     }
 }

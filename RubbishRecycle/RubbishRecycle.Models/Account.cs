@@ -8,32 +8,51 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    [Table("account")]
+    /// <summary>
+    /// 账户。
+    /// </summary>
     public class Account
     {
+        /// <summary>
+        /// 账户表Id号。
+        /// </summary>
         [Key]
-        [MaxLength(36)]
-        [Column("id")]
-        public String Id { get; set; }
+        public Int32 Id { get; set; }
 
+        /// <summary>
+        /// 账户名称。
+        /// </summary>
         [MaxLength(20)]
         [Required(AllowEmptyStrings = false)]
-        [Column("name")]
         public String Name { get; set; }
 
+        /// <summary>
+        /// 密码。
+        /// </summary>
         [MaxLength(20)]
         [Required(AllowEmptyStrings = false)]
-        [Column("password")]
         public String Password { get; set; }
 
-        [MaxLength(10)]
-        [Column("role")]
-        public String Role { get; set; }
+        /// <summary>
+        /// 绑定的手机号。
+        /// </summary>
+        [MaxLength(13)]
+        [Required(AllowEmptyStrings = false)]
+        public String BindingPhone { get; set; }
 
-        [Column("last_login")]
+        /// <summary>
+        /// 最近登录日期。
+        /// </summary>
         public DateTime LastLogin { get; set; }
 
-        [Column("credit")]
+        /// <summary>
+        /// 信誉。
+        /// </summary>
         public Int32 Credit { get; set; }
+
+        /// <summary>
+        /// 账户角色关联列表。
+        /// </summary>
+        public virtual ICollection<AccountRole> AccountRoles { get; set; }
     }
 }

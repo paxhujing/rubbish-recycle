@@ -1,7 +1,11 @@
-﻿using System;
+﻿using RubbishRecycle.Controllers.Assets;
+using RubbishRecycle.Main.App_Start;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Dispatcher;
 
 namespace RubbishRecycle.Main
 {
@@ -14,10 +18,17 @@ namespace RubbishRecycle.Main
             // Web API 路由
             config.MapHttpAttributeRoutes();
 
+            DelegatingHandler[] sessionMessageHandlers = new DelegatingHandler[]
+            {
+                    new SessionMessageHandler()
+            };
+            HttpMessageHandler sessionHandler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(config), sessionMessageHandlers);
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                name: "Session",
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new { id = RouteParameter.Optional },
+                constraints: null,
+                handler: sessionHandler
             );
         }
     }
