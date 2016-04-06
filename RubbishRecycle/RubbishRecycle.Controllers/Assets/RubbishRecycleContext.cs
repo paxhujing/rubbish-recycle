@@ -16,7 +16,7 @@ namespace RubbishRecycle.Controllers.Assets
         public RubbishRecycleContext()
             : base("name=RubbishRecycleContext")
         {
-            Database.SetInitializer(new RubbishRecycleDBInitializer());
+            //Database.SetInitializer(new RubbishRecycleDBInitializer());
         }
 
         #endregion
@@ -28,12 +28,12 @@ namespace RubbishRecycle.Controllers.Assets
             protected override void Seed(RubbishRecycleContext context)
             {
                 Role saler = new Role();
-                saler.RoleName = "saler";
+                saler.Id = "saler";
                 saler.Description = "卖家";
                 context.Roles.Add(saler);
 
                 Role buyer = new Role();
-                buyer.RoleName = "buyer";
+                buyer.Id = "buyer";
                 buyer.Description = "买家";
                 context.Roles.Add(buyer);
 
@@ -45,11 +45,11 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-            base.OnModelCreating(modelBuilder);
-        }
+        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+        //    base.OnModelCreating(modelBuilder);
+        //}
 
         #endregion
 
@@ -58,8 +58,6 @@ namespace RubbishRecycle.Controllers.Assets
         public DbSet<Account> Accounts { get; set; }
 
         public DbSet<Role> Roles { get; set; }
-
-        public DbSet<AccountRole> AccountRoles { get; set; }
 
         #endregion
     }

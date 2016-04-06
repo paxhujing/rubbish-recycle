@@ -11,30 +11,49 @@ namespace RubbishRecycle.Controllers.Assets
 {
     public class RubbishRecycleAuthorizeAttribute : AuthorizeAttribute
     {
+        #region Fields
+
+        private static readonly Dictionary<Int32, IEnumerable<String>> RolesCache;
+
+        #endregion
+
+        #region Constructors
+
+        static RubbishRecycleAuthorizeAttribute()
+        {
+            RolesCache = new Dictionary<Int32, IEnumerable<String>>();
+        }
+
+        #endregion
+
         public override void OnAuthorization(HttpActionContext actionContext)
         {
             AuthenticationHeaderValue authenticationHeader = actionContext.Request.Headers.Authorization;
             if (authenticationHeader != null)
             {
                 String token = authenticationHeader.Parameter;
-                if (!String.IsNullOrEmpty(token))
+                if (!String.IsNullOrWhiteSpace(token))
                 {
                     AccountToken accountToken = AccountTokenManager.Manager[token];
                     if (accountToken != null)
                     {
-                        actionContext.Request.Properties.Add("AccountToken", accountToken);
-                        if (String.IsNullOrEmpty(base.Roles))
+                        if (String.IsNullOrWhiteSpace(base.Roles))
                         {
                             IsAuthorized(actionContext);
+                            actionContext.Request.Properties.Add("Token", accountToken);
                             return;
                         }
                         else
                         {
-                            String[] roles = base.Roles.Split(',');
-                            IEnumerable<String> existedRoles = accountToken.Roles.Intersect(roles, StringComparer.OrdinalIgnoreCase);
-                            if (existedRoles.Count() != 0)
+                            Int32 hash = actionContext.ActionDescriptor.GetHashCode();
+                            if (!RolesCache.ContainsKey(hash))
+                            {
+                                RolesCache.Add(hash, base.Roles.Split(';'));
+                            }
+                            if (RolesCache[hash].Contains(accountToken.Role))
                             {
                                 IsAuthorized(actionContext);
+                                actionContext.Request.Properties.Add("Token", accountToken);
                                 return;
                             }
                         }

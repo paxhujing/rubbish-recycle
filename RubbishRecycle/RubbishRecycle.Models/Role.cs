@@ -11,6 +11,7 @@ namespace RubbishRecycle.Models
     /// <summary>
     /// 角色。
     /// </summary>
+    [Table("role")]
     public class Role
     {
         /// <summary>
@@ -18,12 +19,14 @@ namespace RubbishRecycle.Models
         /// </summary>
         [Key]
         [MaxLength(20)]
-        public String RoleName { get; set; }
+        [Column("id")]
+        public String Id { get; set; }
 
         /// <summary>
         /// 描述。
         /// </summary>
         [MaxLength(30)]
+        [Column("description")]
         public String Description { get; set; }
     }
 }

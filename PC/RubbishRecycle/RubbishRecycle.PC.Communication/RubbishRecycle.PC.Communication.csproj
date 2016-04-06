@@ -34,6 +34,12 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RubbishRecycle.Models">
+      <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="RubbishRecycle.Toolkit">
+      <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />

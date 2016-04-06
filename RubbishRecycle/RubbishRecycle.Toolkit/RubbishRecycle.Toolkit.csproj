@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FEFC40CE-66BF-481B-955A-D5EF45668BFB}</ProjectGuid>
+    <ProjectGuid>{87590789-AF8D-4FA3-8484-7C6B5FB3E80B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RubbishRecycle.PC.Contract</RootNamespace>
-    <AssemblyName>RubbishRecycle.PC.Contract</AssemblyName>
+    <RootNamespace>RubbishRecycle.Toolkit</RootNamespace>
+    <AssemblyName>RubbishRecycle.Toolkit</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,9 +30,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="RubbishRecycle.Models">
-      <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Models.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -43,7 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IAccountProxy.cs" />
+    <Compile Include="RSAHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

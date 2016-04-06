@@ -6,15 +6,19 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    public enum AccountType
+    /// <summary>
+    /// 登陆结果。
+    /// </summary>
+    public class LoginResult
     {
         /// <summary>
-        /// 卖家。
+        /// 对称加密向量。
         /// </summary>
-        Saler,
+        public Byte[] IV { get; set; }
+
         /// <summary>
-        /// 买家。
+        /// 会话Token。
         /// </summary>
-        Buyer,
+        public String Token { get; set; }
     }
 }

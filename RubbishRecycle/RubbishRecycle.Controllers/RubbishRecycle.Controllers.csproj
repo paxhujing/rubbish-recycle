@@ -82,6 +82,10 @@
       <Project>{0d3991e1-cf5c-4b6d-ab87-e2cbd724f3e8}</Project>
       <Name>RubbishRecycle.Models</Name>
     </ProjectReference>
+    <ProjectReference Include="..\RubbishRecycle.Toolkit\RubbishRecycle.Toolkit.csproj">
+      <Project>{87590789-af8d-4fa3-8484-7c6b5fb3e80b}</Project>
+      <Name>RubbishRecycle.Toolkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />

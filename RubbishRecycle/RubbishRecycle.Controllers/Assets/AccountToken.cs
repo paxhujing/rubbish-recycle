@@ -21,7 +21,6 @@ namespace RubbishRecycle.Controllers.Assets
         {
             this._securityContext = context;
             this._token = token;
-            this._roles = new List<String>(1);
         }
 
         #endregion
@@ -65,14 +64,13 @@ namespace RubbishRecycle.Controllers.Assets
         #endregion
 
         #region Roles
-
-        private IList<String> _roles;
         /// <summary>
         /// 角色列表。
         /// </summary>
-        public IList<String> Roles
+        public String Role
         {
-            get { return this._roles; }
+            get;
+            set;
         }
 
         #endregion
