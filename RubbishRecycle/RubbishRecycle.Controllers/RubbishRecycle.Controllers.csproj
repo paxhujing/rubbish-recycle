@@ -51,6 +51,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
@@ -77,11 +78,15 @@
     <Compile Include="Assets\RubbishRecycleContext.cs" />
     <Compile Include="Assets\SessionMessageHandler.cs" />
     <Compile Include="Assets\RubbishRecycleAuthorizeAttribute.cs" />
+    <Compile Include="Assets\TaoBaoSms.cs" />
     <Compile Include="OrderController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SmsController.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\RubbishRecycle.Config\RubbishRecycle.Config.csproj">
+      <Project>{50b9474d-fe36-41bd-8a52-482dd1b427b3}</Project>
+      <Name>RubbishRecycle.Config</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RubbishRecycle.Models\RubbishRecycle.Models.csproj">
       <Project>{0d3991e1-cf5c-4b6d-ab87-e2cbd724f3e8}</Project>
       <Name>RubbishRecycle.Models</Name>

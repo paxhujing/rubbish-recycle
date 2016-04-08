@@ -10,8 +10,9 @@ namespace RubbishRecycle.Toolkit
 {
     public static class RSAHelper
     {
-        public static String Encrypt(this RSACryptoServiceProvider provider,Byte[] data)
+        public static String Encrypt(this RSACryptoServiceProvider provider,String original)
         {
+            Byte[] data = Encoding.UTF8.GetBytes(original);
             Int32 maxLength = provider.KeySize / 8 - 11;
             if (data.Length <= maxLength)
             {
@@ -41,13 +42,13 @@ namespace RubbishRecycle.Toolkit
             }
         }
 
-        public static Byte[] Decrypt(this RSACryptoServiceProvider provider, String base64String)
+        public static String Decrypt(this RSACryptoServiceProvider provider, String encrypted)
         {
             Int32 maxLength = provider.KeySize / 8;
-            Byte[] data = Convert.FromBase64String(base64String);
+            Byte[] data = Convert.FromBase64String(encrypted);
             if (data.Length <= maxLength)
             {
-                return provider.Decrypt(data, false);
+                data = provider.Decrypt(data, false);
             }
             else
             {
@@ -63,10 +64,11 @@ namespace RubbishRecycle.Toolkit
                             output.Write(block, 0, block.Length);
                             readCount = input.Read(buffer, 0, maxLength);
                         }
-                        return output.ToArray();
+                        data = output.ToArray();
                     }
                 }
             }
+            return Encoding.UTF8.GetString(data);
         }
     }
 }

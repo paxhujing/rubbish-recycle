@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using System.Xml;
 using System.Data.Entity;
 using RubbishRecycle.Toolkit;
+using RubbishRecycle.Config;
 
 namespace RubbishRecycle.Controllers
 {
@@ -50,7 +51,7 @@ namespace RubbishRecycle.Controllers
 
         static AccountController()
         {
-            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider();
+            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(2048);
             AccountController.RSAProvider = rsaProvider;
             AccountController.GlobalPrivateKey = rsaProvider.ToXmlString(true);
             AccountController.RSAProvider.FromXmlString(AccountController.GlobalPrivateKey);
@@ -73,27 +74,32 @@ namespace RubbishRecycle.Controllers
 
         #region Methods
 
+        #region Actions
+
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
         public String RequestCommunication()
         {
-            //using (RubbishRecycleContext context = new RubbishRecycleContext())
-            //{
-            //    IQueryable<Role> roles = context.Roles;
-            //    foreach (Role role in roles)
-            //    {
-            //    }
-            //}
             return AccountController.GlobalPublicKey;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetVerifyCode")]
+        public String GetVerifyCode(String bindingPhone, String roleId)
+        {
+            SmsResult result = TaoBaoSms.SendVerifyCode(bindingPhone, roleId);
+            String json = JsonConvert.SerializeObject(result);
+            return AccountController.RSAProvider.Encrypt(json);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public LoginResult Login([FromBody]String encryptedJson)
+        public String Login([FromBody]String encryptedJson)
         {
-            String json = RSADecrypt(encryptedJson);
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
             Byte[] secretKey = loginInfo.SecretKey;
             if ((secretKey != null) && (secretKey.Length != 0))
@@ -102,8 +108,7 @@ namespace RubbishRecycle.Controllers
                 Account account = VerifyAccount(loginInfo.Name, loginInfo.Password);
                 if (account != null)
                 {
-                    //生成Token
-                    return InitAccountToken(secretKey, account);
+                    return EncryptLoginResponseMessage(secretKey, account);
                 }
             }
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -112,9 +117,9 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterSaler")]
-        public LoginResult RegisterSaler([FromBody]String encryptedJson)
+        public String RegisterSaler([FromBody]String encryptedJson)
         {
-            String json = RSADecrypt(encryptedJson);
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
             Byte[] secretKey = registerInfo.SecretKey;
             if ((secretKey != null) && (secretKey.Length != 0))
@@ -122,7 +127,7 @@ namespace RubbishRecycle.Controllers
                 Account account = null;
                 if (TryRegisterAccount(registerInfo, "saler",out account))
                 {
-                    return InitAccountToken(secretKey, account);
+                    return EncryptLoginResponseMessage(secretKey, account);
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -131,9 +136,9 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterBuyer")]
-        public LoginResult RegisterBuyer([FromBody]String encryptedJson)
+        public String RegisterBuyer([FromBody]String encryptedJson)
         {
-            String json = RSADecrypt(encryptedJson);
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
             Byte[] secretKey = registerInfo.SecretKey;
             if ((secretKey != null) && (secretKey.Length != 0))
@@ -141,11 +146,13 @@ namespace RubbishRecycle.Controllers
                 Account account = null;
                 if (TryRegisterAccount(registerInfo, "buyer", out account))
                 {
-                    return InitAccountToken(secretKey, account);
+                    return EncryptLoginResponseMessage(secretKey, account);
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
         }
+
+        #endregion
 
         #region Private
 
@@ -207,6 +214,19 @@ namespace RubbishRecycle.Controllers
         }
 
         /// <summary>
+        /// 加密登陆响应消息。
+        /// </summary>
+        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
+        /// <param name="account">客户端账号信息。</param>
+        /// <returns>加密消息。</returns>
+        private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
+        {
+            LoginResult result = InitAccountToken(secretKey, account);
+            String json = JsonConvert.SerializeObject(result);
+            return AccountController.RSAProvider.Encrypt(json);
+        }
+
+        /// <summary>
         /// 创建通信的安全上下文。
         /// </summary>
         /// <param name="actionContext"></param>
@@ -251,18 +271,6 @@ namespace RubbishRecycle.Controllers
             Byte[] data = Encoding.UTF8.GetBytes(str);
             data = AccountController.MD5Provider.ComputeHash(data);
             return Convert.ToBase64String(data);
-        }
-
-        /// <summary>
-        /// RSA解密。
-        /// </summary>
-        /// <param name="encrypted">RSA加密后的BASE64数据</param>
-        /// <returns>RSA解密后的数据。</returns>
-        private String RSADecrypt(String encrypted)
-        {
-            Byte[] data = AccountController.RSAProvider.Decrypt(encrypted);
-            String temp = Encoding.UTF8.GetString(data);
-            return temp;
         }
 
         #endregion

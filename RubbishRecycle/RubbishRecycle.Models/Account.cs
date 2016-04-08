@@ -46,6 +46,12 @@ namespace RubbishRecycle.Models
         public String BindingPhone { get; set; }
 
         /// <summary>
+        /// 积分。
+        /// </summary>
+        [Column("auction")]
+        public Single Auction { get; set; }
+
+        /// <summary>
         /// 最近登录日期。
         /// </summary>
         [Column("last_login")]
