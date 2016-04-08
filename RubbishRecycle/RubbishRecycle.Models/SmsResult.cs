@@ -10,18 +10,18 @@ namespace RubbishRecycle.Models
     /// <summary>
     /// 短信请求结果。
     /// </summary>
-    public class SmsResult
+    public struct SmsResult
     {
         [JsonProperty("code")]
-        public String Code { get; set; }
+        public String Code;
 
         [JsonProperty("extend")]
-        public String Extend { get; set; }
+        public String Extend;
 
         [JsonProperty("is_success")]
-        public Boolean IsSuccess { get; set; }
+        public Boolean IsSuccess;
 
         [JsonProperty("error")]
-        public String Error { get; set; }
+        public String Error;
     }
 }

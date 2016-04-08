@@ -54,6 +54,7 @@
     <Compile Include="RegisterInfo.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="SmsResult.cs" />
+    <Compile Include="VerifyCodeRequest.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

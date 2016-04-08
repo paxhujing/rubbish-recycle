@@ -87,10 +87,12 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("GetVerifyCode")]
-        public String GetVerifyCode(String bindingPhone, String roleId)
+        public String GetVerifyCode([FromBody]String encryptedJson)
         {
-            SmsResult result = TaoBaoSms.SendVerifyCode(bindingPhone, roleId);
-            String json = JsonConvert.SerializeObject(result);
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
+            VerifyCodeRequest request = JsonConvert.DeserializeObject<VerifyCodeRequest>(json);
+            SmsResult result = TaoBaoSms.SendVerifyCode(request.BindingPhone, request.RoleId);
+            json = JsonConvert.SerializeObject(result);
             return AccountController.RSAProvider.Encrypt(json);
         }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,16 +10,18 @@ namespace RubbishRecycle.Models
     /// <summary>
     /// 登陆结果。
     /// </summary>
-    public class LoginResult
+    public struct LoginResult
     {
         /// <summary>
         /// 对称加密向量。
         /// </summary>
-        public Byte[] IV { get; set; }
+        [JsonProperty("iv")]
+        public Byte[] IV;
 
         /// <summary>
         /// 会话Token。
         /// </summary>
-        public String Token { get; set; }
+        [JsonProperty("token")]
+        public String Token;
     }
 }
