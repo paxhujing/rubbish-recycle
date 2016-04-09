@@ -95,7 +95,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [AllowAnonymous]
-        [HttpPost]
+        [HttpGet]
         [Route("Login")]
         public LoginResult Login([FromBody]String encryptedJson)
         {
