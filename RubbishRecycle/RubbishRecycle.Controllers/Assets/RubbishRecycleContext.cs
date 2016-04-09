@@ -23,7 +23,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Nested class
 
-        private class RubbishRecycleDBInitializer : DropCreateDatabaseAlways<RubbishRecycleContext>
+        private class RubbishRecycleDBInitializer : DropCreateDatabaseIfModelChanges<RubbishRecycleContext>
         {
             protected override void Seed(RubbishRecycleContext context)
             {
