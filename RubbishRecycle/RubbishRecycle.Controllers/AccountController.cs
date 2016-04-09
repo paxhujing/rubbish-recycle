@@ -200,9 +200,10 @@ namespace RubbishRecycle.Controllers
         /// <returns></returns>
         private Account VerifyAccount(String name, String password)
         {
+            String md5Password = MD5Compute(password);
             using (RubbishRecycleContext context = new RubbishRecycleContext())
             {
-                Account account = context.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == MD5Compute(password)));
+                Account account = context.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == md5Password));
                 return account;
             }
         }
