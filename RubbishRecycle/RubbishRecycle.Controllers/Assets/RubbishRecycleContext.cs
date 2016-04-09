@@ -25,7 +25,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Nested class
 #if DEBUG
-        private class RubbishRecycleDBInitializer : DropCreateDatabaseIfModelChanges<RubbishRecycleContext>
+        private class RubbishRecycleDBInitializer : CreateDatabaseIfNotExists<RubbishRecycleContext>
         {
             protected override void Seed(RubbishRecycleContext context)
             {
