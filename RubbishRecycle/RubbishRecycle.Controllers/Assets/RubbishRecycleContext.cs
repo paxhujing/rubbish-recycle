@@ -25,7 +25,12 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Nested class
 #if DEBUG
-        private class RubbishRecycleDBInitializer : CreateDatabaseIfNotExists<RubbishRecycleContext>
+        private class RubbishRecycleDBInitializer :
+#if REBUILD
+            CreateDatabaseIfNotExists<RubbishRecycleContext>
+#else
+            DropCreateDatabaseIfModelChanges<RubbishRecycleContext>
+#endif
         {
             protected override void Seed(RubbishRecycleContext context)
             {
@@ -48,7 +53,7 @@ namespace RubbishRecycle.Controllers.Assets
         }
 #endif
 
-        #endregion
+#endregion
 
         #region Methods
 
