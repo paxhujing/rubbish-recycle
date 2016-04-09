@@ -87,19 +87,17 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("GetVerifyCode")]
-        public String GetVerifyCode([FromBody]String encryptedJson)
+        public VerifyCodeSmsResult GetVerifyCode([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             VerifyCodeRequest request = JsonConvert.DeserializeObject<VerifyCodeRequest>(json);
-            SmsResult result = TaoBaoSms.SendVerifyCode(request.BindingPhone, request.RoleId);
-            json = JsonConvert.SerializeObject(result);
-            return AccountController.RSAProvider.Encrypt(json);
+            return TaoBaoSms.SendVerifyCode(request.BindingPhone, request.RoleId);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public String Login([FromBody]String encryptedJson)
+        public LoginResult Login([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
@@ -110,7 +108,7 @@ namespace RubbishRecycle.Controllers
                 Account account = VerifyAccount(loginInfo.Name, loginInfo.Password);
                 if (account != null)
                 {
-                    return EncryptLoginResponseMessage(secretKey, account);
+                    return InitAccountToken(secretKey, account); ;
                 }
             }
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
@@ -119,7 +117,7 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterSaler")]
-        public String RegisterSaler([FromBody]String encryptedJson)
+        public LoginResult RegisterSaler([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
@@ -129,7 +127,7 @@ namespace RubbishRecycle.Controllers
                 Account account = null;
                 if (TryRegisterAccount(registerInfo, "saler",out account))
                 {
-                    return EncryptLoginResponseMessage(secretKey, account);
+                    return InitAccountToken(secretKey, account); ;
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -138,7 +136,7 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterBuyer")]
-        public String RegisterBuyer([FromBody]String encryptedJson)
+        public LoginResult RegisterBuyer([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
@@ -148,10 +146,20 @@ namespace RubbishRecycle.Controllers
                 Account account = null;
                 if (TryRegisterAccount(registerInfo, "buyer", out account))
                 {
-                    return EncryptLoginResponseMessage(secretKey, account);
+                    return InitAccountToken(secretKey, account); ;
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
+        }
+
+        [RubbishRecycleAuthorize]
+        public Account GetAccount()
+        {
+            AccountToken token = (AccountToken)base.ActionContext.Request.Properties["Token"];
+            using (RubbishRecycleContext context = new RubbishRecycleContext())
+            {
+                return context.Accounts.First(x => x.Id == token.AccountId);
+            }
         }
 
         #endregion
@@ -193,9 +201,22 @@ namespace RubbishRecycle.Controllers
         {
             using (RubbishRecycleContext context = new RubbishRecycleContext())
             {
-                Account account = context.Accounts.FirstOrDefault(x => x.Name == name && x.Password == MD5Compute(password));
+                Account account = context.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == MD5Compute(password)));
                 return account;
             }
+        }
+
+        /// <summary>
+        /// 加密登陆响应消息。
+        /// </summary>
+        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
+        /// <param name="account">客户端账号信息。</param>
+        /// <returns>加密消息。</returns>
+        private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
+        {
+            LoginResult result = InitAccountToken(secretKey, account);
+            String json = JsonConvert.SerializeObject(result);
+            return AccountController.RSAProvider.Encrypt(json);
         }
 
         /// <summary>
@@ -216,19 +237,6 @@ namespace RubbishRecycle.Controllers
         }
 
         /// <summary>
-        /// 加密登陆响应消息。
-        /// </summary>
-        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
-        /// <param name="account">客户端账号信息。</param>
-        /// <returns>加密消息。</returns>
-        private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
-        {
-            LoginResult result = InitAccountToken(secretKey, account);
-            String json = JsonConvert.SerializeObject(result);
-            return AccountController.RSAProvider.Encrypt(json);
-        }
-
-        /// <summary>
         /// 创建通信的安全上下文。
         /// </summary>
         /// <param name="actionContext"></param>
@@ -241,11 +249,11 @@ namespace RubbishRecycle.Controllers
                 //创建安全上下文
                 ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, AccountController.GlobalIV);
                 ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, AccountController.GlobalIV);
-                AccountSecurityContext context = new AccountSecurityContext(encryptor, decryptor);
+                AESCryptor cryptor = new AESCryptor(encryptor, decryptor);
                 //生成令牌
                 String temp = String.Format("{0}{1}{2}{3}", secretKey.GetHashCode(), DateTime.Now.Ticks, account.Name, account.Password);
                 String token = MD5Compute(temp);
-                AccountToken accountToken = new AccountToken(token, context);
+                AccountToken accountToken = new AccountToken(token, account.Id, cryptor);
                 accountToken.Role = account.RoleId;
                 return accountToken;
             }

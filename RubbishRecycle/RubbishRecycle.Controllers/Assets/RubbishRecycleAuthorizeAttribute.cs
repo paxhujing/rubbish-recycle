@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -13,7 +14,7 @@ namespace RubbishRecycle.Controllers.Assets
     {
         #region Fields
 
-        private static readonly Dictionary<Int32, IEnumerable<String>> RolesCache;
+        private static readonly ConcurrentDictionary<Int32, IEnumerable<String>> RolesCache;
 
         #endregion
 
@@ -21,42 +22,31 @@ namespace RubbishRecycle.Controllers.Assets
 
         static RubbishRecycleAuthorizeAttribute()
         {
-            RolesCache = new Dictionary<Int32, IEnumerable<String>>();
+            RolesCache = new ConcurrentDictionary<Int32, IEnumerable<String>>();
         }
 
         #endregion
 
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            AuthenticationHeaderValue authenticationHeader = actionContext.Request.Headers.Authorization;
-            if (authenticationHeader != null)
+            AccountToken accountToken = actionContext.Request.GetTokenByRequestHeader();
+            if (accountToken != null)
             {
-                String token = authenticationHeader.Parameter;
-                if (!String.IsNullOrWhiteSpace(token))
+                if (String.IsNullOrWhiteSpace(base.Roles))
                 {
-                    AccountToken accountToken = AccountTokenManager.Manager[token];
-                    if (accountToken != null)
+                    IsAuthorized(actionContext);
+                    actionContext.Request.Properties.Add("Token", accountToken);
+                    return;
+                }
+                else
+                {
+                    Int32 hash = actionContext.ActionDescriptor.GetHashCode();
+                    RolesCache.GetOrAdd(hash, base.Roles.Split(';'));
+                    if (RolesCache[hash].Contains(accountToken.Role))
                     {
-                        if (String.IsNullOrWhiteSpace(base.Roles))
-                        {
-                            IsAuthorized(actionContext);
-                            actionContext.Request.Properties.Add("Token", accountToken);
-                            return;
-                        }
-                        else
-                        {
-                            Int32 hash = actionContext.ActionDescriptor.GetHashCode();
-                            if (!RolesCache.ContainsKey(hash))
-                            {
-                                RolesCache.Add(hash, base.Roles.Split(';'));
-                            }
-                            if (RolesCache[hash].Contains(accountToken.Role))
-                            {
-                                IsAuthorized(actionContext);
-                                actionContext.Request.Properties.Add("Token", accountToken);
-                                return;
-                            }
-                        }
+                        IsAuthorized(actionContext);
+                        actionContext.Request.Properties.Add("Token", accountToken);
+                        return;
                     }
                 }
             }

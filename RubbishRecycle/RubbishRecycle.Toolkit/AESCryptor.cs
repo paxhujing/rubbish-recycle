@@ -6,18 +6,21 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RubbishRecycle.Controllers.Assets
+namespace RubbishRecycle.Toolkit
 {
-    internal class AccountSecurityContext
+    /// <summary>
+    /// AES 加密/解密器。
+    /// </summary>
+    public class AESCryptor
     {
         #region Constructors
 
         /// <summary>
-        /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountSecurityContext 实例。
+        /// 初始化类型 RubbishRecycle.Controllers.Assets.AESCryptor 实例。
         /// </summary>
         /// <param name="encryptor">加密器。</param>
         /// <param name="decryptor">解密器。</param>
-        public AccountSecurityContext(ICryptoTransform encryptor, ICryptoTransform decryptor)
+        public AESCryptor(ICryptoTransform encryptor, ICryptoTransform decryptor)
         {
             this._encryptor = encryptor;
             this._decryptor = decryptor;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RubbishRecycle.Toolkit;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,11 +17,13 @@ namespace RubbishRecycle.Controllers.Assets
         /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountToken 实例。
         /// </summary>
         /// <param name="token">令牌。</param>
-        /// <param name="context">安全上下文。</param>
-        public AccountToken(String token, AccountSecurityContext context)
+        /// <param name="accountId">账号Id。</param>
+        /// <param name="cryptor">AES 加密/解密器。</param>
+        public AccountToken(String token,Int32 accountId, AESCryptor cryptor)
         {
-            this._securityContext = context;
             this._token = token;
+            this._accountId = accountId;
+            this._cryptor = cryptor;
         }
 
         #endregion
@@ -50,15 +53,28 @@ namespace RubbishRecycle.Controllers.Assets
 
         #endregion
 
+        #region AccountId
+
+        private readonly Int32 _accountId;
+        /// <summary>
+        /// 账号Id。
+        /// </summary>
+        public Int32 AccountId
+        {
+            get { return this._accountId; }
+        }
+
+        #endregion
+
         #region Context
 
-        private readonly AccountSecurityContext _securityContext;
+        private readonly AESCryptor _cryptor;
         /// <summary>
-        /// 安全上下文。
+        /// AES 加密/解密器。
         /// </summary>
-        public AccountSecurityContext SecurityContext
+        public AESCryptor Cryptor
         {
-            get { return this._securityContext; }
+            get { return this._cryptor; }
         }
 
         #endregion

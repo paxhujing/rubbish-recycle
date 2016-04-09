@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    /// <summary>
-    /// 短信请求结果。
-    /// </summary>
-    public struct SmsResult
+    public struct VerifyCodeSmsResult
     {
+        [JsonProperty("code")]
+        public String Code;
+
         [JsonProperty("extend")]
         public String Extend;
 

@@ -18,14 +18,14 @@ namespace RubbishRecycle.Models
         /// 角色名称。
         /// </summary>
         [Key]
-        [MaxLength(20)]
+        [StringLength(20)]
         [Column("id")]
         public String Id { get; set; }
 
         /// <summary>
         /// 描述。
         /// </summary>
-        [MaxLength(30)]
+        [StringLength(30)]
         [Column("description")]
         public String Description { get; set; }
     }

@@ -16,7 +16,7 @@ namespace RubbishRecycle.Controllers.Assets
         public RubbishRecycleContext()
             : base("name=RubbishRecycleContext")
         {
-            //Database.SetInitializer(new RubbishRecycleDBInitializer());
+            Database.SetInitializer(new RubbishRecycleDBInitializer());
         }
 
         #endregion
@@ -27,6 +27,10 @@ namespace RubbishRecycle.Controllers.Assets
         {
             protected override void Seed(RubbishRecycleContext context)
             {
+                context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_name on account (name)");
+                context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_phone on account (binding_phone)");
+                context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_roleid on account (role_id)");
+
                 Role saler = new Role();
                 saler.Id = "saler";
                 saler.Description = "卖家";
@@ -45,11 +49,11 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        //{
-        //    modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-        //    base.OnModelCreating(modelBuilder);
-        //}
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            base.OnModelCreating(modelBuilder);
+        }
 
         #endregion
 

@@ -59,12 +59,19 @@
                              Grid.Row="2"
                              Grid.Column="0"
                              VerticalContentAlignment="Center" />
+                <TextBlock Grid.Row="0"
+                           Grid.Column="1"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"
+                           Margin="10,0">
+                    <Hyperlink x:Name="Register" Click="Register_Click">注册？</Hyperlink>
+                </TextBlock>
                 <TextBlock Grid.Row="2"
                            Grid.Column="1"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Left"
                            Margin="10,0">
-                <Hyperlink x:Name="ForgetPassword">忘记密码？</Hyperlink>
+                    <Hyperlink x:Name="ForgetPassword" Click="ForgetPassword_Click">忘记密码？</Hyperlink>
                 </TextBlock>
                 <StackPanel x:Name="StackLayout"
                             Orientation="Horizontal"

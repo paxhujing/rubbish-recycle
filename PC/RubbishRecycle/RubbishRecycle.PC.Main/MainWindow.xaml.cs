@@ -1,4 +1,5 @@
-﻿using RubbishRecycle.PC.Communication;
+﻿using RubbishRecycle.Models;
+using RubbishRecycle.PC.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,13 +24,18 @@ namespace RubbishRecycle.PC.Main
     {
         #region Fields
 
-
+        private readonly AccountProxy _proxy = new AccountProxy();
 
         #endregion
 
         public MainWindow()
         {
             InitializeComponent();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Account account = this._proxy.GetAccount(App.Token,App.AESProvider);
         }
     }
 }

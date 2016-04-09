@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
@@ -24,7 +20,7 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 账户名称。
         /// </summary>
-        [MaxLength(20)]
+        [StringLength(20)]
         [Required(AllowEmptyStrings = false)]
         [Column("name")]
         public String Name { get; set; }
@@ -32,7 +28,7 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 密码。
         /// </summary>
-        [MaxLength(80)]
+        [StringLength(80)]
         [Required(AllowEmptyStrings = false)]
         [Column("password")]
         public String Password { get; set; }
@@ -40,7 +36,7 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 绑定的手机号。
         /// </summary>
-        [MaxLength(13)]
+        [StringLength(13)]
         [Required(AllowEmptyStrings = false)]
         [Column("binding_phone")]
         public String BindingPhone { get; set; }
@@ -66,6 +62,7 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 角色Id。
         /// </summary>
+        [StringLength(20)]
         [Column("role_id")]
         public String RoleId { get; set; }
     }

@@ -24,7 +24,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public static SmsResult SendVerifyCode(String bindingPhone, String roleId)
+        public static VerifyCodeSmsResult SendVerifyCode(String bindingPhone, String roleId)
         {
             SmsConfigSection smsConfig = RCManager.SmsConfig;
             if (smsConfig == null) throw new MissingMemberException("miss section 'sms' in config file");
@@ -42,7 +42,7 @@ namespace RubbishRecycle.Controllers.Assets
             request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【收破烂】\"}}", code);
             //api/account/GetVerifyCode?bindingPhone=18284559968&roleId=saler
             AlibabaAliqinFcSmsNumSendResponse response = client.Execute(request);
-            SmsResult result = new SmsResult();
+            VerifyCodeSmsResult result = new VerifyCodeSmsResult();
             if (!response.IsError)
             {
                 result.Code = code;

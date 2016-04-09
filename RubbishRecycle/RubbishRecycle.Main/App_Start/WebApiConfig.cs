@@ -20,7 +20,7 @@ namespace RubbishRecycle.Main
 
             DelegatingHandler[] sessionMessageHandlers = new DelegatingHandler[]
             {
-                    new SessionMessageHandler()
+                new SessionMessageHandler()
             };
             HttpMessageHandler sessionHandler = HttpClientFactory.CreatePipeline(new HttpControllerDispatcher(config), sessionMessageHandlers);
             config.Routes.MapHttpRoute(

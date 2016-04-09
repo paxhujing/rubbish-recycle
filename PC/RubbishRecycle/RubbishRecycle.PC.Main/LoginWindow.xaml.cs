@@ -46,18 +46,18 @@ namespace RubbishRecycle.PC.Main
             this._proxy.RequestCommunicationAsync(InitCallback);
         }
 
-        private void InitCallback(Task<HttpResponseMessage> r)
+        private void InitCallback(String publicKey)
         {
             Prompt.Dispatcher.Invoke(() =>
             {
                 Prompt.IsBusy = false;
             });
-            if (r.IsFaulted)
+            if (String.IsNullOrEmpty(publicKey))
             {
-                MessageBox.Show(r.Exception.Message);
+                MessageBox.Show("初始化失败！");
                 return;
             }
-            this._publicKey = r.Result.Content.ReadAsStringAsync().Result;
+            this._publicKey = publicKey;
         }
 
         #endregion
@@ -66,19 +66,64 @@ namespace RubbishRecycle.PC.Main
 
         private void StartLogin_Click(object sender, RoutedEventArgs e)
         {
+            e.Handled = true;
             DialogResult = true;
-            RijndaelManaged aesProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
-            Byte[] secretKey = aesProvider.Key;
+            Byte[] secretKey = App.AESProvider.Key;
             Models.RegisterInfo ri = new Models.RegisterInfo();
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";
             ri.SecretKey = secretKey;
             Models.LoginResult result = this._proxy.RegisterBuyer(ri, this._publicKey);
+            if (String.IsNullOrEmpty(result.Token))
+            {
+                MessageBox.Show("注册失败！");
+                return;
+            }
+            App.AESProvider.IV = result.IV;
         }
 
         #endregion
 
         #endregion
+
+        private void ForgetPassword_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        private void Register_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            Prompt.BusyContent = "注册中...";
+            Prompt.IsBusy = true;
+            Byte[] secretKey = App.AESProvider.Key;
+            Models.RegisterInfo ri = new Models.RegisterInfo();
+            ri.BindingPhone = "18284559968";
+            ri.Name = "hujing";
+            ri.Password = "123456";
+            ri.SecretKey = secretKey;
+            this._proxy.RegisterBuyerAsync(ri, this._publicKey, RegisterCallback);
+        }
+
+        private void RegisterCallback(Models.LoginResult result)
+        {
+            Prompt.Dispatcher.Invoke(() =>
+            {
+                Prompt.IsBusy = false;
+                if (String.IsNullOrEmpty(result.Token))
+                {
+                    MessageBox.Show("注册失败！");
+                    DialogResult = false;
+                    return;
+                }
+                else
+                {
+                    App.AESProvider.IV = result.IV;
+                    App.Token = result.Token;
+                    DialogResult = true;
+                }
+            });
+        }
     }
 }

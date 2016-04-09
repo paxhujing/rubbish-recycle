@@ -73,8 +73,8 @@
   <ItemGroup>
     <Compile Include="AccountController.cs" />
     <Compile Include="Assets\AccountToken.cs" />
-    <Compile Include="Assets\AccountSecurityContext.cs" />
     <Compile Include="Assets\AccountTokenManager.cs" />
+    <Compile Include="Assets\HttpHeaderHelper.cs" />
     <Compile Include="Assets\RubbishRecycleContext.cs" />
     <Compile Include="Assets\SessionMessageHandler.cs" />
     <Compile Include="Assets\RubbishRecycleAuthorizeAttribute.cs" />

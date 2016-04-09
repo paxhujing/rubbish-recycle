@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Cryptography;
 using System.Windows;
 
 namespace RubbishRecycle.PC.Main
@@ -13,6 +9,10 @@ namespace RubbishRecycle.PC.Main
     /// </summary>
     public partial class App : Application
     {
+        internal static readonly RijndaelManaged AESProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
+
+        internal static String Token;
+
         protected override void OnStartup(StartupEventArgs e)
         {
             ShutdownMode = ShutdownMode.OnExplicitShutdown;
