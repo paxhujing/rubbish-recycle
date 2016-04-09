@@ -153,6 +153,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [RubbishRecycleAuthorize]
+        [HttpGet]
         public Account GetAccount()
         {
             AccountToken token = (AccountToken)base.ActionContext.Request.Properties["Token"];
