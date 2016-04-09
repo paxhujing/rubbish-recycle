@@ -16,13 +16,15 @@ namespace RubbishRecycle.Controllers.Assets
         public RubbishRecycleContext()
             : base("name=RubbishRecycleContext")
         {
+#if DEBUG
             Database.SetInitializer(new RubbishRecycleDBInitializer());
+#endif
         }
 
         #endregion
 
         #region Nested class
-
+#if DEBUG
         private class RubbishRecycleDBInitializer : DropCreateDatabaseIfModelChanges<RubbishRecycleContext>
         {
             protected override void Seed(RubbishRecycleContext context)
@@ -44,6 +46,7 @@ namespace RubbishRecycle.Controllers.Assets
                 context.SaveChanges();
             }
         }
+#endif
 
         #endregion
 
