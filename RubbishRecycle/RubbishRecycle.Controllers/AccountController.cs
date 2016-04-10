@@ -1,20 +1,13 @@
 ﻿using RubbishRecycle.Controllers.Assets;
 using RubbishRecycle.Models;
 using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Web.Http;
 using System.Linq;
 using System.Text;
-using System.Web.Http.Controllers;
 using System.Net;
-using System.Collections.Generic;
 using Newtonsoft.Json;
-using System.Xml;
-using System.Data.Entity;
 using RubbishRecycle.Toolkit;
-using RubbishRecycle.Config;
 
 namespace RubbishRecycle.Controllers
 {
@@ -101,6 +94,11 @@ namespace RubbishRecycle.Controllers
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
+            LoginResult result;
+            if (IsTokenExsited(loginInfo.Name, loginInfo.Password, out result))
+            {
+                return result;
+            }
             Byte[] secretKey = loginInfo.SecretKey;
             if ((secretKey != null) && (secretKey.Length != 0))
             {
@@ -121,13 +119,21 @@ namespace RubbishRecycle.Controllers
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            Byte[] secretKey = registerInfo.SecretKey;
-            if ((secretKey != null) && (secretKey.Length != 0))
+            if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
             {
-                Account account = null;
-                if (TryRegisterAccount(registerInfo, "saler",out account))
+                LoginResult result;
+                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out result))
                 {
-                    return InitAccountToken(secretKey, account); ;
+                    return result;
+                }
+                Byte[] secretKey = registerInfo.SecretKey;
+                if ((secretKey != null) && (secretKey.Length != 0))
+                {
+                    Account account = null;
+                    if (TryRegisterAccount(registerInfo, "saler", out account))
+                    {
+                        return InitAccountToken(secretKey, account); ;
+                    }
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -140,13 +146,21 @@ namespace RubbishRecycle.Controllers
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            Byte[] secretKey = registerInfo.SecretKey;
-            if ((secretKey != null) && (secretKey.Length != 0))
+            if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
             {
-                Account account = null;
-                if (TryRegisterAccount(registerInfo, "buyer", out account))
+                LoginResult result;
+                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out result))
                 {
-                    return InitAccountToken(secretKey, account); ;
+                    return result;
+                }
+                Byte[] secretKey = registerInfo.SecretKey;
+                if ((secretKey != null) && (secretKey.Length != 0))
+                {
+                    Account account = null;
+                    if (TryRegisterAccount(registerInfo, "buyer", out account))
+                    {
+                        return InitAccountToken(secretKey, account); ;
+                    }
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -170,10 +184,10 @@ namespace RubbishRecycle.Controllers
         /// <summary>
         /// 注册用户信息。
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="password"></param>
-        /// <param name="isSaler"></param>
-        /// <returns></returns>
+        /// <param name="registerInfo">注册信息。</param>
+        /// <param name="roleId">角色Id。</param>
+        /// <param name="account">账户信息。</param>
+        /// <returns>成功返回true；否则返回false。</returns>
         private Boolean TryRegisterAccount(RegisterInfo registerInfo, String roleId, out Account account)
         {
             account = null;
@@ -182,7 +196,7 @@ namespace RubbishRecycle.Controllers
                 account = new Account();
                 account.RoleId = roleId;
                 account.Id = Guid.NewGuid().GetHashCode();
-                account.Name = registerInfo.Name;
+                account.Name = String.IsNullOrWhiteSpace(registerInfo.Name) ? registerInfo.BindingPhone : registerInfo.Name;
                 account.BindingPhone = registerInfo.BindingPhone;
                 account.Password = MD5Compute(registerInfo.Password);
                 account.LastLogin = DateTime.Now;
@@ -197,7 +211,7 @@ namespace RubbishRecycle.Controllers
         /// </summary>
         /// <param name="name">账户名。</param>
         /// <param name="password">密码。</param>
-        /// <returns></returns>
+        /// <returns>账户信息。</returns>
         private Account VerifyAccount(String name, String password)
         {
             String md5Password = MD5Compute(password);
@@ -209,25 +223,11 @@ namespace RubbishRecycle.Controllers
         }
 
         /// <summary>
-        /// 加密登陆响应消息。
-        /// </summary>
-        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
-        /// <param name="account">客户端账号信息。</param>
-        /// <returns>加密消息。</returns>
-        private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
-        {
-            LoginResult result = InitAccountToken(secretKey, account);
-            String json = JsonConvert.SerializeObject(result);
-            return AccountController.RSAProvider.Encrypt(json);
-        }
-
-        /// <summary>
         /// 初始化账户令牌。
         /// </summary>
-        /// <param name="secretKey"></param>
-        /// <param name="account"></param>
-        /// <param name="accountType"></param>
-        /// <returns></returns>
+        /// <param name="secretKey">客户端密钥。</param>
+        /// <param name="account">账户信息。</param>
+        /// <returns>登陆结果。</returns>
         private LoginResult InitAccountToken(Byte[] secretKey, Account account)
         {
             AccountToken accountToken = CreateAccountToken(secretKey, account);
@@ -239,11 +239,11 @@ namespace RubbishRecycle.Controllers
         }
 
         /// <summary>
-        /// 创建通信的安全上下文。
+        /// 创建账户的Token。
         /// </summary>
-        /// <param name="actionContext"></param>
-        /// <param name="response"></param>
-        /// <returns></returns>
+        /// <param name="secretKey">客户端密钥。</param>
+        /// <param name="account">账户信息。</param>
+        /// <returns>账户Token。</returns>
         private AccountToken CreateAccountToken(Byte[] secretKey, Account account)
         {
             try
@@ -252,10 +252,8 @@ namespace RubbishRecycle.Controllers
                 ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, AccountController.GlobalIV);
                 ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, AccountController.GlobalIV);
                 AESCryptor cryptor = new AESCryptor(encryptor, decryptor);
-                //生成令牌
-                String temp = String.Format("{0}{1}{2}{3}", secretKey.GetHashCode(), DateTime.Now.Ticks, account.Name, account.Password);
-                String token = MD5Compute(temp);
-                AccountToken accountToken = new AccountToken(token, account.Id, cryptor);
+                Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(account.Name, account.Password);
+                AccountToken accountToken = new AccountToken(account.Id, tokenMapKey, cryptor);
                 accountToken.Role = account.RoleId;
                 return accountToken;
             }
@@ -269,9 +267,43 @@ namespace RubbishRecycle.Controllers
             }
         }
 
+        /// <summary>
+        /// 用户是否已经登陆。
+        /// </summary>
+        /// <param name="name">用户名。</param>
+        /// <param name="password">密码。</param>
+        /// <param name="result">如果已经登陆，则表示登陆结果。</param>
+        /// <returns>如果已经登陆则返回true；否则返回false。</returns>
+        private Boolean IsTokenExsited(String name,String password,out LoginResult result)
+        {
+            result = new LoginResult();
+            Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(name, password);
+            AccountToken accountToken = AccountTokenManager.Manager.GetTokenByMapKey(tokenMapKey);
+            if (accountToken != null)
+            {
+                result.Token = accountToken.Token;
+                result.IV = AccountController.GlobalIV;
+                return true;
+            }
+            return false;
+        }
+
         #endregion
 
         #region Misc
+
+        /// <summary>
+        /// 加密登陆响应消息。
+        /// </summary>
+        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
+        /// <param name="account">客户端账号信息。</param>
+        /// <returns>加密消息。</returns>
+        //private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
+        //{
+        //    LoginResult result = InitAccountToken(secretKey, account);
+        //    String json = JsonConvert.SerializeObject(result);
+        //    return AccountController.RSAProvider.Encrypt(json);
+        //}
 
         /// <summary>
         /// 计算字符串的MD5值。
