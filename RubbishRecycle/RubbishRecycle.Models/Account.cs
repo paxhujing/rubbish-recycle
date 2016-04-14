@@ -65,5 +65,8 @@ namespace RubbishRecycle.Models
         [StringLength(20)]
         [Column("role_id")]
         public String RoleId { get; set; }
+
+        [Column("is_reesed")]
+        public Boolean IsFreezed { get; set; }
     }
 }

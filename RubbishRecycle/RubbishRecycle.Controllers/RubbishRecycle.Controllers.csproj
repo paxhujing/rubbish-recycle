@@ -74,6 +74,7 @@
     <Compile Include="AccountController.cs" />
     <Compile Include="Assets\AccountToken.cs" />
     <Compile Include="Assets\AccountTokenManager.cs" />
+    <Compile Include="Assets\AppGlobal.cs" />
     <Compile Include="Assets\HttpHeaderHelper.cs" />
     <Compile Include="Assets\RubbishRecycleContext.cs" />
     <Compile Include="Assets\SessionMessageHandler.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="Assets\TaoBaoSms.cs" />
     <Compile Include="OrderController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\RubbishRecycle.Config\RubbishRecycle.Config.csproj">
@@ -90,6 +92,10 @@
     <ProjectReference Include="..\RubbishRecycle.Models\RubbishRecycle.Models.csproj">
       <Project>{0d3991e1-cf5c-4b6d-ab87-e2cbd724f3e8}</Project>
       <Name>RubbishRecycle.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RubbishRecycle.Repositories\RubbishRecycle.Repositories.csproj">
+      <Project>{057fd72f-da08-4dcf-a0a8-b809906de5d0}</Project>
+      <Name>RubbishRecycle.Repositories</Name>
     </ProjectReference>
     <ProjectReference Include="..\RubbishRecycle.Toolkit\RubbishRecycle.Toolkit.csproj">
       <Project>{87590789-af8d-4fa3-8484-7c6b5fb3e80b}</Project>

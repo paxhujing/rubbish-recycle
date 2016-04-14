@@ -8,6 +8,8 @@ using System.Text;
 using System.Net;
 using Newtonsoft.Json;
 using RubbishRecycle.Toolkit;
+using RubbishRecycle.Repositories;
+using RubbishRecycle.Controllers.Repositories;
 
 namespace RubbishRecycle.Controllers
 {
@@ -34,6 +36,8 @@ namespace RubbishRecycle.Controllers
 
         private static readonly MD5CryptoServiceProvider MD5Provider;
 
+        private readonly IAccountRepository<RubbishRecycleContext> _repository;
+
         #endregion
 
         #region Constructors
@@ -54,7 +58,7 @@ namespace RubbishRecycle.Controllers
 
         public AccountController()
         {
-
+            this._repository = new AccountRepository(AppGlobal.DbContext);
         }
 
         #endregion
@@ -94,7 +98,7 @@ namespace RubbishRecycle.Controllers
                 return token;
             }
             //验证用户
-            Account account = VerifyAccount(loginInfo.Name, loginInfo.Password);
+            Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
             if (account != null)
             {
                 return InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account); ;
@@ -148,15 +152,12 @@ namespace RubbishRecycle.Controllers
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
         }
 
+        [RubbishRecycleAuthorize(Roles = "admin")]
         [RubbishRecycleAuthorize]
         [HttpGet]
-        public Account GetAccount()
+        public IQueryable<Account> GetAllAccounts()
         {
-            AccountToken token = (AccountToken)base.ActionContext.Request.Properties["Token"];
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                return context.Accounts.First(x => x.Id == token.AccountId);
-            }
+            return this._repository.GetAllAccounts();
         }
 
         #endregion
@@ -172,36 +173,15 @@ namespace RubbishRecycle.Controllers
         /// <returns>成功返回true；否则返回false。</returns>
         private Boolean TryRegisterAccount(RegisterInfo registerInfo, String roleId, out Account account)
         {
-            account = null;
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                account = new Account();
-                account.RoleId = roleId;
-                account.Id = Guid.NewGuid().GetHashCode();
-                account.Name = String.IsNullOrWhiteSpace(registerInfo.Name) ? registerInfo.BindingPhone : registerInfo.Name;
-                account.BindingPhone = registerInfo.BindingPhone;
-                account.Password = MD5Compute(registerInfo.Password);
-                account.LastLogin = DateTime.Now;
-                context.Accounts.Add(account);
-                Int32 result = context.SaveChanges();
-                return result != 0;
-            }
-        }
-
-        /// <summary>
-        /// 验证用户信息。
-        /// </summary>
-        /// <param name="name">账户名。</param>
-        /// <param name="password">密码。</param>
-        /// <returns>账户信息。</returns>
-        private Account VerifyAccount(String name, String password)
-        {
-            String md5Password = MD5Compute(password);
-            using (RubbishRecycleContext context = new RubbishRecycleContext())
-            {
-                Account account = context.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == md5Password));
-                return account;
-            }
+            account = new Account();
+            account.RoleId = roleId;
+            account.Id = Guid.NewGuid().GetHashCode();
+            account.Name = String.IsNullOrWhiteSpace(registerInfo.Name) ? registerInfo.BindingPhone : registerInfo.Name;
+            account.BindingPhone = registerInfo.BindingPhone;
+            account.Password = CryptoHelper.MD5Compute(registerInfo.Password);
+            account.LastLogin = DateTime.Now;
+            account = this._repository.AddAccount(account);
+            return account != null;
         }
 
         /// <summary>
@@ -284,18 +264,6 @@ namespace RubbishRecycle.Controllers
         //    String json = JsonConvert.SerializeObject(result);
         //    return AccountController.RSAProvider.Encrypt(json);
         //}
-
-        /// <summary>
-        /// 计算字符串的MD5值。
-        /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        private String MD5Compute(String str)
-        {
-            Byte[] data = Encoding.UTF8.GetBytes(str);
-            data = AccountController.MD5Provider.ComputeHash(data);
-            return Convert.ToBase64String(data);
-        }
 
         #endregion
 

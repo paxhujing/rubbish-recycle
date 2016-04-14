@@ -41,5 +41,6 @@ namespace RubbishRecycle.Models
         /// </summary>
         [JsonProperty("password")]
         public String Password;
+
     }
 }
