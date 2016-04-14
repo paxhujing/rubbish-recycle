@@ -30,10 +30,6 @@ namespace RubbishRecycle.Controllers
 
         private static readonly RijndaelManaged AESProvider;
 
-        private static readonly Byte[] GlobalIV;
-
-        //private static readonly String GlobalIVBase64String;
-
         #endregion
 
         private static readonly MD5CryptoServiceProvider MD5Provider;
@@ -52,8 +48,6 @@ namespace RubbishRecycle.Controllers
 
             RijndaelManaged aesProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
             AccountController.AESProvider = aesProvider;
-            AccountController.GlobalIV = aesProvider.IV;
-            //AccountController.GlobalIVBase64String = Convert.ToBase64String(AccountController.GlobalIV);
 
             AccountController.MD5Provider = new MD5CryptoServiceProvider();
         }
@@ -90,24 +84,20 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public LoginResult Login([FromBody]String encryptedJson)
+        public String Login([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
-            LoginResult result;
-            if (IsTokenExsited(loginInfo.Name, loginInfo.Password, out result))
+            String token;
+            if (IsTokenExsited(loginInfo.Name, loginInfo.Password, out token))
             {
-                return result;
+                return token;
             }
-            Byte[] secretKey = loginInfo.SecretKey;
-            if ((secretKey != null) && (secretKey.Length != 0))
+            //验证用户
+            Account account = VerifyAccount(loginInfo.Name, loginInfo.Password);
+            if (account != null)
             {
-                //验证用户
-                Account account = VerifyAccount(loginInfo.Name, loginInfo.Password);
-                if (account != null)
-                {
-                    return InitAccountToken(secretKey, account); ;
-                }
+                return InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account); ;
             }
             throw new HttpResponseException(HttpStatusCode.Unauthorized);
         }
@@ -115,25 +105,21 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterSaler")]
-        public LoginResult RegisterSaler([FromBody]String encryptedJson)
+        public String RegisterSaler([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
             if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
             {
-                LoginResult result;
-                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out result))
+                String token;
+                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out token))
                 {
-                    return result;
+                    return token;
                 }
-                Byte[] secretKey = registerInfo.SecretKey;
-                if ((secretKey != null) && (secretKey.Length != 0))
+                Account account = null;
+                if (TryRegisterAccount(registerInfo, "saler", out account))
                 {
-                    Account account = null;
-                    if (TryRegisterAccount(registerInfo, "saler", out account))
-                    {
-                        return InitAccountToken(secretKey, account); ;
-                    }
+                    return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account); ;
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -142,25 +128,21 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterBuyer")]
-        public LoginResult RegisterBuyer([FromBody]String encryptedJson)
+        public String RegisterBuyer([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
             if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
             {
-                LoginResult result;
-                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out result))
+                String token;
+                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out token))
                 {
-                    return result;
+                    return token;
                 }
-                Byte[] secretKey = registerInfo.SecretKey;
-                if ((secretKey != null) && (secretKey.Length != 0))
+                Account account = null;
+                if (TryRegisterAccount(registerInfo, "buyer", out account))
                 {
-                    Account account = null;
-                    if (TryRegisterAccount(registerInfo, "buyer", out account))
-                    {
-                        return InitAccountToken(secretKey, account); ;
-                    }
+                    return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account); ;
                 }
             }
             throw new HttpResponseException(HttpStatusCode.NotAcceptable);
@@ -226,31 +208,30 @@ namespace RubbishRecycle.Controllers
         /// 初始化账户令牌。
         /// </summary>
         /// <param name="secretKey">客户端密钥。</param>
+        /// <param name="iv">客户端加密向量。</param>
         /// <param name="account">账户信息。</param>
-        /// <returns>登陆结果。</returns>
-        private LoginResult InitAccountToken(Byte[] secretKey, Account account)
+        /// <returns>登陆Token。</returns>
+        private String InitAccountToken(Byte[] secretKey,Byte[] iv, Account account)
         {
-            AccountToken accountToken = CreateAccountToken(secretKey, account);
+            AccountToken accountToken = CreateAccountToken(secretKey, iv, account);
             AccountTokenManager.Manager.Add(accountToken);
-            LoginResult result = new LoginResult();
-            result.Token = accountToken.Token;
-            result.IV = AccountController.GlobalIV;
-            return result;
+            return accountToken.Token;
         }
 
         /// <summary>
         /// 创建账户的Token。
         /// </summary>
         /// <param name="secretKey">客户端密钥。</param>
+        /// <param name="iv">客户端加密向量。</param>
         /// <param name="account">账户信息。</param>
         /// <returns>账户Token。</returns>
-        private AccountToken CreateAccountToken(Byte[] secretKey, Account account)
+        private AccountToken CreateAccountToken(Byte[] secretKey,Byte[] iv, Account account)
         {
             try
             {
                 //创建安全上下文
-                ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, AccountController.GlobalIV);
-                ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, AccountController.GlobalIV);
+                ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, iv);
+                ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, iv);
                 AESCryptor cryptor = new AESCryptor(encryptor, decryptor);
                 Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(account.Name, account.Password);
                 AccountToken accountToken = new AccountToken(account.Id, tokenMapKey, cryptor);
@@ -272,19 +253,18 @@ namespace RubbishRecycle.Controllers
         /// </summary>
         /// <param name="name">用户名。</param>
         /// <param name="password">密码。</param>
-        /// <param name="result">如果已经登陆，则表示登陆结果。</param>
+        /// <param name="token">登陆token。</param>
         /// <returns>如果已经登陆则返回true；否则返回false。</returns>
-        private Boolean IsTokenExsited(String name,String password,out LoginResult result)
+        private Boolean IsTokenExsited(String name, String password, out String token)
         {
-            result = new LoginResult();
             Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(name, password);
             AccountToken accountToken = AccountTokenManager.Manager.GetTokenByMapKey(tokenMapKey);
             if (accountToken != null)
             {
-                result.Token = accountToken.Token;
-                result.IV = AccountController.GlobalIV;
+                token = accountToken.Token;
                 return true;
             }
+            token = null;
             return false;
         }
 
