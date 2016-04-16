@@ -1,4 +1,5 @@
-﻿using RubbishRecycle.PC.Communication;
+﻿using RubbishRecycle.Models;
+using RubbishRecycle.PC.Communication;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -74,13 +75,12 @@ namespace RubbishRecycle.PC.Main
             ri.Name = "hujing";
             ri.Password = "123456";
             ri.SecretKey = secretKey;
-            Models.LoginResult result = this._proxy.RegisterBuyer(ri, this._publicKey);
-            if (String.IsNullOrEmpty(result.Token))
+            String token = this._proxy.RegisterBuyer(ri, this._publicKey);
+            if (String.IsNullOrEmpty(token))
             {
                 MessageBox.Show("注册失败！");
                 return;
             }
-            App.AESProvider.IV = result.IV;
         }
 
         #endregion
@@ -95,23 +95,28 @@ namespace RubbishRecycle.PC.Main
         private void Register_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
+            VerifyCodeRequest codeRequest = new VerifyCodeRequest();
+            codeRequest.BindingPhone = "15202815810";
+            codeRequest.RoleId = "buyer";
+            VerifyCodeSmsResult result = this._proxy.GetVerifyCode(codeRequest, this._publicKey);
+
             Prompt.BusyContent = "注册中...";
             Prompt.IsBusy = true;
-            Byte[] secretKey = App.AESProvider.Key;
             Models.RegisterInfo ri = new Models.RegisterInfo();
-            ri.BindingPhone = "18284559968";
-            ri.Name = "hujing";
+            ri.BindingPhone = "13281904422";
+            ri.Name = "huyucheng";
             ri.Password = "123456";
-            ri.SecretKey = secretKey;
+            ri.SecretKey = App.AESProvider.Key;
+            ri.IV = App.AESProvider.IV;
             this._proxy.RegisterBuyerAsync(ri, this._publicKey, RegisterCallback);
         }
 
-        private void RegisterCallback(Models.LoginResult result)
+        private void RegisterCallback(String token)
         {
             Prompt.Dispatcher.Invoke(() =>
             {
                 Prompt.IsBusy = false;
-                if (String.IsNullOrEmpty(result.Token))
+                if (String.IsNullOrEmpty(token))
                 {
                     MessageBox.Show("注册失败！");
                     DialogResult = false;
@@ -119,8 +124,7 @@ namespace RubbishRecycle.PC.Main
                 }
                 else
                 {
-                    App.AESProvider.IV = result.IV;
-                    App.Token = result.Token;
+                    App.Token = token;
                     DialogResult = true;
                 }
             });

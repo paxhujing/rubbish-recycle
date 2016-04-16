@@ -39,7 +39,19 @@ namespace RubbishRecycle.Controllers.Assets
             request.RecNum = bindingPhone;
             request.SmsTemplateCode = verifyCodeConfig.TemplateCode;
             String code = GenerateVerifyCode(verifyCodeConfig.Length);
-            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【收破烂】\"}}", code);
+            String roleName = null;
+            switch (roleId)
+            {
+                case "saler":
+                    roleName = "卖家方";
+                    break;
+                case "buyer":
+                    roleName = "买家方";
+                    break;
+                default:
+                    throw new InvalidOperationException();
+            }
+            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【收破烂】{1}\"}}", code, roleName);
             //api/account/GetVerifyCode?bindingPhone=18284559968&roleId=saler
             AlibabaAliqinFcSmsNumSendResponse response = client.Execute(request);
             VerifyCodeSmsResult result = new VerifyCodeSmsResult();

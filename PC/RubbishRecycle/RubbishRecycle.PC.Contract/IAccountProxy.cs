@@ -15,9 +15,11 @@ namespace RubbishRecycle.PC.Contract
 
         String RequestCommunication();
 
-        LoginResult RegisterBuyer(RegisterInfo info, String publicKey);
+        String RegisterBuyer(RegisterInfo info, String publicKey);
 
         Account GetAccount(String token, RijndaelManaged aesProvider);
+
+        VerifyCodeSmsResult GetVerifyCode(VerifyCodeRequest codeReuqest, String publicKey);
 
         #endregion
 
@@ -25,7 +27,7 @@ namespace RubbishRecycle.PC.Contract
 
         void RequestCommunicationAsync(Action<String> callback);
 
-        void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<LoginResult> callback);
+        void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<String> callback);
 
         #endregion
     }

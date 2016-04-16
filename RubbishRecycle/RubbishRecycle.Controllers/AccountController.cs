@@ -76,7 +76,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPost]
         [Route("GetVerifyCode")]
         public VerifyCodeSmsResult GetVerifyCode([FromBody]String encryptedJson)
         {

@@ -26,13 +26,12 @@ namespace RubbishRecycle.PC.Communication
             return publicKey;
         }
 
-        public LoginResult RegisterBuyer(RegisterInfo info,String publicKey)
+        public String RegisterBuyer(RegisterInfo info,String publicKey)
         {
             String str = RSAEncrypt(info, publicKey);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/RegisterBuyer");
             request.Content = new StringContent(str);
-            String json = base.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
-            return JsonConvert.DeserializeObject<LoginResult>(json);
+            return base.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
         }
 
         public Account GetAccount(String token, RijndaelManaged aesProvider)
@@ -46,6 +45,16 @@ namespace RubbishRecycle.PC.Communication
             return JsonConvert.DeserializeObject<Account>(json);
         }
 
+        public VerifyCodeSmsResult GetVerifyCode(VerifyCodeRequest codeReuqest, String publicKey)
+        {
+            String str = RSAEncrypt(codeReuqest, publicKey);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetVerifyCode");
+            request.Content = new StringContent(str);
+            HttpResponseMessage response = base.SendAsync(request).Result;
+            String json = response.Content.ReadAsStringAsync().Result;
+            return JsonConvert.DeserializeObject<VerifyCodeSmsResult>(json);
+        }
+
         #endregion
 
         #region Async
@@ -57,16 +66,15 @@ namespace RubbishRecycle.PC.Communication
             base.SendAsync(request).ContinueWith((r) => callback(r.Result.Content.ReadAsStringAsync().Result));
         }
 
-        public void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<LoginResult> callback)
+        public void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<String> callback)
         {
             String str = RSAEncrypt(info, publicKey);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/RegisterBuyer");
             request.Content = new StringContent(str);
             base.SendAsync(request).ContinueWith((r) =>
             {
-                String json = r.Result.Content.ReadAsStringAsync().Result;
-                LoginResult result = JsonConvert.DeserializeObject<LoginResult>(json);
-                callback(result);
+                String token = r.Result.Content.ReadAsStringAsync().Result;
+                callback(token);
             });
         }
 
