@@ -13,7 +13,6 @@ using System.Web.Http;
 
 namespace RubbishRecycle.Controllers
 {
-    [RoutePrefix("api/order")]
     public class OrderController : ApiController
     {
         #region Fields
@@ -31,7 +30,7 @@ namespace RubbishRecycle.Controllers
 
         #endregion
 
-        #region Methods
+        #region Actions
 
         [RubbishRecycleAuthorize(Roles = "admin")]
         [Route("GetOrders")]
