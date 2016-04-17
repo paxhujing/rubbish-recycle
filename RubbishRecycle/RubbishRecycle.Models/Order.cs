@@ -15,15 +15,11 @@ namespace RubbishRecycle.Models
         [Key]
         [MaxLength(36)]
         [Column("id")]
-        public String Id { get; private set; }
+        public String Id { get; set; }
 
         [MaxLength(36)]
         [Column("saler_id")]
         public String SalerId { get; set; }
-
-        [MaxLength(36)]
-        [Column("order_confirm_id")]
-        public String OrderConfirmId { get; set; }
 
         [Column("rubbish_type_id")]
         public Int32 RubbishTypeId { get; set; }
@@ -40,25 +36,15 @@ namespace RubbishRecycle.Models
         [Column("create_time")]
         public DateTime CreateTime { get; set; }
 
-        [Column("expire_time")]
-        public DateTime ExpireTime { get; set; }
-
         [MaxLength(255)]
         [Column("trading_address")]
         public String TradingAddress { get; set; }
-
-        [Column("order_state")]
-        public OrderState State { get; set; }
-
-        [Column("except_trading_time")]
-        public DateTime ExceptTradingTime { get; set; }
-
-        [Column("confirm_code")]
-        public String ConfirmCode { get; set; }
 
         [MaxLength(100)]
         [Required(AllowEmptyStrings = false)]
         [Column("description")]
         public String Description { get; set; }
+
+        public virtual ICollection<OrderStateTrace> States { get; set; }
     }
 }

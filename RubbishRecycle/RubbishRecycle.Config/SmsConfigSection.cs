@@ -30,6 +30,13 @@ namespace RubbishRecycle.Config
             set { base["appSecretKey"] = value; }
         }
 
+        [ConfigurationProperty("appName", IsRequired = true)]
+        public String AppName
+        {
+            get { return (String)base["appName"]; }
+            set { base["appName"] = value; }
+        }
+
         [ConfigurationProperty("format", IsRequired = false, DefaultValue = "json")]
         public String Format
         {

@@ -1,6 +1,8 @@
 ﻿using MySql.Data.MySqlClient;
 using RubbishRecycle.Controllers.Assets;
+using RubbishRecycle.Controllers.Repositories;
 using RubbishRecycle.Models;
+using RubbishRecycle.Repositories;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +18,7 @@ namespace RubbishRecycle.Controllers
     {
         #region Fields
 
-        IList<Order> _orders = new List<Order>();
+        private readonly IOrderRepository<RubbishRecycleContext> _orderRepository;
 
         #endregion
 
@@ -24,66 +26,51 @@ namespace RubbishRecycle.Controllers
 
         public OrderController()
         {
+            this._orderRepository = new OrderRepository(AppGlobal.DbContext);
         }
 
         #endregion
 
         #region Methods
 
-        [RubbishRecycleAuthorize(Roles = "Saler")]
+        [RubbishRecycleAuthorize(Roles = "admin")]
         [Route("GetOrders")]
         [HttpGet]
-        public IEnumerable<Order> GetOrders()
+        public IQueryable<Order> GetOrders(Int32 pageNo, Int32 pageSize =10)
         {
-            //using (RubbishRecycleContext context = new RubbishRecycleContext())
-            //{
-            //    return context.Orders;
-            //}
-            throw new NotImplementedException();
+            return this._orderRepository.GetOrders(pageSize, pageSize);
         }
 
-        [RubbishRecycleAuthorize(Roles = "Saler")]
-        [Route("GetOrderById")]
+        [RubbishRecycleAuthorize(Roles = "saler,buyer")]
+        [Route("GetOrders")]
         [HttpGet]
-        public Order GetOrderById(String id)
+        public IQueryable<Order> GetOrders(String salerId, Int32 pageNo, Int32 pageSize = 10)
         {
-            //using (RubbishRecycleContext context = new RubbishRecycleContext())
-            //{
-            //    Order order = context.Orders.FirstOrDefault(x => x.Id == id);
-            //    if (order == null)
-            //    {
-            //        throw new HttpResponseException(HttpStatusCode.NotFound);
-            //    }
-            //    return order;
-            //}
-            throw new NotImplementedException();
+            return this._orderRepository.GetOrders(salerId, pageNo, pageSize);
         }
 
-        [RubbishRecycleAuthorize(Roles = "Saler")]
-        [Route("AddOrder")]
-        [HttpPost]
-        public String AddOrder(Order order)
+        [RubbishRecycleAuthorize(Roles = "saler")]
+        [Route("GetOrder")]
+        [HttpGet]
+        public Order GetOrder(String id, String salerId)
         {
-            //using (RubbishRecycleContext context = new RubbishRecycleContext())
-            //{
-            //    Order added = context.Orders.Add(order);
-            //    context.SaveChanges();
-            //    return added.Id;
-            throw new NotImplementedException();
-            //}
+            return this._orderRepository.GetOrder(id, salerId);
         }
 
-        [RubbishRecycleAuthorize(Roles = "Saler")]
+        [RubbishRecycleAuthorize(Roles = "saler")]
         [Route("RemoveOrder")]
         [HttpDelete]
-        public void RemoveOrder(Order order)
+        public Boolean RemoveOrder(String id, String salerId)
         {
-            //using (RubbishRecycleContext context = new RubbishRecycleContext())
-            //{
-            //    context.Orders.Remove(order);
-            //    context.SaveChanges();
-            //}
-            throw new NotImplementedException();
+            return this._orderRepository.DeleteOrder(id, salerId);
+        }
+
+        [RubbishRecycleAuthorize(Roles = "saler")]
+        [Route("CreateOrder")]
+        [HttpPost]
+        public Order CreateOrder(Order order, out String message)
+        {
+            return this._orderRepository.CreateOrder(order, out message);
         }
 
         #endregion

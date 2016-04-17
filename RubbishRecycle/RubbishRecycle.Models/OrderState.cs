@@ -9,31 +9,48 @@ namespace RubbishRecycle.Models
     /// <summary>
     /// 订单状态。
     /// </summary>
-    public enum OrderState : byte
+    public enum OrderState
     {
         /// <summary>
         /// 审核中。
         /// </summary>
         Reviewing,
         /// <summary>
+        /// 未通过（交易流程结束）。
+        /// </summary>
+        NotPass,
+
+        /// <summary>
         /// 待确认。
         /// </summary>
         Waiting,
         /// <summary>
-        /// 过期。
+        /// 等待过期（交易流程结束）。
         /// </summary>
-        Expire,
+        WaitExpire,
+
         /// <summary>
-        /// 确定。
+        /// 确认中。
         /// </summary>
-        Confirm,
+        Confirming,
         /// <summary>
-        /// 完成。
+        /// 确认过期（交易流程结束）。
+        /// </summary>
+        ConfirmExpire,
+
+        /// <summary>
+        /// 线下交易中。
+        /// </summary>
+        Trading,
+        /// <summary>
+        /// 线下交易过期（交易流程结束）。
+        /// </summary>
+        TradeExpire,
+
+        /// <summary>
+        /// <summary>
+        /// 完成（交易流程结束）。
         /// </summary>
         Finish,
-        /// <summary>
-        /// 取消。
-        /// </summary>
-        Cancel,
     }
 }

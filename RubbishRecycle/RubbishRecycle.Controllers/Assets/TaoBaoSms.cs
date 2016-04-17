@@ -51,8 +51,8 @@ namespace RubbishRecycle.Controllers.Assets
                 default:
                     throw new InvalidOperationException();
             }
-            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【收破烂】{1}\"}}", code, roleName);
-            //api/account/GetVerifyCode?bindingPhone=18284559968&roleId=saler
+            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【{1}】{2}\"}}",
+                code, smsConfig.AppName, roleName);
             AlibabaAliqinFcSmsNumSendResponse response = client.Execute(request);
             VerifyCodeSmsResult result = new VerifyCodeSmsResult();
             if (!response.IsError)

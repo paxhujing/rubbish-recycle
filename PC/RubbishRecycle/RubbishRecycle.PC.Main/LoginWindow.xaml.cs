@@ -96,7 +96,7 @@ namespace RubbishRecycle.PC.Main
         {
             e.Handled = true;
             VerifyCodeRequest codeRequest = new VerifyCodeRequest();
-            codeRequest.BindingPhone = "15202815810";
+            codeRequest.BindingPhone = "13281904422";
             codeRequest.RoleId = "buyer";
             VerifyCodeSmsResult result = this._proxy.GetVerifyCode(codeRequest, this._publicKey);
 

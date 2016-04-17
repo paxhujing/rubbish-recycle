@@ -71,6 +71,10 @@ namespace RubbishRecycle.Controllers.Assets
 
         public DbSet<Role> Roles { get; set; }
 
+        public DbSet<Order> Orders { get; set; }
+
+        public DbSet<OrderStateTrace> OrderStates { get; set; }
+
         #endregion
     }
 }
