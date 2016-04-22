@@ -24,7 +24,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public static VerifyCodeSmsResult SendVerifyCode(String bindingPhone, String roleId)
+        public static String SendVerifyCode(String bindingPhone)
         {
             SmsConfigSection smsConfig = RCManager.SmsConfig;
             if (smsConfig == null) throw new MissingMemberException("miss section 'sms' in config file");
@@ -33,40 +33,21 @@ namespace RubbishRecycle.Controllers.Assets
             ITopClient client = new DefaultTopClient(smsConfig.ServerUrl, smsConfig.AppKey, smsConfig.AppSecretKey, smsConfig.Format);
 
             AlibabaAliqinFcSmsNumSendRequest request = new AlibabaAliqinFcSmsNumSendRequest();
-            request.Extend = roleId;
             request.SmsType = verifyCodeConfig.SmsType;
             request.SmsFreeSignName = verifyCodeConfig.SignName;
             request.RecNum = bindingPhone;
             request.SmsTemplateCode = verifyCodeConfig.TemplateCode;
             String code = GenerateVerifyCode(verifyCodeConfig.Length);
-            String roleName = null;
-            switch (roleId)
-            {
-                case "saler":
-                    roleName = "卖家方";
-                    break;
-                case "buyer":
-                    roleName = "买家方";
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
-            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【{1}】{2}\"}}",
-                code, smsConfig.AppName, roleName);
+            request.SmsParam = String.Format("{{\"code\":\"{0}\",\"product\":\"【{1}】\"}}", code, smsConfig.AppName);
             AlibabaAliqinFcSmsNumSendResponse response = client.Execute(request);
-            VerifyCodeSmsResult result = new VerifyCodeSmsResult();
             if (!response.IsError)
             {
-                result.Code = code;
-                result.Extend = roleId;
-                result.IsSuccess = true;
+                return code;
             }
             else
             {
-                result.IsSuccess = false;
-                result.Error = response.ErrMsg;
+                return null;
             }
-            return result;
         }
 
         private static String GenerateVerifyCode(Int32 count)
