@@ -70,7 +70,7 @@ namespace RubbishRecycle.PC.Main
             e.Handled = true;
             DialogResult = true;
             Byte[] secretKey = App.AESProvider.Key;
-            Models.RegisterInfo ri = new Models.RegisterInfo();
+            RegisterInfo ri = new RegisterInfo();
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";
@@ -95,14 +95,10 @@ namespace RubbishRecycle.PC.Main
         private void Register_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            VerifyCodeRequest codeRequest = new VerifyCodeRequest();
-            codeRequest.BindingPhone = "15202815810";
-            codeRequest.RoleId = "buyer";
-            VerifyCodeSmsResult result = this._proxy.GetVerifyCode(codeRequest, this._publicKey);
 
             Prompt.BusyContent = "注册中...";
             Prompt.IsBusy = true;
-            Models.RegisterInfo ri = new Models.RegisterInfo();
+            RegisterInfo ri = new RegisterInfo();
             ri.BindingPhone = "13281904422";
             ri.Name = "huyucheng";
             ri.Password = "123456";

@@ -20,7 +20,6 @@ namespace RubbishRecycle.Models
         [Column("order_id")]
         public String OrderId { get; set; }
 
-        [Timestamp]
         [Column("timestamp")]
         public DateTime Timestamp { get; set; }
 

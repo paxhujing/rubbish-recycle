@@ -19,7 +19,7 @@ namespace RubbishRecycle.PC.Contract
 
         Account GetAccount(String token, RijndaelManaged aesProvider);
 
-        VerifyCodeSmsResult GetVerifyCode(VerifyCodeRequest codeReuqest, String publicKey);
+        String GetVerifyCode(String bindingPhone);
 
         #endregion
 

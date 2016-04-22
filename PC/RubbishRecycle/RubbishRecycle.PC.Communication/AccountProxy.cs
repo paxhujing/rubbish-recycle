@@ -45,14 +45,12 @@ namespace RubbishRecycle.PC.Communication
             return JsonConvert.DeserializeObject<Account>(json);
         }
 
-        public VerifyCodeSmsResult GetVerifyCode(VerifyCodeRequest codeReuqest, String publicKey)
+        public String GetVerifyCode(String bindingPhone)
         {
-            String str = RSAEncrypt(codeReuqest, publicKey);
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetVerifyCode");
-            request.Content = new StringContent(str);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetVerifyCode?bindingPhone=" + bindingPhone);
+            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = base.SendAsync(request).Result;
-            String json = response.Content.ReadAsStringAsync().Result;
-            return JsonConvert.DeserializeObject<VerifyCodeSmsResult>(json);
+            return response.Content.ReadAsStringAsync().Result;
         }
 
         #endregion
