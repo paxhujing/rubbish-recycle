@@ -35,7 +35,7 @@ namespace RubbishRecycle.PC.Main
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            Account account = this._proxy.GetAccount(App.Token,App.AESProvider);
+            //Account account = this._proxy.GetAccount(App.Token,App.AESProvider);
         }
     }
 }

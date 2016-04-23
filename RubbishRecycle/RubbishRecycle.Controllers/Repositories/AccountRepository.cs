@@ -37,7 +37,7 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Account FindAccount(String name)
         {
-            return base.DbContext.Accounts.FirstOrDefault(x => x.Name == name);
+            return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name));
         }
 
         public Boolean FreezeAccount(String name)
@@ -76,6 +76,16 @@ namespace RubbishRecycle.Controllers.Repositories
             String md5Password = CryptoHelper.MD5Compute(password);
             Account account = base.DbContext.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == md5Password));
             return account;
+        }
+
+        public Boolean IsNameUsed(String name)
+        {
+            return base.DbContext.Accounts.Any(x => x.Name == name);
+        }
+
+        public Boolean IsPhoneBinded(String phone)
+        {
+            return base.DbContext.Accounts.Any(x => x.Name == phone);
         }
 
         #endregion

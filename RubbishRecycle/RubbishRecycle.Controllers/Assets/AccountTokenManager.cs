@@ -52,11 +52,11 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public AccountToken GetTokenByMapKey(Int32 tokenMapKey)
+        public AccountToken GetTokenByAccountId(Int32 accountId)
         {
-            if (this._mapToken.ContainsKey(tokenMapKey))
+            if (this._mapToken.ContainsKey(accountId))
             {
-                String token = this._mapToken[tokenMapKey];
+                String token = this._mapToken[accountId];
                 return GetAndUpdateAccountTokenLife(token);
             }
             return null;
@@ -67,14 +67,14 @@ namespace RubbishRecycle.Controllers.Assets
             base.InsertItem(index, item);
             item.life = AccountTokenManager.LifeTime;
             this._mapAccountToken.Add(item.Token, item);
-            this._mapToken.Add(item.TokenMapKey, item.Token);
+            this._mapToken.Add(item.AccountId, item.Token);
         }
 
         protected override void RemoveItem(Int32 index)
         {
             AccountToken accountToken = base.Items[index];
             this._mapAccountToken.Remove(accountToken.Token);
-            this._mapToken.Remove(accountToken.TokenMapKey);
+            this._mapToken.Remove(accountToken.AccountId);
             //如果accountToken本就是最后一项，就直接移除
             if (base.Count == (index + 1))
             {
@@ -129,7 +129,7 @@ namespace RubbishRecycle.Controllers.Assets
             foreach (AccountToken accountToken in lifeAccountTokens)
             {
                 newMapAccountToken.Add(accountToken.Token, accountToken);
-                newMapToken.Add(accountToken.TokenMapKey, accountToken.Token);
+                newMapToken.Add(accountToken.AccountId, accountToken.Token);
             }
             lock(this)
             {

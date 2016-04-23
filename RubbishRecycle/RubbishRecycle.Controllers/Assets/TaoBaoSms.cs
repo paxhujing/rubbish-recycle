@@ -24,7 +24,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public static String SendVerifyCode(String bindingPhone)
+        public static String SendVerifyCode(String bindingPhone,out String errorMessage)
         {
             SmsConfigSection smsConfig = RCManager.SmsConfig;
             if (smsConfig == null) throw new MissingMemberException("miss section 'sms' in config file");
@@ -42,10 +42,12 @@ namespace RubbishRecycle.Controllers.Assets
             AlibabaAliqinFcSmsNumSendResponse response = client.Execute(request);
             if (!response.IsError)
             {
+                errorMessage = null;
                 return code;
             }
             else
             {
+                errorMessage = response.ErrMsg;
                 return null;
             }
         }

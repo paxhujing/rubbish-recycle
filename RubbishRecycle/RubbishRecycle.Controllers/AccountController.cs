@@ -70,97 +70,115 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public String RequestCommunication()
+        public OperationResult<String> RequestCommunication()
         {
-            return AccountController.GlobalPublicKey;
+            return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
         }
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("GetVerifyCode")]
-        public String GetVerifyCode(String bindingPhone)
+        [Route("IsNameUsed")]
+        public OperationResult<Boolean> IsNameUsed(String name)
         {
-            return TaoBaoSms.SendVerifyCode(bindingPhone);
+            Boolean isUsed = this._repository.IsNameUsed(name);
+            OperationResult<Boolean> result = new OperationResult<Boolean>();
+            result.Data = isUsed;
+            return result;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("IsPhoneBinded")]
+        public OperationResult<Boolean> IsPhoneBinded(String phone)
+        {
+            Boolean isBinded = this._repository.IsPhoneBinded(phone);
+            OperationResult<Boolean> result = new OperationResult<Boolean>();
+            result.Data = isBinded;
+            return result;
+        }
+
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("GetRegisterVerifyCode")]
+        public OperationResult<String> GetRegisterVerifyCode(String bindingPhone)
+        {
+            String errorMessage;
+            String code = TaoBaoSms.SendVerifyCode(bindingPhone,out errorMessage);
+            return AppGlobal.GenerateResult<String>(code, errorMessage);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public String Login([FromBody]String encryptedJson)
+        public OperationResult<String> Login([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
-            String token;
-            if (IsTokenExsited(loginInfo.Name, loginInfo.Password, out token))
-            {
-                return token;
-            }
-            //验证用户
             Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+            String token = null;
             if (account != null)
             {
-                return InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account); ;
+                if (!IsTokenExsited(account, out token))
+                {
+                    token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
+                }
+                return AppGlobal.GenerateSuccessResult<String>(token);
             }
-            throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            return AppGlobal.GenerateErrorResult<String>("账户不存在");
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterSaler")]
-        public String RegisterSaler([FromBody]String encryptedJson)
+        public OperationResult<String> RegisterSaler([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
-            {
-                String token;
-                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out token))
-                {
-                    return token;
-                }
-                Account account = null;
-                if (TryRegisterAccount(registerInfo, "saler", out account))
-                {
-                    return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account); ;
-                }
-            }
-            throw new HttpResponseException(HttpStatusCode.NotAcceptable);
+            String errorMessage;
+            String token = Register(registerInfo, "saler", out errorMessage);
+            return AppGlobal.GenerateResult<String>(token, errorMessage);
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("RegisterBuyer")]
-        public String RegisterBuyer([FromBody]String encryptedJson)
+        public OperationResult<String> RegisterBuyer([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            if (!String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
-            {
-                String token;
-                if (IsTokenExsited(registerInfo.Name, registerInfo.Password, out token))
-                {
-                    return token;
-                }
-                Account account = null;
-                if (TryRegisterAccount(registerInfo, "buyer", out account))
-                {
-                    return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account); ;
-                }
-            }
-            throw new HttpResponseException(HttpStatusCode.NotAcceptable);
+            String errorMessage;
+            String token = Register(registerInfo, "buyer", out errorMessage);
+            return AppGlobal.GenerateResult<String>(token, errorMessage);
         }
 
         [RubbishRecycleAuthorize(Roles = "admin")]
-        [RubbishRecycleAuthorize]
         [HttpGet]
         public IQueryable<Account> GetAllAccounts()
         {
             return this._repository.GetAllAccounts();
         }
 
+        [RubbishRecycleAuthorize(Roles ="admin;saler;buyer")]
+        [HttpGet]
+        public Account GetAccount(String name)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
 
         #region Private
+
+        private String Register(RegisterInfo registerInfo, String roleId, out String errorMessage)
+        {
+            errorMessage = null;
+            Account account = RegisterCore(registerInfo, roleId, out errorMessage);
+            if (account != null)
+            {
+                return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account);
+            }
+            return null;
+        }
 
         /// <summary>
         /// 注册用户信息。
@@ -169,17 +187,31 @@ namespace RubbishRecycle.Controllers
         /// <param name="roleId">角色Id。</param>
         /// <param name="account">账户信息。</param>
         /// <returns>成功返回true；否则返回false。</returns>
-        private Boolean TryRegisterAccount(RegisterInfo registerInfo, String roleId, out Account account)
+        private Account RegisterCore(RegisterInfo registerInfo, String roleId, out String errorMessage)
         {
+            if (String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
+            {
+                errorMessage = "手机号不能为空";
+                return null;
+            }
+
+            errorMessage = null;
+            String name = registerInfo.Name ?? registerInfo.BindingPhone;
+            Account account = this._repository.FindAccount(name);
+            if (account != null)
+            {
+                errorMessage = "此账户名已被使用，或者手机号已被绑定";
+                return null;
+            }
             account = new Account();
             account.RoleId = roleId;
             account.Id = Guid.NewGuid().GetHashCode();
-            account.Name = String.IsNullOrWhiteSpace(registerInfo.Name) ? registerInfo.BindingPhone : registerInfo.Name;
+            account.Name = name;
             account.BindingPhone = registerInfo.BindingPhone;
             account.Password = CryptoHelper.MD5Compute(registerInfo.Password);
             account.LastLogin = DateTime.Now;
             account = this._repository.AddAccount(account);
-            return account != null;
+            return account;
         }
 
         /// <summary>
@@ -211,8 +243,7 @@ namespace RubbishRecycle.Controllers
                 ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, iv);
                 ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, iv);
                 AESCryptor cryptor = new AESCryptor(encryptor, decryptor);
-                Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(account.Name, account.Password);
-                AccountToken accountToken = new AccountToken(account.Id, tokenMapKey, cryptor);
+                AccountToken accountToken = new AccountToken(account.Id, cryptor);
                 accountToken.Role = account.RoleId;
                 return accountToken;
             }
@@ -233,10 +264,9 @@ namespace RubbishRecycle.Controllers
         /// <param name="password">密码。</param>
         /// <param name="token">登陆token。</param>
         /// <returns>如果已经登陆则返回true；否则返回false。</returns>
-        private Boolean IsTokenExsited(String name, String password, out String token)
+        private Boolean IsTokenExsited(Account account, out String token)
         {
-            Int32 tokenMapKey = AccountToken.GenerateTokenMapKey(name, password);
-            AccountToken accountToken = AccountTokenManager.Manager.GetTokenByMapKey(tokenMapKey);
+            AccountToken accountToken = AccountTokenManager.Manager.GetTokenByAccountId(account.Id);
             if (accountToken != null)
             {
                 token = accountToken.Token;
@@ -245,23 +275,6 @@ namespace RubbishRecycle.Controllers
             token = null;
             return false;
         }
-
-        #endregion
-
-        #region Misc
-
-        /// <summary>
-        /// 加密登陆响应消息。
-        /// </summary>
-        /// <param name="secretKey">创建Token使用的客户端密钥。</param>
-        /// <param name="account">客户端账号信息。</param>
-        /// <returns>加密消息。</returns>
-        //private String EncryptLoginResponseMessage(Byte[] secretKey, Account account)
-        //{
-        //    LoginResult result = InitAccountToken(secretKey, account);
-        //    String json = JsonConvert.SerializeObject(result);
-        //    return AccountController.RSAProvider.Encrypt(json);
-        //}
 
         #endregion
 

@@ -27,14 +27,12 @@ namespace RubbishRecycle.Controllers.Assets
         /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountToken 实例。
         /// </summary>
         /// <param name="accountId">账号Id。</param>
-        /// <param name="tokenMapKey"></param>
         /// <param name="cryptor">AES 加密/解密器。</param>
-        public AccountToken(Int32 accountId,Int32 tokenMapKey, AESCryptor cryptor)
+        public AccountToken(Int32 accountId, AESCryptor cryptor)
         {
             this._token = Guid.NewGuid().ToString().Replace("-", String.Empty);
             this._accountId = accountId;
             this._cryptor = cryptor;
-            this._tokenMapKey = tokenMapKey;
             this._syncRoot = new Object();
         }
 
@@ -76,19 +74,6 @@ namespace RubbishRecycle.Controllers.Assets
 
         #endregion
 
-        #region TokenMapKey
-
-        private readonly Int32 _tokenMapKey;
-        /// <summary>
-        /// 通过账户名和密码唯一标识该Token。
-        /// </summary>
-        public Int32 TokenMapKey
-        {
-            get { return this._tokenMapKey; }
-        }
-
-        #endregion
-
         #region Context
 
         private readonly AESCryptor _cryptor;
@@ -114,6 +99,19 @@ namespace RubbishRecycle.Controllers.Assets
 
         #endregion
 
+        #region IsFreeze
+
+        /// <summary>
+        /// 账户是否被冻结。
+        /// </summary>
+        public Boolean IsFreeze
+        {
+            get;
+            set;
+        }
+
+        #endregion
+
         #region SyncRoot
 
         private readonly Object _syncRoot;
@@ -126,21 +124,6 @@ namespace RubbishRecycle.Controllers.Assets
         }
 
         #endregion
-
-        #endregion
-
-        #region Methods
-
-        /// <summary>
-        /// 生成唯一标识Token的Key。
-        /// </summary>
-        /// <param name="name">账户名。</param>
-        /// <param name="password">密码。</param>
-        /// <returns>唯一标识Token的Key。</returns>
-        public static Int32 GenerateTokenMapKey(String name,String password)
-        {
-            return name.GetHashCode() ^ password.GetHashCode();
-        }
 
         #endregion
     }

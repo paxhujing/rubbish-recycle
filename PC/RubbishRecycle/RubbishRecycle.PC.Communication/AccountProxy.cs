@@ -17,62 +17,63 @@ namespace RubbishRecycle.PC.Communication
     {
         #region Sync Methods
 
-        public String RequestCommunication()
+        public OperationResult<String> RequestCommunication()
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/RequestCommunication");
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = base.SendAsync(request).Result;
-            String publicKey = response.Content.ReadAsStringAsync().Result;
+            OperationResult<String> publicKey = response.Content.ReadAsAsync<OperationResult<String>>().Result;
             return publicKey;
         }
 
-        public String RegisterBuyer(RegisterInfo info,String publicKey)
+        public OperationResult<String> RegisterBuyer(RegisterInfo info,String publicKey)
         {
             String str = RSAEncrypt(info, publicKey);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/RegisterBuyer");
             request.Content = new StringContent(str);
-            return base.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
+            return base.SendAsync(request).Result.Content.ReadAsAsync<OperationResult<String>>().Result;
         }
 
-        public Account GetAccount(String token, RijndaelManaged aesProvider)
+        public OperationResult<Account> GetAccount(String token, RijndaelManaged aesProvider)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/GetAccount");
-            request.Headers.Authorization = new AuthenticationHeaderValue("basic", token);
-            String json = base.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
-            ICryptoTransform decryptor = aesProvider.CreateDecryptor();
-            AESCryptor cryptor = new AESCryptor(null, decryptor);
-            json = cryptor.Dencrypt(json);
-            return JsonConvert.DeserializeObject<Account>(json);
+            //HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/GetAccount");
+            //request.Headers.Authorization = new AuthenticationHeaderValue("basic", token);
+            //String json = base.SendAsync(request).Result.Content.ReadAsStringAsync().Result;
+            //ICryptoTransform decryptor = aesProvider.CreateDecryptor();
+            //AESCryptor cryptor = new AESCryptor(null, decryptor);
+            //json = cryptor.Dencrypt(json);
+            //return JsonConvert.DeserializeObject<Account>(json);
+            throw new NotImplementedException();
         }
 
-        public String GetVerifyCode(String bindingPhone)
+        public OperationResult<String> GetVerifyCode(String bindingPhone)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetVerifyCode?bindingPhone=" + bindingPhone);
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
             HttpResponseMessage response = base.SendAsync(request).Result;
-            return response.Content.ReadAsStringAsync().Result;
+            return response.Content.ReadAsAsync<OperationResult<String>>().Result;
         }
 
         #endregion
 
         #region Async
 
-        public void RequestCommunicationAsync(Action<String> callback)
+        public void RequestCommunicationAsync(Action<OperationResult<String>> callback)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/RequestCommunication");
             request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
-            base.SendAsync(request).ContinueWith((r) => callback(r.Result.Content.ReadAsStringAsync().Result));
+            base.SendAsync(request).ContinueWith((r) => callback(r.Result.Content.ReadAsAsync<OperationResult<String>>().Result));
         }
 
-        public void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<String> callback)
+        public void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<OperationResult<String>> callback)
         {
             String str = RSAEncrypt(info, publicKey);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/RegisterBuyer");
             request.Content = new StringContent(str);
             base.SendAsync(request).ContinueWith((r) =>
             {
-                String token = r.Result.Content.ReadAsStringAsync().Result;
-                callback(token);
+                OperationResult<String> result = r.Result.Content.ReadAsAsync<OperationResult<String>>().Result;
+                callback(result);
             });
         }
 

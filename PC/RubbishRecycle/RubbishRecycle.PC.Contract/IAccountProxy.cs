@@ -13,21 +13,21 @@ namespace RubbishRecycle.PC.Contract
     {
         #region Sync
 
-        String RequestCommunication();
+        OperationResult<String> RequestCommunication();
 
-        String RegisterBuyer(RegisterInfo info, String publicKey);
+        OperationResult<String> RegisterBuyer(RegisterInfo info, String publicKey);
 
-        Account GetAccount(String token, RijndaelManaged aesProvider);
+        OperationResult<Account> GetAccount(String token, RijndaelManaged aesProvider);
 
-        String GetVerifyCode(String bindingPhone);
+        OperationResult<String> GetVerifyCode(String bindingPhone);
 
         #endregion
 
         #region Async
 
-        void RequestCommunicationAsync(Action<String> callback);
+        void RequestCommunicationAsync(Action<OperationResult<String>> callback);
 
-        void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<String> callback);
+        void RegisterBuyerAsync(RegisterInfo info, String publicKey, Action<OperationResult<String>> callback);
 
         #endregion
     }

@@ -47,18 +47,20 @@ namespace RubbishRecycle.PC.Main
             this._proxy.RequestCommunicationAsync(InitCallback);
         }
 
-        private void InitCallback(String publicKey)
+        private void InitCallback(OperationResult<String> result)
         {
             Prompt.Dispatcher.Invoke(() =>
             {
                 Prompt.IsBusy = false;
             });
-            if (String.IsNullOrEmpty(publicKey))
+            if (result.IsSussess)
             {
-                MessageBox.Show("初始化失败！");
-                return;
+                this._publicKey = result.Data;
             }
-            this._publicKey = publicKey;
+            else
+            {
+                MessageBox.Show(result.ErrorMessage);
+            }
         }
 
         #endregion
@@ -75,11 +77,16 @@ namespace RubbishRecycle.PC.Main
             ri.Name = "hujing";
             ri.Password = "123456";
             ri.SecretKey = secretKey;
-            String token = this._proxy.RegisterBuyer(ri, this._publicKey);
-            if (String.IsNullOrEmpty(token))
+            OperationResult<String> result = this._proxy.RegisterBuyer(ri, this._publicKey);
+            if (result.IsSussess)
             {
-                MessageBox.Show("注册失败！");
-                return;
+                App.Token = result.Data;
+                DialogResult = true;
+            }
+            else
+            {
+                DialogResult = false;
+                MessageBox.Show(result.ErrorMessage);
             }
         }
 
@@ -99,29 +106,29 @@ namespace RubbishRecycle.PC.Main
             Prompt.BusyContent = "注册中...";
             Prompt.IsBusy = true;
             RegisterInfo ri = new RegisterInfo();
-            ri.BindingPhone = "13281904422";
-            ri.Name = "huyucheng";
+            ri.BindingPhone = "18284559968";
+            ri.Name = "hujing";
             ri.Password = "123456";
             ri.SecretKey = App.AESProvider.Key;
             ri.IV = App.AESProvider.IV;
             this._proxy.RegisterBuyerAsync(ri, this._publicKey, RegisterCallback);
         }
 
-        private void RegisterCallback(String token)
+        private void RegisterCallback(OperationResult<String> result)
         {
             Prompt.Dispatcher.Invoke(() =>
             {
                 Prompt.IsBusy = false;
-                if (String.IsNullOrEmpty(token))
+                if (result.IsSussess)
                 {
-                    MessageBox.Show("注册失败！");
-                    DialogResult = false;
-                    return;
+                    App.Token = result.Data;
+                    DialogResult = true;
                 }
                 else
                 {
-                    App.Token = token;
-                    DialogResult = true;
+                    DialogResult = false;
+                    MessageBox.Show(result.ErrorMessage);
+                    return;
                 }
             });
         }

@@ -14,11 +14,9 @@ namespace RubbishRecycle.PC.Communication
 
         public WebApiProxy()
         {
-#if !DEBUG
             String baseUrl = @"http://localhost:49811";
-#else
-            String baseUrl = ConfigurationManager.AppSettings["baseUrl"];
-#endif
+            //String baseUrl = ConfigurationManager.AppSettings["baseUrl"];
+
             if (String.IsNullOrEmpty(baseUrl))
             {
                 throw new ArgumentNullException("baseUrl");

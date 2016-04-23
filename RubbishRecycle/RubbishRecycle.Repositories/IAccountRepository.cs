@@ -19,6 +19,20 @@ namespace RubbishRecycle.Repositories
         Account AddAccount(Account info);
 
         /// <summary>
+        /// 检查账户名是否已经被使用。
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Boolean IsNameUsed(String name);
+
+        /// <summary>
+        /// 检查手机是否已经被绑定。
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        Boolean IsPhoneBinded(String phone);
+
+        /// <summary>
         /// 查找账号。
         /// </summary>
         /// <param name="name"></param>
