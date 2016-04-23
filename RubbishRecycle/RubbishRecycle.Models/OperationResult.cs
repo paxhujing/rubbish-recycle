@@ -10,8 +10,8 @@ namespace RubbishRecycle.Models
     [JsonObject("result")]
     public struct OperationResult<T>
     {
-        [JsonProperty("is_sussess")]
-        public Boolean IsSussess { get { return String.IsNullOrWhiteSpace(this.ErrorMessage); } }
+        [JsonProperty("is_success")]
+        public Boolean IsSuccess { get { return String.IsNullOrWhiteSpace(this.ErrorMessage); } }
 
         [JsonProperty("data")]
         public T Data { get; set; }
