@@ -30,6 +30,7 @@ namespace RubbishRecycle.Main
                 constraints: null,
                 handler: sessionHandler
             );
+            config.Filters.Add(new UnhandleExceptionFilterAttribute());
         }
     }
 }

@@ -16,7 +16,6 @@ namespace RubbishRecycle.Main
     {
         protected void Application_Start()
         {
-            base.Error += WebApiApplication_Error;
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
             //GlobalConfiguration.Configuration.Formatters.Add(new TextPlainFormatter());
@@ -28,12 +27,6 @@ namespace RubbishRecycle.Main
 
             //GlobalConfiguration.Configuration.Formatters.Clear();
             //GlobalConfiguration.Configuration.Formatters.Add(jsonFormatter);
-        }
-
-        private void WebApiApplication_Error(object sender, EventArgs e)
-        {
-            Exception ex = Server.GetLastError();
-            AppGlobal.Log.ErrorFormat(ex.InnerException.Message);
         }
     }
 }

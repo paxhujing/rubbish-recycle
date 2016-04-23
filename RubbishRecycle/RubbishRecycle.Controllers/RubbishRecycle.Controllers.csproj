@@ -84,6 +84,7 @@
     <Compile Include="Assets\SessionMessageHandler.cs" />
     <Compile Include="Assets\RubbishRecycleAuthorizeAttribute.cs" />
     <Compile Include="Assets\TaoBaoSms.cs" />
+    <Compile Include="Assets\UnhandleExceptionFilterAttribute.cs" />
     <Compile Include="OrderController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repositories\AccountRepository.cs" />
