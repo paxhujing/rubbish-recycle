@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Threading;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace RubbishRecycle.Controllers.Assets
 {
@@ -29,7 +29,9 @@ namespace RubbishRecycle.Controllers.Assets
         {
             this._mapAccountToken = new Dictionary<String, AccountToken>();
             this._mapToken = new Dictionary<Int32, String>();
-            this._timer = new Timer(RebuildAccountTokens, null, TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(4));
+            this._timer = new Timer(TimeSpan.FromMinutes(4).TotalMilliseconds);
+            this._timer.Elapsed += _timer_Elapsed;
+            this._timer.Start();
         }
 
         #endregion
@@ -96,6 +98,50 @@ namespace RubbishRecycle.Controllers.Assets
             base.ClearItems();
         }
 
+        #region TC
+
+        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
+        {
+            this._timer.Stop();
+            RebuildAccountTokens();
+            this._timer.Start();
+        }
+
+        private void RebuildAccountTokens()
+        {
+            AccountToken[] accountTokens = this.ToArray();
+            AppGlobal.Log.InfoFormat("Token collection launch...total count: {0}", accountTokens.Length);
+            if (accountTokens.Length == 0) return;
+            IList<AccountToken> lifeAccountTokens = new List<AccountToken>(accountTokens.Length);
+            Parallel.ForEach(accountTokens, (accountToken) =>
+            {
+                lock (accountToken.SyncRoot)
+                {
+                    accountToken.life--;
+                    if (!accountToken.IsInvalide)
+                    {
+                        lifeAccountTokens.Add(accountToken);
+                    }
+                }
+            });
+            Dictionary<String, AccountToken> newMapAccountToken = new Dictionary<String, AccountToken>();
+            Dictionary<Int32, String> newMapToken = new Dictionary<Int32, String>();
+            foreach (AccountToken accountToken in lifeAccountTokens)
+            {
+                newMapAccountToken.Add(accountToken.Token, accountToken);
+                newMapToken.Add(accountToken.AccountId, accountToken.Token);
+            }
+            AppGlobal.Log.InfoFormat("New map account token count: {0}", newMapAccountToken.Count);
+            AppGlobal.Log.InfoFormat("New map token count: {0}", newMapToken.Count);
+            lock (this)
+            {
+                this._mapAccountToken = newMapAccountToken;
+                this._mapToken = newMapToken;
+            }
+        }
+
+        #endregion
+
         #region Misc
 
         private AccountToken GetAndUpdateAccountTokenLife(String token)
@@ -106,35 +152,6 @@ namespace RubbishRecycle.Controllers.Assets
                 if (accountToken.IsInvalide) return null;
                 accountToken.life = AccountTokenManager.LifeTime;
                 return accountToken;
-            }
-        }
-
-        private void RebuildAccountTokens(Object state)
-        {
-            AccountToken[] accountTokens = this.ToArray();
-            IList<AccountToken> lifeAccountTokens = new List<AccountToken>(accountTokens.Length);
-            Parallel.ForEach(accountTokens, (accountToken) =>
-             {
-                 lock(accountToken.SyncRoot)
-                 {
-                     accountToken.life--;
-                     if (!accountToken.IsInvalide)
-                     {
-                         lifeAccountTokens.Add(accountToken);
-                     }
-                 }
-             });
-            Dictionary<String, AccountToken> newMapAccountToken = new Dictionary<String, AccountToken>();
-            Dictionary<Int32, String> newMapToken = new Dictionary<Int32, String>();
-            foreach (AccountToken accountToken in lifeAccountTokens)
-            {
-                newMapAccountToken.Add(accountToken.Token, accountToken);
-                newMapToken.Add(accountToken.AccountId, accountToken.Token);
-            }
-            lock(this)
-            {
-                this._mapAccountToken = newMapAccountToken;
-                this._mapToken = newMapToken;
             }
         }
 
