@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Http;
 using System.Web.Routing;
 
+//[assembly: log4net.Config.XmlConfigurator(Watch = true, ConfigFile = "log4net.config")]
 namespace RubbishRecycle.Main
 {
     public class WebApiApplication : System.Web.HttpApplication

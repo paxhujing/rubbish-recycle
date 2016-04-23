@@ -72,6 +72,7 @@ namespace RubbishRecycle.Controllers
         [Route("RequestCommunication")]
         public OperationResult<String> RequestCommunication()
         {
+            AppGlobal.Log.DebugFormat("haha");
             return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
         }
 

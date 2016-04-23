@@ -13,7 +13,7 @@ namespace RubbishRecycle.Controllers.Assets
     {
         public static readonly RubbishRecycleContext DbContext = new RubbishRecycleContext();
 
-        public static readonly ILog Log = LogManager.GetLogger("RubbishRecycleLogger");
+        public static readonly ILog Log = LoggerManager.GetLogger("RubbishRecycleLogger");
 
         public static OperationResult<T> GenerateResult<T>(T data, String errorMessage)
         {
