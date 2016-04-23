@@ -18,7 +18,7 @@ namespace RubbishRecycle.Main
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
 
-            //GlobalConfiguration.Configuration.Formatters.Add(new TextPlainFormatter());
+            GlobalConfiguration.Configuration.Formatters.Add(new TextPlainFormatter());
 
             //JsonMediaTypeFormatter jsonFormatter = GlobalConfiguration.Configuration.Formatters.JsonFormatter;
             //jsonFormatter.Indent = true;

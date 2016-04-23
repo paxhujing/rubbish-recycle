@@ -36,7 +36,6 @@ namespace RubbishRecycle.Controllers.Assets
             {
                 context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_name on account (name)");
                 context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_phone on account (binding_phone)");
-                context.Database.ExecuteSqlCommand("CREATE UNIQUE INDEX IX_account_roleid on account (role_id)");
 
                 Role saler = new Role();
                 saler.Id = "saler";
