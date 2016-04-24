@@ -148,8 +148,8 @@ namespace RubbishRecycle.Controllers.Assets
 
         private Boolean IsValid(AccountToken token)
         {
-            TimeSpan interval = token.Timestamp - DateTime.Now;
-            AppGlobal.Log.DebugFormat("Get token: {0}; interval: {1}", token.AccountId, interval);
+            TimeSpan interval = DateTime.Now - token.Timestamp;
+            AppGlobal.Log.DebugFormat("Get token: {0}; interval: {1}", token.AccountId, interval.TotalMinutes);
             return interval < AccountTokenManager.LifeTime;
         }
 

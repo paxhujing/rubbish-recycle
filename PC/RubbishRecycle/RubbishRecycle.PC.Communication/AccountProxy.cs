@@ -46,10 +46,9 @@ namespace RubbishRecycle.PC.Communication
             throw new NotImplementedException();
         }
 
-        public OperationResult<String> GetVerifyCode(String bindingPhone)
+        public OperationResult<String> GetRegisterVerifyCode(String bindingPhone)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetVerifyCode?bindingPhone=" + bindingPhone);
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("text/plain"));
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/GetRegisterVerifyCode?bindingPhone=" + bindingPhone);
             HttpResponseMessage response = base.SendAsync(request).Result;
             return response.Content.ReadAsAsync<OperationResult<String>>().Result;
         }

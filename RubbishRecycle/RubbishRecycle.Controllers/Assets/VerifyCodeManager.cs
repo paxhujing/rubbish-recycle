@@ -118,8 +118,8 @@ namespace RubbishRecycle.Controllers.Assets
 
         private Boolean IsValid(PhoneVerifyCode pv)
         {
-            TimeSpan interval = pv.Timestamp - DateTime.Now;
-            AppGlobal.Log.DebugFormat("Get verify code: {0}; interval: {1}", pv.Phone, interval);
+            TimeSpan interval = DateTime.Now - pv.Timestamp;
+            AppGlobal.Log.DebugFormat("Get verify code: {0}; interval: {1}", pv.Phone, interval.TotalSeconds);
             return interval < VerifyCodeManager.LifeTime;
         }
 

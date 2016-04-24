@@ -85,7 +85,6 @@ namespace RubbishRecycle.PC.Main
             }
             else
             {
-                DialogResult = false;
                 MessageBox.Show(result.ErrorMessage);
             }
         }
@@ -102,10 +101,16 @@ namespace RubbishRecycle.PC.Main
         private void Register_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-
+            OperationResult<String> result = this._proxy.GetRegisterVerifyCode("18284559968");
+            if (!result.IsSuccess)
+            {
+                MessageBox.Show(result.ErrorMessage);
+                return;
+            }
             Prompt.BusyContent = "注册中...";
             Prompt.IsBusy = true;
             RegisterInfo ri = new RegisterInfo();
+            ri.VerifyCode = result.Data;
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";
@@ -126,7 +131,6 @@ namespace RubbishRecycle.PC.Main
                 }
                 else
                 {
-                    DialogResult = false;
                     MessageBox.Show(result.ErrorMessage);
                     return;
                 }
