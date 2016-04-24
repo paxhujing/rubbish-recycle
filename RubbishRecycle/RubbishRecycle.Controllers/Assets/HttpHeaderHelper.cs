@@ -26,7 +26,7 @@ namespace RubbishRecycle.Controllers.Assets
             String token = null;
             if (request.TryExtractToken(out token))
             {
-                return AccountTokenManager.Manager[token];
+                return AccountTokenManager.Manager.GetTokenByToken(token);
             }
             return null;
         }

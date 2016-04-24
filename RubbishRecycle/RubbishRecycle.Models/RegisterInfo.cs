@@ -31,6 +31,12 @@ namespace RubbishRecycle.Models
         public String Name;
 
         /// <summary>
+        /// 验证码。
+        /// </summary>
+        [JsonProperty("verify_code")]
+        public String VerifyCode;
+
+        /// <summary>
         /// 绑定的手机号。
         /// </summary>
         [JsonProperty("binding_phone")]

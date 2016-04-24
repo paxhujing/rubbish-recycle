@@ -7,19 +7,21 @@ using System.Timers;
 
 namespace RubbishRecycle.Controllers.Assets
 {
-    internal class AccountTokenManager : Collection<AccountToken>
+    internal class AccountTokenManager
     {
         #region Fields
 
-        private static readonly Int32 LifeTime = 3;
+        private static readonly TimeSpan LifeTime = TimeSpan.FromMinutes(10);
 
         public static readonly AccountTokenManager Manager = new AccountTokenManager();
 
-        private Dictionary<String, AccountToken> _mapAccountToken;
+        private readonly Dictionary<Int32, AccountToken> _idMapAccountToken;
 
-        private Dictionary<Int32, String> _mapToken;
+        private readonly Dictionary<String, AccountToken> _tokenMapAccountToken;
 
         private readonly Timer _timer;
+
+        private readonly Object _syncObj = new Object();
 
         #endregion
 
@@ -27,135 +29,132 @@ namespace RubbishRecycle.Controllers.Assets
 
         private AccountTokenManager()
         {
-            this._mapAccountToken = new Dictionary<String, AccountToken>();
-            this._mapToken = new Dictionary<Int32, String>();
-            this._timer = new Timer(TimeSpan.FromMinutes(4).TotalMilliseconds);
+            this._idMapAccountToken = new Dictionary<Int32, AccountToken>();
+            this._tokenMapAccountToken = new Dictionary<String, AccountToken>();
+
+            this._timer = new Timer(TimeSpan.FromMinutes(3).TotalMilliseconds);
             this._timer.Elapsed += _timer_Elapsed;
-            this._timer.Start();
-        }
-
-        #endregion
-
-        #region Properties
-
-        public AccountToken this[String token]
-        {
-            get
-            {
-                if (this._mapAccountToken.ContainsKey(token))
-                {
-                    return GetAndUpdateAccountTokenLife(token);
-                }
-                return null;
-            }
         }
 
         #endregion
 
         #region Methods
 
-        public AccountToken GetTokenByAccountId(Int32 accountId)
+        public AccountToken GetTokenById(Int32 accountId)
         {
-            if (this._mapToken.ContainsKey(accountId))
+            lock(this._syncObj)
             {
-                String token = this._mapToken[accountId];
-                return GetAndUpdateAccountTokenLife(token);
-            }
-            return null;
-        }
-
-        protected override void InsertItem(Int32 index, AccountToken item)
-        {
-            base.InsertItem(index, item);
-            item.life = AccountTokenManager.LifeTime;
-            this._mapAccountToken.Add(item.Token, item);
-            this._mapToken.Add(item.AccountId, item.Token);
-        }
-
-        protected override void RemoveItem(Int32 index)
-        {
-            AccountToken accountToken = base.Items[index];
-            this._mapAccountToken.Remove(accountToken.Token);
-            this._mapToken.Remove(accountToken.AccountId);
-            //如果accountToken本就是最后一项，就直接移除
-            if (base.Count == (index + 1))
-            {
-                base.RemoveItem(index);
-            }//否则用最后一项替换删除项
-            else
-            {
-                Int32 lastIndex = base.Count - 1;
-                AccountToken last = base.Items[lastIndex];
-                base.SetItem(index, last);
-                base.RemoveItem(lastIndex);
+                if (this._idMapAccountToken.ContainsKey(accountId))
+                {
+                    AccountToken accountToken = this._idMapAccountToken[accountId];
+                    if (IsValid(accountToken))
+                    {
+                        accountToken.Timestamp = DateTime.Now;
+                        return accountToken;
+                    }
+                    Remove(accountToken);
+                }
+                return null;
             }
         }
 
-        protected override void ClearItems()
+        public AccountToken GetTokenByToken(String token)
         {
-            this._mapAccountToken.Clear();
-            this._mapToken.Clear();
-            base.ClearItems();
+            lock (this._syncObj)
+            {
+                if (this._tokenMapAccountToken.ContainsKey(token))
+                {
+                    AccountToken accountToken = this._tokenMapAccountToken[token];
+                    if (IsValid(accountToken))
+                    {
+                        accountToken.Timestamp = DateTime.Now;
+                        return accountToken;
+                    }
+                }
+                return null;
+            }
+        }
+
+        public void Add(AccountToken token)
+        {
+            lock(this._syncObj)
+            {
+                token.Timestamp = DateTime.Now;
+                this._idMapAccountToken.Add(token.AccountId, token);
+                this._tokenMapAccountToken.Add(token.Token, token);
+                if (!this._timer.Enabled)
+                {
+                    this._timer.Start();
+                }
+            }
+        }
+
+        public void Remove(AccountToken token)
+        {
+            lock(this._syncObj)
+            {
+                this._idMapAccountToken.Remove(token.AccountId);
+                this._tokenMapAccountToken.Remove(token.Token);
+                if (this._idMapAccountToken.Count == 0)
+                {
+                    this._timer.Stop();
+                }
+            }
+        }
+
+        public void Clear()
+        {
+            lock(this._syncObj)
+            {
+                this._idMapAccountToken.Clear();
+                this._tokenMapAccountToken.Clear();
+                this._timer.Stop();
+            }
         }
 
         #region TC
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            this._timer.Stop();
-            RebuildAccountTokens();
-            this._timer.Start();
+            lock (this._syncObj)
+            {
+                this._timer.Stop();
+                Rebuild();
+                if (this._idMapAccountToken.Count != 0)
+                {
+                    this._timer.Start();
+                }
+            }
         }
 
-        private void RebuildAccountTokens()
+        private void Rebuild()
         {
-            AccountToken[] accountTokens = this.ToArray();
+            AccountToken[] accountTokens = this._idMapAccountToken.Values.ToArray();
             AppGlobal.Log.InfoFormat("Token collection launch...total count: {0}", accountTokens.Length);
             if (accountTokens.Length == 0) return;
-            IList<AccountToken> lifeAccountTokens = new List<AccountToken>(accountTokens.Length);
+
+            this._idMapAccountToken.Clear();
+            this._tokenMapAccountToken.Clear();
             Parallel.ForEach(accountTokens, (accountToken) =>
             {
-                lock (accountToken.SyncRoot)
+                if (IsValid(accountToken))
                 {
-                    accountToken.life--;
-                    if (!accountToken.IsInvalide)
-                    {
-                        lifeAccountTokens.Add(accountToken);
-                    }
+                    this._idMapAccountToken.Add(accountToken.AccountId, accountToken);
+                    this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 }
             });
-            Dictionary<String, AccountToken> newMapAccountToken = new Dictionary<String, AccountToken>();
-            Dictionary<Int32, String> newMapToken = new Dictionary<Int32, String>();
-            foreach (AccountToken accountToken in lifeAccountTokens)
-            {
-                newMapAccountToken.Add(accountToken.Token, accountToken);
-                newMapToken.Add(accountToken.AccountId, accountToken.Token);
-            }
-            AppGlobal.Log.InfoFormat("New map account token count: {0}", newMapAccountToken.Count);
-            AppGlobal.Log.InfoFormat("New map token count: {0}", newMapToken.Count);
-            lock (this)
-            {
-                this._mapAccountToken = newMapAccountToken;
-                this._mapToken = newMapToken;
-            }
+            AppGlobal.Log.InfoFormat("New map account token count: {0}", this._idMapAccountToken.Count);
         }
 
-        #endregion
-
-        #region Misc
-
-        private AccountToken GetAndUpdateAccountTokenLife(String token)
+        private Boolean IsValid(AccountToken token)
         {
-            AccountToken accountToken = this._mapAccountToken[token];
-            lock(accountToken.SyncRoot)
-            {
-                if (accountToken.IsInvalide) return null;
-                accountToken.life = AccountTokenManager.LifeTime;
-                return accountToken;
-            }
+            TimeSpan interval = token.Timestamp - DateTime.Now;
+            AppGlobal.Log.DebugFormat("Get token: {0}; interval: {1}", token.AccountId, interval);
+            return interval < AccountTokenManager.LifeTime;
         }
 
         #endregion
+
 
         #endregion
     }

@@ -14,11 +14,6 @@ namespace RubbishRecycle.Controllers.Assets
     {
         #region Fields
 
-        /// <summary>
-        /// 生命值。当生命值小于或等于0时，Token失效。
-        /// </summary>
-        internal Int32 life;
-
         #endregion
 
         #region Constructors
@@ -33,7 +28,7 @@ namespace RubbishRecycle.Controllers.Assets
             this._token = Guid.NewGuid().ToString().Replace("-", String.Empty);
             this._accountId = accountId;
             this._cryptor = cryptor;
-            this._syncRoot = new Object();
+            this.Timestamp = DateTime.Now;
         }
 
         #endregion
@@ -41,11 +36,12 @@ namespace RubbishRecycle.Controllers.Assets
         #region Properties
 
         /// <summary>
-        /// Token是否失效。
+        /// 时间戳。
         /// </summary>
-        public Boolean IsInvalide
+        public DateTime Timestamp
         {
-            get { return this.life <= 0; }
+            get;
+            set;
         }
 
         #region Token
@@ -108,19 +104,6 @@ namespace RubbishRecycle.Controllers.Assets
         {
             get;
             set;
-        }
-
-        #endregion
-
-        #region SyncRoot
-
-        private readonly Object _syncRoot;
-        /// <summary>
-        /// 用于线程同步。
-        /// </summary>
-        public Object SyncRoot
-        {
-            get{ return this._syncRoot; }
         }
 
         #endregion

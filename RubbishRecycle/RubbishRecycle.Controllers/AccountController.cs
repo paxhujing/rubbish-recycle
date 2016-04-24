@@ -189,13 +189,19 @@ namespace RubbishRecycle.Controllers
         /// <returns>成功返回true；否则返回false。</returns>
         private Account RegisterCore(RegisterInfo registerInfo, String roleId, out String errorMessage)
         {
+            errorMessage = null;
             if (String.IsNullOrWhiteSpace(registerInfo.BindingPhone))
             {
                 errorMessage = "手机号不能为空";
                 return null;
             }
 
-            errorMessage = null;
+            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(registerInfo.BindingPhone);
+            if (verifyCode != registerInfo.VerifyCode)
+            {
+                errorMessage = "验证码错误";
+                return null;
+            }
             String name = registerInfo.Name ?? registerInfo.BindingPhone;
             Account account = this._repository.FindAccount(name);
             if (account != null)
@@ -266,7 +272,7 @@ namespace RubbishRecycle.Controllers
         /// <returns>如果已经登陆则返回true；否则返回false。</returns>
         private Boolean IsTokenExsited(Account account, out String token)
         {
-            AccountToken accountToken = AccountTokenManager.Manager.GetTokenByAccountId(account.Id);
+            AccountToken accountToken = AccountTokenManager.Manager.GetTokenById(account.Id);
             if (accountToken != null)
             {
                 token = accountToken.Token;

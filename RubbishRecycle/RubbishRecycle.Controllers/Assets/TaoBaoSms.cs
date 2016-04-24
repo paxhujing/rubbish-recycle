@@ -43,6 +43,7 @@ namespace RubbishRecycle.Controllers.Assets
             if (!response.IsError)
             {
                 errorMessage = null;
+                VerifyCodeManager.Manager.Add(bindingPhone, code);
                 return code;
             }
             else

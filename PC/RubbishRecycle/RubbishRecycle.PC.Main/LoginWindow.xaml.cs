@@ -53,7 +53,7 @@ namespace RubbishRecycle.PC.Main
             {
                 Prompt.IsBusy = false;
             });
-            if (result.IsSussess)
+            if (result.IsSuccess)
             {
                 this._publicKey = result.Data;
             }
@@ -78,7 +78,7 @@ namespace RubbishRecycle.PC.Main
             ri.Password = "123456";
             ri.SecretKey = secretKey;
             OperationResult<String> result = this._proxy.RegisterBuyer(ri, this._publicKey);
-            if (result.IsSussess)
+            if (result.IsSuccess)
             {
                 App.Token = result.Data;
                 DialogResult = true;
@@ -119,7 +119,7 @@ namespace RubbishRecycle.PC.Main
             Prompt.Dispatcher.Invoke(() =>
             {
                 Prompt.IsBusy = false;
-                if (result.IsSussess)
+                if (result.IsSuccess)
                 {
                     App.Token = result.Data;
                     DialogResult = true;
