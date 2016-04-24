@@ -16,17 +16,22 @@ namespace RubbishRecycle.Controllers.Assets
 
         public static OperationResult<T> GenerateResult<T>(T data, String errorMessage)
         {
-            return new OperationResult<T>() { Data = data,ErrorMessage = errorMessage };
+            return new OperationResult<T>()
+            {
+                Data = data,
+                ErrorMessage = errorMessage,
+                IsSuccess = String.IsNullOrWhiteSpace(errorMessage)
+            };
         }
 
         public static OperationResult<T> GenerateSuccessResult<T>(T data)
         {
-            return new OperationResult<T>() { Data = data};
+            return new OperationResult<T>() { Data = data, IsSuccess = true };
         }
 
         public static OperationResult<T> GenerateErrorResult<T>(String errorMessage)
         {
-            return new OperationResult<T>() { ErrorMessage = errorMessage };
+            return new OperationResult<T>() { ErrorMessage = errorMessage, IsSuccess = false };
         }
     }
 }

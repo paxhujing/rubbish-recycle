@@ -11,7 +11,7 @@ namespace RubbishRecycle.Models
     public struct OperationResult<T>
     {
         [JsonProperty("is_success")]
-        public Boolean IsSuccess { get { return String.IsNullOrWhiteSpace(this.ErrorMessage); } }
+        public Boolean IsSuccess;
 
         [JsonProperty("data")]
         public T Data { get; set; }
