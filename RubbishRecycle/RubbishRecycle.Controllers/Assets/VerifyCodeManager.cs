@@ -45,6 +45,7 @@ namespace RubbishRecycle.Controllers.Assets
                 if (this._mapVerifyCode.ContainsKey(phone))
                 {
                     PhoneVerifyCode pv = this._mapVerifyCode[phone];
+                    AppGlobal.Log.DebugFormat("Get verify code: {0}; Timestamp: {1}", pv.Phone, pv.Timestamp);
                     this._mapVerifyCode.Remove(phone);
                     if (IsValid(pv))
                     {
@@ -119,7 +120,6 @@ namespace RubbishRecycle.Controllers.Assets
         private Boolean IsValid(PhoneVerifyCode pv)
         {
             TimeSpan interval = DateTime.Now - pv.Timestamp;
-            AppGlobal.Log.DebugFormat("Get verify code: {0}; interval: {1}", pv.Phone, interval.TotalSeconds);
             return interval < VerifyCodeManager.LifeTime;
         }
 

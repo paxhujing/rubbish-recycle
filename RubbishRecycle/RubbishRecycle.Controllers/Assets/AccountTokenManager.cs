@@ -47,6 +47,7 @@ namespace RubbishRecycle.Controllers.Assets
                 if (this._idMapAccountToken.ContainsKey(accountId))
                 {
                     AccountToken accountToken = this._idMapAccountToken[accountId];
+                    AppGlobal.Log.DebugFormat("Get token by id: {0}; interval: {1}", accountId, accountToken.Timestamp);
                     if (IsValid(accountToken))
                     {
                         accountToken.Timestamp = DateTime.Now;
@@ -65,6 +66,7 @@ namespace RubbishRecycle.Controllers.Assets
                 if (this._tokenMapAccountToken.ContainsKey(token))
                 {
                     AccountToken accountToken = this._tokenMapAccountToken[token];
+                    AppGlobal.Log.DebugFormat("Get token by token: {0}; interval: {1}", token, accountToken.Timestamp);
                     if (IsValid(accountToken))
                     {
                         accountToken.Timestamp = DateTime.Now;
@@ -149,7 +151,6 @@ namespace RubbishRecycle.Controllers.Assets
         private Boolean IsValid(AccountToken token)
         {
             TimeSpan interval = DateTime.Now - token.Timestamp;
-            AppGlobal.Log.DebugFormat("Get token: {0}; interval: {1}", token.AccountId, interval.TotalMinutes);
             return interval < AccountTokenManager.LifeTime;
         }
 
