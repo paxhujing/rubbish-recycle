@@ -66,7 +66,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Properties
 
-        public DbSet<AppKey> AppKeys { get; set; }
+        public DbSet<AppKeyInfo> AppKeyInfos { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
 

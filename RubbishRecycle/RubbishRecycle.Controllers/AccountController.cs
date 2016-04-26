@@ -76,7 +76,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPost]
         [Route("IsNameUsed")]
         public OperationResult<Boolean> IsNameUsed([FromBody]String encryptedJson)
         {
@@ -97,7 +97,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPost]
         [Route("IsPhoneBinded")]
         public OperationResult<Boolean> IsPhoneBinded([FromBody]String encryptedJson)
         {
@@ -118,7 +118,7 @@ namespace RubbishRecycle.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
+        [HttpPost]
         [Route("GetRegisterVerifyCode")]
         public OperationResult<String> GetRegisterVerifyCode([FromBody]String encryptedJson)
         {

@@ -25,10 +25,10 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #region IAccountRepository<TKey>接口
 
-        public AppKey GetAppKeyInfo(String appKey)
+        public AppKeyInfo GetAppKeyInfo(String appKey)
         {
             if (String.IsNullOrWhiteSpace(appKey)) return null;
-            return base.DbContext.AppKeys.FirstOrDefault(x => x.Key == appKey);
+            return base.DbContext.AppKeyInfos.FirstOrDefault(x => x.AppKey == appKey);
         }
 
         public Account AddAccount(Account info)

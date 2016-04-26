@@ -16,7 +16,7 @@ namespace RubbishRecycle.Repositories
         /// </summary>
         /// <param name="appKey">应用程序的AppKey字符串。</param>
         /// <returns></returns>
-        AppKey GetAppKeyInfo(String appKey);
+        AppKeyInfo GetAppKeyInfo(String appKey);
 
         /// <summary>
         /// 添加账号。
