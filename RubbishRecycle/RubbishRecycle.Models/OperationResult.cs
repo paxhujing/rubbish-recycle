@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    [JsonObject("result")]
     public struct OperationResult<T>
     {
         [JsonProperty("is_success")]

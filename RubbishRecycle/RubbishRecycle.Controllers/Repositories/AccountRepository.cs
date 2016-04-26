@@ -25,6 +25,12 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #region IAccountRepository<TKey>接口
 
+        public AppKey GetAppKeyInfo(String appKey)
+        {
+            if (String.IsNullOrWhiteSpace(appKey)) return null;
+            return base.DbContext.AppKeys.FirstOrDefault(x => x.Key == appKey);
+        }
+
         public Account AddAccount(Account info)
         {
             base.DbContext.Accounts.Add(info);
@@ -37,11 +43,13 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Account FindAccount(String name)
         {
+            if (String.IsNullOrWhiteSpace(name)) return null;
             return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name));
         }
 
         public Boolean FreezeAccount(String name)
         {
+            if (String.IsNullOrWhiteSpace(name)) return false;
             Account account = FindAccount(name);
             if (account != null)
             {
@@ -55,6 +63,7 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean UnfreezeAccount(String name)
         {
+            if (String.IsNullOrWhiteSpace(name)) return false;
             Account account = FindAccount(name);
             if (account != null)
             {
@@ -73,6 +82,7 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Account VerifyAccount(String name, String password)
         {
+            if (String.IsNullOrWhiteSpace(name) || String.IsNullOrWhiteSpace(password)) return null;
             String md5Password = CryptoHelper.MD5Compute(password);
             Account account = base.DbContext.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == md5Password));
             return account;
@@ -80,11 +90,13 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean IsNameUsed(String name)
         {
+            if (String.IsNullOrWhiteSpace(name)) return false;
             return base.DbContext.Accounts.Any(x => x.Name == name);
         }
 
         public Boolean IsPhoneBinded(String phone)
         {
+            if (String.IsNullOrWhiteSpace(phone)) return false;
             return base.DbContext.Accounts.Any(x => x.Name == phone);
         }
 

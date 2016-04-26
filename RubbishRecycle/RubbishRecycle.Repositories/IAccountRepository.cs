@@ -12,6 +12,13 @@ namespace RubbishRecycle.Repositories
         where TKey : DbContext
     {
         /// <summary>
+        /// 获取AppKey的信息。
+        /// </summary>
+        /// <param name="appKey">应用程序的AppKey字符串。</param>
+        /// <returns></returns>
+        AppKey GetAppKeyInfo(String appKey);
+
+        /// <summary>
         /// 添加账号。
         /// </summary>
         /// <param name="info"></param>

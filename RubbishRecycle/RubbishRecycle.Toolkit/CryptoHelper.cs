@@ -70,31 +70,38 @@ namespace RubbishRecycle.Toolkit
         /// <returns></returns>
         public static String Decrypt(this RSACryptoServiceProvider provider, String encrypted)
         {
-            Int32 maxLength = provider.KeySize / 8;
-            Byte[] data = Convert.FromBase64String(encrypted);
-            if (data.Length <= maxLength)
+            try
             {
-                data = provider.Decrypt(data, false);
-            }
-            else
-            {
-                Byte[] buffer = new Byte[maxLength];
-                using (MemoryStream input = new MemoryStream(data))
+                Int32 maxLength = provider.KeySize / 8;
+                Byte[] data = Convert.FromBase64String(encrypted);
+                if (data.Length <= maxLength)
                 {
-                    using (MemoryStream output = new MemoryStream())
+                    data = provider.Decrypt(data, false);
+                }
+                else
+                {
+                    Byte[] buffer = new Byte[maxLength];
+                    using (MemoryStream input = new MemoryStream(data))
                     {
-                        Int32 readCount = input.Read(buffer, 0, maxLength);
-                        while (readCount > 0)
+                        using (MemoryStream output = new MemoryStream())
                         {
-                            Byte[] block = provider.Decrypt(buffer, false);
-                            output.Write(block, 0, block.Length);
-                            readCount = input.Read(buffer, 0, maxLength);
+                            Int32 readCount = input.Read(buffer, 0, maxLength);
+                            while (readCount > 0)
+                            {
+                                Byte[] block = provider.Decrypt(buffer, false);
+                                output.Write(block, 0, block.Length);
+                                readCount = input.Read(buffer, 0, maxLength);
+                            }
+                            data = output.ToArray();
                         }
-                        data = output.ToArray();
                     }
                 }
+                return Encoding.UTF8.GetString(data);
             }
-            return Encoding.UTF8.GetString(data);
+            catch (CryptographicException)
+            {
+                return null;
+            }
         }
     }
 }

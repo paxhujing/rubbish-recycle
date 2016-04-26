@@ -25,10 +25,10 @@ namespace RubbishRecycle.Controllers.Assets
         /// <param name="cryptor">AES 加密/解密器。</param>
         public AccountToken(Int32 accountId, AESCryptor cryptor)
         {
-            this._token = Guid.NewGuid().ToString().Replace("-", String.Empty);
             this._accountId = accountId;
             this._cryptor = cryptor;
             this.Timestamp = DateTime.Now;
+            GenerateToken();
         }
 
         #endregion
@@ -46,7 +46,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Token
 
-        private readonly String _token;
+        private String _token;
         /// <summary>
         /// 客户端令牌。
         /// </summary>
@@ -107,6 +107,17 @@ namespace RubbishRecycle.Controllers.Assets
         }
 
         #endregion
+
+        #endregion
+
+        #region Methods
+
+        public String GenerateToken()
+        {
+            String token = Guid.NewGuid().ToString().Replace("-", String.Empty);
+            this._token = token;
+            return token;
+        }
 
         #endregion
     }

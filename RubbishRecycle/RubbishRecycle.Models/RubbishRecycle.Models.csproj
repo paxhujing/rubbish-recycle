@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Account.cs" />
+    <Compile Include="AppKey.cs" />
     <Compile Include="LoginInfo.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="Order.cs" />

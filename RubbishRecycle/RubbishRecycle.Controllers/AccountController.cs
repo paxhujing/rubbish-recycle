@@ -70,16 +70,21 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public OperationResult<String> RequestCommunication()
+        public OperationResult<String> RequestCommunication(String appKey)
         {
-            return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
+            if (IsLegalRequest(appKey))
+            {
+                return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
+            }
+            return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("IsNameUsed")]
-        public OperationResult<Boolean> IsNameUsed(String name)
+        public OperationResult<Boolean> IsNameUsed(String encryptedName)
         {
+            String name = AccountController.RSAProvider.Decrypt(encryptedName);
             Boolean isUsed = this._repository.IsNameUsed(name);
             OperationResult<Boolean> result = new OperationResult<Boolean>();
             result.Data = isUsed;
@@ -89,9 +94,10 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("IsPhoneBinded")]
-        public OperationResult<Boolean> IsPhoneBinded(String phone)
+        public OperationResult<Boolean> IsPhoneBinded(String encryptedPhone)
         {
-            Boolean isBinded = this._repository.IsPhoneBinded(phone);
+            String bindingPhone = AccountController.RSAProvider.Decrypt(encryptedPhone);
+            Boolean isBinded = this._repository.IsPhoneBinded(bindingPhone);
             OperationResult<Boolean> result = new OperationResult<Boolean>();
             result.Data = isBinded;
             return result;
@@ -100,10 +106,11 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("GetRegisterVerifyCode")]
-        public OperationResult<String> GetRegisterVerifyCode(String bindingPhone)
+        public OperationResult<String> GetRegisterVerifyCode(String encryptedPhone)
         {
+            String bindingPhone = AccountController.RSAProvider.Decrypt(encryptedPhone);
             String errorMessage;
-            String code = TaoBaoSms.SendVerifyCode(bindingPhone,out errorMessage);
+            String code = TaoBaoSms.SendVerifyCode(bindingPhone, out errorMessage);
             return AppGlobal.GenerateResult<String>(code, errorMessage);
         }
 
@@ -113,18 +120,22 @@ namespace RubbishRecycle.Controllers
         public OperationResult<String> Login([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
-            Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
-            String token = null;
-            if (account != null)
+            if (!String.IsNullOrWhiteSpace(json))
             {
-                if (!IsTokenExsited(account, out token))
+                LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
+                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                String token = null;
+                if (account != null)
                 {
-                    token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
+                    if (!IsTokenExsited(account, out token))
+                    {
+                        token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
+                    }
+                    return AppGlobal.GenerateSuccessResult<String>(token);
                 }
-                return AppGlobal.GenerateSuccessResult<String>(token);
+                return AppGlobal.GenerateErrorResult<String>("账户不存在");
             }
-            return AppGlobal.GenerateErrorResult<String>("账户不存在");
+            return AppGlobal.GenerateErrorResult<String>("参数错误");
         }
 
         [AllowAnonymous]
@@ -132,11 +143,7 @@ namespace RubbishRecycle.Controllers
         [Route("RegisterSaler")]
         public OperationResult<String> RegisterSaler([FromBody]String encryptedJson)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            String errorMessage;
-            String token = Register(registerInfo, "saler", out errorMessage);
-            return AppGlobal.GenerateResult<String>(token, errorMessage);
+            return Register("saler", encryptedJson);
         }
 
         [AllowAnonymous]
@@ -144,11 +151,7 @@ namespace RubbishRecycle.Controllers
         [Route("RegisterBuyer")]
         public OperationResult<String> RegisterBuyer([FromBody]String encryptedJson)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-            String errorMessage;
-            String token = Register(registerInfo, "buyer", out errorMessage);
-            return AppGlobal.GenerateResult<String>(token, errorMessage);
+            return Register("buyer", encryptedJson);
         }
 
         [RubbishRecycleAuthorize(Roles = "admin")]
@@ -169,7 +172,27 @@ namespace RubbishRecycle.Controllers
 
         #region Private
 
-        private String Register(RegisterInfo registerInfo, String roleId, out String errorMessage)
+        public OperationResult<String> Register(String roleId, String encryptedJson)
+        {
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
+            if (!String.IsNullOrWhiteSpace(json))
+            {
+                RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
+                String errorMessage;
+                String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
+                return AppGlobal.GenerateResult<String>(token, errorMessage);
+            }
+            return AppGlobal.GenerateErrorResult<String>("参数错误");
+        }
+
+        /// <summary>
+        /// 注册。如果注册成功则初始化账户的Token。
+        /// </summary>
+        /// <param name="registerInfo"></param>
+        /// <param name="roleId"></param>
+        /// <param name="errorMessage"></param>
+        /// <returns></returns>
+        private String RegisterAndInitToken(RegisterInfo registerInfo, String roleId, out String errorMessage)
         {
             errorMessage = null;
             Account account = RegisterCore(registerInfo, roleId, out errorMessage);
@@ -275,11 +298,21 @@ namespace RubbishRecycle.Controllers
             AccountToken accountToken = AccountTokenManager.Manager.GetTokenById(account.Id);
             if (accountToken != null)
             {
-                token = accountToken.Token;
+                token = accountToken.GenerateToken();
                 return true;
             }
             token = null;
             return false;
+        }
+
+        /// <summary>
+        /// 是否是合法的请求。
+        /// </summary>
+        /// <param name="appKey">AppKey。</param>
+        /// <returns>合法返回true；否则返回false。</returns>
+        private Boolean IsLegalRequest(String appKey)
+        {
+            return this._repository.GetAppKeyInfo(appKey) == null;
         }
 
         #endregion
