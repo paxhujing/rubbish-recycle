@@ -18,7 +18,7 @@ namespace RubbishRecycle.Controllers.Assets
         {
             if (!String.IsNullOrWhiteSpace(errorMessage))
             {
-                AppGlobal.Log.ErrorFormat(errorMessage);
+                AppGlobal.Log.WarnFormat(errorMessage);
             }
             return new OperationResult<T>()
             {
@@ -35,7 +35,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         public static OperationResult<T> GenerateErrorResult<T>(String errorMessage)
         {
-            AppGlobal.Log.ErrorFormat(errorMessage);
+            AppGlobal.Log.WarnFormat(errorMessage);
             return new OperationResult<T>() { ErrorMessage = errorMessage, IsSuccess = false };
         }
     }
