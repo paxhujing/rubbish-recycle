@@ -36,5 +36,10 @@ namespace RubbishRecycle.Models
         [JsonProperty("password")]
         public String Password;
 
+        /// <summary>
+        /// 客户端的AppKey。
+        /// </summary>
+        [JsonProperty("app_key")]
+        public String AppKey;
     }
 }

@@ -70,48 +70,71 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpGet]
         [Route("RequestCommunication")]
-        public OperationResult<String> RequestCommunication(String appKey)
+        public OperationResult<String> RequestCommunication()
         {
-            if (IsLegalRequest(appKey))
-            {
-                return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
-            }
-            return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
+            return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("IsNameUsed")]
-        public OperationResult<Boolean> IsNameUsed(String encryptedName)
+        public OperationResult<Boolean> IsNameUsed([FromBody]String encryptedJson)
         {
-            String name = AccountController.RSAProvider.Decrypt(encryptedName);
-            Boolean isUsed = this._repository.IsNameUsed(name);
-            OperationResult<Boolean> result = new OperationResult<Boolean>();
-            result.Data = isUsed;
-            return result;
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
+            if (String.IsNullOrWhiteSpace(json))
+            {
+                return AppGlobal.GenerateErrorResult<Boolean>("参数错误");
+            }
+            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
+            if (IsLegalRequest(arg.AppKey))
+            {
+                Boolean isUsed = this._repository.IsNameUsed(arg.Data);
+                OperationResult<Boolean> result = new OperationResult<Boolean>();
+                result.Data = isUsed;
+                return result;
+            }
+            return AppGlobal.GenerateErrorResult<Boolean>("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("IsPhoneBinded")]
-        public OperationResult<Boolean> IsPhoneBinded(String encryptedPhone)
+        public OperationResult<Boolean> IsPhoneBinded([FromBody]String encryptedJson)
         {
-            String bindingPhone = AccountController.RSAProvider.Decrypt(encryptedPhone);
-            Boolean isBinded = this._repository.IsPhoneBinded(bindingPhone);
-            OperationResult<Boolean> result = new OperationResult<Boolean>();
-            result.Data = isBinded;
-            return result;
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
+            if (String.IsNullOrWhiteSpace(json))
+            {
+                return AppGlobal.GenerateErrorResult<Boolean>("参数错误");
+            }
+            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
+            if (IsLegalRequest(arg.AppKey))
+            {
+                Boolean isUsed = this._repository.IsPhoneBinded(arg.Data);
+                OperationResult<Boolean> result = new OperationResult<Boolean>();
+                result.Data = isUsed;
+                return result;
+            }
+            return AppGlobal.GenerateErrorResult<Boolean>("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpGet]
         [Route("GetRegisterVerifyCode")]
-        public OperationResult<String> GetRegisterVerifyCode(String encryptedPhone)
+        public OperationResult<String> GetRegisterVerifyCode([FromBody]String encryptedJson)
         {
-            String bindingPhone = AccountController.RSAProvider.Decrypt(encryptedPhone);
-            String errorMessage;
-            String code = TaoBaoSms.SendVerifyCode(bindingPhone, out errorMessage);
-            return AppGlobal.GenerateResult<String>(code, errorMessage);
+            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
+            if (String.IsNullOrWhiteSpace(json))
+            {
+                return AppGlobal.GenerateErrorResult<String>("参数错误");
+            }
+            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
+            if (IsLegalRequest(arg.AppKey))
+            {
+                String errorMessage;
+                String code = TaoBaoSms.SendVerifyCode(arg.Data, out errorMessage);
+                return AppGlobal.GenerateResult<String>(code, errorMessage);
+            }
+            return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
         }
 
         [AllowAnonymous]
@@ -123,17 +146,21 @@ namespace RubbishRecycle.Controllers
             if (!String.IsNullOrWhiteSpace(json))
             {
                 LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
-                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
-                String token = null;
-                if (account != null)
+                if (IsLegalRequest(loginInfo.AppKey))
                 {
-                    if (!IsTokenExsited(account, out token))
+                    Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                    String token = null;
+                    if (account != null)
                     {
-                        token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
+                        if (!IsTokenExsited(account, out token))
+                        {
+                            token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
+                        }
+                        return AppGlobal.GenerateSuccessResult<String>(token);
                     }
-                    return AppGlobal.GenerateSuccessResult<String>(token);
+                    return AppGlobal.GenerateErrorResult<String>("账户不存在");
                 }
-                return AppGlobal.GenerateErrorResult<String>("账户不存在");
+                return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
             }
             return AppGlobal.GenerateErrorResult<String>("参数错误");
         }
@@ -178,9 +205,13 @@ namespace RubbishRecycle.Controllers
             if (!String.IsNullOrWhiteSpace(json))
             {
                 RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-                String errorMessage;
-                String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
-                return AppGlobal.GenerateResult<String>(token, errorMessage);
+                if (IsLegalRequest(registerInfo.AppKey))
+                {
+                    String errorMessage;
+                    String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
+                    return AppGlobal.GenerateResult<String>(token, errorMessage);
+                }
+                return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
             }
             return AppGlobal.GenerateErrorResult<String>("参数错误");
         }
