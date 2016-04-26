@@ -343,7 +343,7 @@ namespace RubbishRecycle.Controllers
         /// <returns>合法返回true；否则返回false。</returns>
         private Boolean IsLegalRequest(String appKey)
         {
-            return this._repository.GetAppKeyInfo(appKey) == null;
+            return this._repository.GetAppKeyInfo(appKey) != null;
         }
 
         #endregion
