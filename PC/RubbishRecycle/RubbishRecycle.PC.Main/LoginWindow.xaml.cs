@@ -101,7 +101,10 @@ namespace RubbishRecycle.PC.Main
         private void Register_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            OperationResult<String> result = this._proxy.GetRegisterVerifyCode("18284559968");
+            RequestParamBeforeSignIn<String> arg = new RequestParamBeforeSignIn<String>();
+            arg.Data = "18284559968";
+            arg.AppKey = String.Empty;
+            OperationResult<String> result = this._proxy.GetRegisterVerifyCode(arg,this._publicKey);
             if (!result.IsSuccess)
             {
                 MessageBox.Show(result.ErrorMessage);

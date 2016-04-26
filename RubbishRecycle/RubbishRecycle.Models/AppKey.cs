@@ -16,7 +16,7 @@ namespace RubbishRecycle.Models
         [Column("key")]
         public String Key { get; set; }
 
-        [Column("timestamp")]
-        public DateTime Timestamp { get; set; }
+        [Column("create_time")]
+        public DateTime CreateTime { get; set; }
     }
 }

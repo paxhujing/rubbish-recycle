@@ -46,9 +46,11 @@ namespace RubbishRecycle.PC.Communication
             throw new NotImplementedException();
         }
 
-        public OperationResult<String> GetRegisterVerifyCode(String bindingPhone)
+        public OperationResult<String> GetRegisterVerifyCode(RequestParamBeforeSignIn<String> requestParam, String publicKey)
         {
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, "api/account/GetRegisterVerifyCode?bindingPhone=" + bindingPhone);
+            String str = RSAEncrypt(requestParam, publicKey);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetRegisterVerifyCode");
+            request.Content = new StringContent(str);
             HttpResponseMessage response = base.SendAsync(request).Result;
             return response.Content.ReadAsAsync<OperationResult<String>>().Result;
         }
