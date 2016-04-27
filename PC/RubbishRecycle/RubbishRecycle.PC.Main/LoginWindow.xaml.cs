@@ -104,7 +104,7 @@ namespace RubbishRecycle.PC.Main
             RequestParamBeforeSignIn<String> arg = new RequestParamBeforeSignIn<String>();
             arg.Data = "18284559968";
             arg.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
-            OperationResult<String> result = this._proxy.GetRegisterVerifyCode(arg,this._publicKey);
+            OperationResult result = this._proxy.GetRegisterVerifyCode(arg,this._publicKey);
             if (!result.IsSuccess)
             {
                 MessageBox.Show(result.ErrorMessage);
@@ -114,7 +114,7 @@ namespace RubbishRecycle.PC.Main
             Prompt.IsBusy = true;
             RegisterInfo ri = new RegisterInfo();
             ri.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
-            ri.VerifyCode = result.Data;
+            ri.VerifyCode = String.Empty;
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";

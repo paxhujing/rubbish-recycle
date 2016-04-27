@@ -46,13 +46,13 @@ namespace RubbishRecycle.PC.Communication
             throw new NotImplementedException();
         }
 
-        public OperationResult<String> GetRegisterVerifyCode(RequestParamBeforeSignIn<String> requestParam, String publicKey)
+        public OperationResult GetRegisterVerifyCode(RequestParamBeforeSignIn<String> requestParam, String publicKey)
         {
             String str = RSAEncrypt(requestParam, publicKey);
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Post, "api/account/GetRegisterVerifyCode");
             request.Content = new StringContent(str);
             HttpResponseMessage response = base.SendAsync(request).Result;
-            return response.Content.ReadAsAsync<OperationResult<String>>().Result;
+            return response.Content.ReadAsAsync<OperationResult>().Result;
         }
 
         #endregion
