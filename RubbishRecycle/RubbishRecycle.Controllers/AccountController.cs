@@ -72,7 +72,7 @@ namespace RubbishRecycle.Controllers
         [Route("RequestCommunication")]
         public OperationResult<String> RequestCommunication()
         {
-            return AppGlobal.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
+            return OperationResultHelper.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
         }
 
         [AllowAnonymous]
@@ -83,7 +83,7 @@ namespace RubbishRecycle.Controllers
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             if (String.IsNullOrWhiteSpace(json))
             {
-                return AppGlobal.GenerateErrorResult<Boolean>("参数错误");
+                return OperationResultHelper.GenerateErrorResult<Boolean>("参数错误");
             }
             RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
             if (IsLegalRequest(arg.AppKey))
@@ -93,7 +93,7 @@ namespace RubbishRecycle.Controllers
                 result.Data = isUsed;
                 return result;
             }
-            return AppGlobal.GenerateErrorResult<Boolean>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult<Boolean>("无法识别的客户端");
         }
 
         [AllowAnonymous]
@@ -104,7 +104,7 @@ namespace RubbishRecycle.Controllers
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             if (String.IsNullOrWhiteSpace(json))
             {
-                return AppGlobal.GenerateErrorResult<Boolean>("参数错误");
+                return OperationResultHelper.GenerateErrorResult<Boolean>("参数错误");
             }
             RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
             if (IsLegalRequest(arg.AppKey))
@@ -114,27 +114,27 @@ namespace RubbishRecycle.Controllers
                 result.Data = isUsed;
                 return result;
             }
-            return AppGlobal.GenerateErrorResult<Boolean>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult<Boolean>("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpPost]
         [Route("GetRegisterVerifyCode")]
-        public OperationResult<String> GetRegisterVerifyCode([FromBody]String encryptedJson)
+        public OperationResult GetRegisterVerifyCode([FromBody]String encryptedJson)
         {
             String json = AccountController.RSAProvider.Decrypt(encryptedJson);
             if (String.IsNullOrWhiteSpace(json))
             {
-                return AppGlobal.GenerateErrorResult<String>("参数错误");
+                return OperationResultHelper.GenerateErrorResult("参数错误");
             }
             RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
             if (IsLegalRequest(arg.AppKey))
             {
                 String errorMessage;
                 String code = TaoBaoSms.SendVerifyCode(arg.Data, out errorMessage);
-                return AppGlobal.GenerateResult<String>(code, errorMessage);
+                return OperationResultHelper.GenerateSuccessResult();
             }
-            return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
 
         [AllowAnonymous]
@@ -156,13 +156,13 @@ namespace RubbishRecycle.Controllers
                         {
                             token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
                         }
-                        return AppGlobal.GenerateSuccessResult<String>(token);
+                        return OperationResultHelper.GenerateSuccessResult<String>(token);
                     }
-                    return AppGlobal.GenerateErrorResult<String>("账户不存在");
+                    return OperationResultHelper.GenerateErrorResult<String>("账户不存在");
                 }
-                return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
+                return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
             }
-            return AppGlobal.GenerateErrorResult<String>("参数错误");
+            return OperationResultHelper.GenerateErrorResult<String>("参数错误");
         }
 
         [AllowAnonymous]
@@ -209,11 +209,11 @@ namespace RubbishRecycle.Controllers
                 {
                     String errorMessage;
                     String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
-                    return AppGlobal.GenerateResult<String>(token, errorMessage);
+                    return OperationResultHelper.GenerateResult<String>(token, errorMessage);
                 }
-                return AppGlobal.GenerateErrorResult<String>("无法识别的客户端");
+                return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
             }
-            return AppGlobal.GenerateErrorResult<String>("参数错误");
+            return OperationResultHelper.GenerateErrorResult<String>("参数错误");
         }
 
         /// <summary>

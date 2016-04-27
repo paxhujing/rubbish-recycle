@@ -13,9 +13,21 @@ namespace RubbishRecycle.Models
         public Boolean IsSuccess;
 
         [JsonProperty("data")]
-        public T Data { get; set; }
+        public T Data;
 
         [JsonProperty("error_message")]
-        public String ErrorMessage { get; set; }
+        public String ErrorMessage;
+    }
+
+    public struct OperationResult
+    {
+        [JsonProperty("is_success")]
+        public Boolean IsSuccess;
+
+        [JsonProperty("error_message")]
+        public String ErrorMessage;
+
+        [JsonProperty("data")]
+        private Object Data;
     }
 }

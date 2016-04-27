@@ -103,7 +103,7 @@ namespace RubbishRecycle.PC.Main
             e.Handled = true;
             RequestParamBeforeSignIn<String> arg = new RequestParamBeforeSignIn<String>();
             arg.Data = "18284559968";
-            arg.AppKey = String.Empty;
+            arg.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
             OperationResult<String> result = this._proxy.GetRegisterVerifyCode(arg,this._publicKey);
             if (!result.IsSuccess)
             {
@@ -113,6 +113,7 @@ namespace RubbishRecycle.PC.Main
             Prompt.BusyContent = "注册中...";
             Prompt.IsBusy = true;
             RegisterInfo ri = new RegisterInfo();
+            ri.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
             ri.VerifyCode = result.Data;
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";

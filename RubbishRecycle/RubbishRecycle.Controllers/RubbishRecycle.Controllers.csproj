@@ -80,6 +80,7 @@
     <Compile Include="Assets\AccountTokenManager.cs" />
     <Compile Include="Assets\AppGlobal.cs" />
     <Compile Include="Assets\HttpHeaderHelper.cs" />
+    <Compile Include="Assets\OperationResultHelper.cs" />
     <Compile Include="Assets\PhoneVerifyCode.cs" />
     <Compile Include="Assets\RubbishRecycleContext.cs" />
     <Compile Include="Assets\SessionMessageHandler.cs" />
