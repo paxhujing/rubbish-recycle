@@ -14,27 +14,12 @@ namespace RubbishRecycle.Controllers.Assets
     {
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
-            return base.SendAsync(request, cancellationToken).ContinueWith((r) =>
+            if (request.RequestUri.Scheme != Uri.UriSchemeHttps)
             {
-                HttpResponseMessage rm = r.Result;
-                if (rm.IsSuccessStatusCode)
-                {
-                    ObjectContent oc = rm.Content as ObjectContent;
-                    if (oc != null)
-                    {
-                        AccountToken accountToken = request.GetTokenByRequestHeader();
-                        String json = JsonConvert.SerializeObject(oc.Value);
-                        String encryptContent = accountToken.Cryptor.Encrypt(json);
-                        return new HttpResponseMessage(HttpStatusCode.OK)
-                        {
-                            RequestMessage = rm.RequestMessage,
-                            Content = new StringContent(encryptContent),
-                            ReasonPhrase = rm.ReasonPhrase,
-                        };
-                    }
-                }
-                return rm;
-            }); ;
+                HttpResponseMessage response = new HttpResponseMessage(HttpStatusCode.Forbidden);
+                return Task<HttpResponseMessage>.FromResult(response);
+            }
+            return base.SendAsync(request, cancellationToken);
         }
     }
 }

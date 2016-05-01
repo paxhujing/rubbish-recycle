@@ -23,10 +23,9 @@ namespace RubbishRecycle.Controllers.Assets
         /// </summary>
         /// <param name="accountId">账号Id。</param>
         /// <param name="cryptor">AES 加密/解密器。</param>
-        public AccountToken(Int32 accountId, AESCryptor cryptor)
+        public AccountToken(Int32 accountId)
         {
             this._accountId = accountId;
-            this._cryptor = cryptor;
             this.Timestamp = DateTime.Now;
             GenerateToken();
         }
@@ -66,19 +65,6 @@ namespace RubbishRecycle.Controllers.Assets
         public Int32 AccountId
         {
             get { return this._accountId; }
-        }
-
-        #endregion
-
-        #region Context
-
-        private readonly AESCryptor _cryptor;
-        /// <summary>
-        /// AES 加密/解密器。
-        /// </summary>
-        public AESCryptor Cryptor
-        {
-            get { return this._cryptor; }
         }
 
         #endregion

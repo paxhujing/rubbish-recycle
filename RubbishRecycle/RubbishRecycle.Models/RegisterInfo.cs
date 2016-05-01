@@ -13,18 +13,6 @@ namespace RubbishRecycle.Models
     public struct RegisterInfo
     {
         /// <summary>
-        /// 客户端提供的密钥。
-        /// </summary>
-        [JsonProperty("secret_key")]
-        public Byte[] SecretKey;
-
-        /// <summary>
-        /// 客户端提供的加密向量。
-        /// </summary>
-        [JsonProperty("iv")]
-        public Byte[] IV;
-
-        /// <summary>
         /// 账户名称。
         /// </summary>
         [JsonProperty("name")]

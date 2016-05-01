@@ -91,7 +91,6 @@ namespace RubbishRecycle.Test
         static String Login(HttpClient client, String publicKey, out String iv)
         {
             LoginInfo li = new LoginInfo();
-            li.SecretKey = Program.SecretKey;
             li.Name = "123456";
             li.Password = "123456";
 

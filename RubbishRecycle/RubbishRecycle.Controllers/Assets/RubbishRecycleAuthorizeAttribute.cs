@@ -35,7 +35,6 @@ namespace RubbishRecycle.Controllers.Assets
                 if (String.IsNullOrWhiteSpace(base.Roles))
                 {
                     IsAuthorized(actionContext);
-                    actionContext.Request.Properties.Add("Token", accountToken);
                     return;
                 }
                 else
@@ -45,7 +44,6 @@ namespace RubbishRecycle.Controllers.Assets
                     if (RolesCache[hash].Contains(accountToken.Role))
                     {
                         IsAuthorized(actionContext);
-                        actionContext.Request.Properties.Add("Token", accountToken);
                         return;
                     }
                 }

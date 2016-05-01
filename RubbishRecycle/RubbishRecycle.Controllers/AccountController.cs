@@ -13,7 +13,6 @@ using RubbishRecycle.Controllers.Repositories;
 
 namespace RubbishRecycle.Controllers
 {
-    [RoutePrefix("api/account")]
     public class AccountController : ApiController
     {
         #region Fields
@@ -68,27 +67,13 @@ namespace RubbishRecycle.Controllers
         #region Actions
 
         [AllowAnonymous]
-        [HttpGet]
-        [Route("RequestCommunication")]
-        public OperationResult<String> RequestCommunication()
-        {
-            return OperationResultHelper.GenerateSuccessResult<String>(AccountController.GlobalPublicKey);
-        }
-
-        [AllowAnonymous]
         [HttpPost]
-        [Route("IsNameUsed")]
-        public OperationResult<Boolean> IsNameUsed([FromBody]String encryptedJson)
+        [ActionName("IsNameUsed")]
+        public OperationResult<Boolean> IsNameUsed(RequestParamBeforeSignIn<String> info)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            if (String.IsNullOrWhiteSpace(json))
+            if (IsLegalRequest(info.AppKey))
             {
-                return OperationResultHelper.GenerateErrorResult<Boolean>("参数错误");
-            }
-            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
-            if (IsLegalRequest(arg.AppKey))
-            {
-                Boolean isUsed = this._repository.IsNameUsed(arg.Data);
+                Boolean isUsed = this._repository.IsNameUsed(info.Data);
                 OperationResult<Boolean> result = new OperationResult<Boolean>();
                 result.Data = isUsed;
                 return result;
@@ -98,18 +83,11 @@ namespace RubbishRecycle.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("IsPhoneBinded")]
-        public OperationResult<Boolean> IsPhoneBinded([FromBody]String encryptedJson)
+        public OperationResult<Boolean> IsPhoneBinded(RequestParamBeforeSignIn<String> info)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            if (String.IsNullOrWhiteSpace(json))
+            if (IsLegalRequest(info.AppKey))
             {
-                return OperationResultHelper.GenerateErrorResult<Boolean>("参数错误");
-            }
-            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
-            if (IsLegalRequest(arg.AppKey))
-            {
-                Boolean isUsed = this._repository.IsPhoneBinded(arg.Data);
+                Boolean isUsed = this._repository.IsPhoneBinded(info.Data);
                 OperationResult<Boolean> result = new OperationResult<Boolean>();
                 result.Data = isUsed;
                 return result;
@@ -119,19 +97,13 @@ namespace RubbishRecycle.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("GetRegisterVerifyCode")]
-        public OperationResult GetRegisterVerifyCode([FromBody]String encryptedJson)
+        [ActionName("GetRegisterVerifyCode")]
+        public OperationResult GetRegisterVerifyCode(RequestParamBeforeSignIn<String> info)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            if (String.IsNullOrWhiteSpace(json))
-            {
-                return OperationResultHelper.GenerateErrorResult("参数错误");
-            }
-            RequestParamBeforeSignIn<String> arg = JsonConvert.DeserializeObject<RequestParamBeforeSignIn<String>>(json);
-            if (IsLegalRequest(arg.AppKey))
+            if (IsLegalRequest(info.AppKey))
             {
                 String errorMessage;
-                String code = TaoBaoSms.SendVerifyCode(arg.Data, out errorMessage);
+                String code = TaoBaoSms.SendVerifyCode(info.Data, out errorMessage);
                 return OperationResultHelper.GenerateSuccessResult();
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
@@ -140,45 +112,39 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [Route("Login")]
-        public OperationResult<String> Login([FromBody]String encryptedJson)
+        public OperationResult<String> Login(LoginInfo loginInfo)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            if (!String.IsNullOrWhiteSpace(json))
+            if (IsLegalRequest(loginInfo.AppKey))
             {
-                LoginInfo loginInfo = JsonConvert.DeserializeObject<LoginInfo>(json);
-                if (IsLegalRequest(loginInfo.AppKey))
+                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                String token = null;
+                if (account != null)
                 {
-                    Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
-                    String token = null;
-                    if (account != null)
+                    if (!IsTokenExsited(account, out token))
                     {
-                        if (!IsTokenExsited(account, out token))
-                        {
-                            token = InitAccountToken(loginInfo.SecretKey, loginInfo.IV, account);
-                        }
-                        return OperationResultHelper.GenerateSuccessResult<String>(token);
+                        token = InitAccountToken(account);
                     }
-                    return OperationResultHelper.GenerateErrorResult<String>("账户不存在");
+                    return OperationResultHelper.GenerateSuccessResult<String>(token);
                 }
-                return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
+                return OperationResultHelper.GenerateErrorResult<String>("账户不存在");
             }
-            return OperationResultHelper.GenerateErrorResult<String>("参数错误");
+            return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("RegisterSaler")]
-        public OperationResult<String> RegisterSaler([FromBody]String encryptedJson)
+        [ActionName("RegisterSaler")]
+        public OperationResult<String> RegisterSaler(RegisterInfo registerInfo)
         {
-            return Register("saler", encryptedJson);
+            return Register("saler", registerInfo);
         }
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("RegisterBuyer")]
-        public OperationResult<String> RegisterBuyer([FromBody]String encryptedJson)
+        [ActionName("RegisterBuyer")]
+        public OperationResult<String> RegisterBuyer(RegisterInfo registerInfo)
         {
-            return Register("buyer", encryptedJson);
+            return Register("buyer", registerInfo);
         }
 
         [RubbishRecycleAuthorize(Roles = "admin")]
@@ -199,21 +165,15 @@ namespace RubbishRecycle.Controllers
 
         #region Private
 
-        public OperationResult<String> Register(String roleId, String encryptedJson)
+        public OperationResult<String> Register(String roleId, RegisterInfo registerInfo)
         {
-            String json = AccountController.RSAProvider.Decrypt(encryptedJson);
-            if (!String.IsNullOrWhiteSpace(json))
+            if (IsLegalRequest(registerInfo.AppKey))
             {
-                RegisterInfo registerInfo = JsonConvert.DeserializeObject<RegisterInfo>(json);
-                if (IsLegalRequest(registerInfo.AppKey))
-                {
-                    String errorMessage;
-                    String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
-                    return OperationResultHelper.GenerateResult<String>(token, errorMessage);
-                }
-                return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
+                String errorMessage;
+                String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
+                return OperationResultHelper.GenerateResult<String>(token, errorMessage);
             }
-            return OperationResultHelper.GenerateErrorResult<String>("参数错误");
+            return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
         }
 
         /// <summary>
@@ -229,7 +189,7 @@ namespace RubbishRecycle.Controllers
             Account account = RegisterCore(registerInfo, roleId, out errorMessage);
             if (account != null)
             {
-                return InitAccountToken(registerInfo.SecretKey, registerInfo.IV, account);
+                return InitAccountToken(account);
             }
             return null;
         }
@@ -277,44 +237,14 @@ namespace RubbishRecycle.Controllers
         /// <summary>
         /// 初始化账户令牌。
         /// </summary>
-        /// <param name="secretKey">客户端密钥。</param>
-        /// <param name="iv">客户端加密向量。</param>
         /// <param name="account">账户信息。</param>
         /// <returns>登陆Token。</returns>
-        private String InitAccountToken(Byte[] secretKey,Byte[] iv, Account account)
+        private String InitAccountToken(Account account)
         {
-            AccountToken accountToken = CreateAccountToken(secretKey, iv, account);
+            AccountToken accountToken = new AccountToken(account.Id);
+            accountToken.Role = account.RoleId;
             AccountTokenManager.Manager.Add(accountToken);
             return accountToken.Token;
-        }
-
-        /// <summary>
-        /// 创建账户的Token。
-        /// </summary>
-        /// <param name="secretKey">客户端密钥。</param>
-        /// <param name="iv">客户端加密向量。</param>
-        /// <param name="account">账户信息。</param>
-        /// <returns>账户Token。</returns>
-        private AccountToken CreateAccountToken(Byte[] secretKey,Byte[] iv, Account account)
-        {
-            try
-            {
-                //创建安全上下文
-                ICryptoTransform decryptor = AccountController.AESProvider.CreateDecryptor(secretKey, iv);
-                ICryptoTransform encryptor = AccountController.AESProvider.CreateEncryptor(secretKey, iv);
-                AESCryptor cryptor = new AESCryptor(encryptor, decryptor);
-                AccountToken accountToken = new AccountToken(account.Id, cryptor);
-                accountToken.Role = account.RoleId;
-                return accountToken;
-            }
-            catch (ArgumentNullException)
-            {
-                return null;
-            }
-            catch (FormatException)
-            {
-                return null;
-            }
         }
 
         /// <summary>
