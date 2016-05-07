@@ -10,8 +10,7 @@
         Width="430"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        WindowStyle="ToolWindow"
-        Loaded="Window_Loaded">
+        WindowStyle="ToolWindow">
     <ex:BusyIndicator x:Name="Prompt">
         <StackPanel Orientation="Horizontal"
                     VerticalAlignment="Bottom"

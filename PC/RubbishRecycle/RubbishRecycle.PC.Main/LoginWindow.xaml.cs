@@ -1,5 +1,6 @@
 ﻿using RubbishRecycle.Models;
 using RubbishRecycle.PC.Communication;
+using RubbishRecycle.Toolkit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,43 +28,15 @@ namespace RubbishRecycle.PC.Main
 
         private readonly AccountProxy _proxy = new AccountProxy();
 
-        private String _publicKey;
-
         #endregion
 
         public LoginWindow()
         {
             InitializeComponent();
+            Util.SetCertificatePolicy();
         }
 
         #region Methods
-
-        #region Init
-
-        private void Window_Loaded(object sender, RoutedEventArgs e)
-        {
-            Prompt.BusyContent = "初始化...";
-            Prompt.IsBusy = true;
-            this._proxy.RequestCommunicationAsync(InitCallback);
-        }
-
-        private void InitCallback(OperationResult<String> result)
-        {
-            Prompt.Dispatcher.Invoke(() =>
-            {
-                Prompt.IsBusy = false;
-            });
-            if (result.IsSuccess)
-            {
-                this._publicKey = result.Data;
-            }
-            else
-            {
-                MessageBox.Show(result.ErrorMessage);
-            }
-        }
-
-        #endregion
 
         #region Login
 
@@ -71,13 +44,11 @@ namespace RubbishRecycle.PC.Main
         {
             e.Handled = true;
             DialogResult = true;
-            Byte[] secretKey = App.AESProvider.Key;
             RegisterInfo ri = new RegisterInfo();
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";
-            ri.SecretKey = secretKey;
-            OperationResult<String> result = this._proxy.RegisterBuyer(ri, this._publicKey);
+            OperationResult<String> result = this._proxy.RegisterBuyer(ri);
             if (result.IsSuccess)
             {
                 App.Token = result.Data;
@@ -104,7 +75,7 @@ namespace RubbishRecycle.PC.Main
             RequestParamBeforeSignIn<String> arg = new RequestParamBeforeSignIn<String>();
             arg.Data = "18284559968";
             arg.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
-            OperationResult result = this._proxy.GetRegisterVerifyCode(arg,this._publicKey);
+            OperationResult result = this._proxy.GetRegisterVerifyCode(arg);
             if (!result.IsSuccess)
             {
                 MessageBox.Show(result.ErrorMessage);
@@ -118,9 +89,7 @@ namespace RubbishRecycle.PC.Main
             ri.BindingPhone = "18284559968";
             ri.Name = "hujing";
             ri.Password = "123456";
-            ri.SecretKey = App.AESProvider.Key;
-            ri.IV = App.AESProvider.IV;
-            this._proxy.RegisterBuyerAsync(ri, this._publicKey, RegisterCallback);
+            this._proxy.RegisterBuyerAsync(ri, RegisterCallback);
         }
 
         private void RegisterCallback(OperationResult<String> result)

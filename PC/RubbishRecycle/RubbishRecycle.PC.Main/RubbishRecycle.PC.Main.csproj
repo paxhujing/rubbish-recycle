@@ -38,6 +38,9 @@
     <Reference Include="RubbishRecycle.Models">
       <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Models.dll</HintPath>
     </Reference>
+    <Reference Include="RubbishRecycle.Toolkit">
+      <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Toolkit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
