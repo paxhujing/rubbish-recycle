@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -111,11 +112,14 @@ namespace RubbishRecycle.Controllers.Assets
 
         private void Rebuild()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             PhoneVerifyCode[] pvs = this._mapVerifyCode.Values.ToArray();
             AppGlobal.Log.InfoFormat("Verify code collection launch...total count: {0}", pvs.Length);
             if (pvs.Length == 0)
             {
-                AppGlobal.Log.InfoFormat("Verify code collection finish");
+                sw.Stop();
+                AppGlobal.Log.InfoFormat("Verify code collection finish: {0}", sw.ElapsedMilliseconds);
                 return;
             }
 
@@ -127,7 +131,8 @@ namespace RubbishRecycle.Controllers.Assets
                     this._mapVerifyCode.Add(pv.Phone, pv);
                 }
             });
-            AppGlobal.Log.InfoFormat("Verify code collection finish...New verify code count: {0}", this._mapVerifyCode.Count);
+            sw.Stop();
+            AppGlobal.Log.InfoFormat("Verify code collection finish: {0}...New verify code count: {1}", sw.ElapsedMilliseconds, this._mapVerifyCode.Count);
         }
 
         private Boolean IsValid(PhoneVerifyCode pv)

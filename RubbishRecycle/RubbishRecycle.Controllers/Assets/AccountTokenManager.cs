@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Timers;
@@ -143,11 +144,14 @@ namespace RubbishRecycle.Controllers.Assets
 
         private void Rebuild()
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             AccountToken[] accountTokens = this._idMapAccountToken.Values.ToArray();
             AppGlobal.Log.InfoFormat("Token collection launch...total count: {0}", accountTokens.Length);
             if (accountTokens.Length == 0)
             {
-                AppGlobal.Log.InfoFormat("Token collection finish");
+                sw.Stop();
+                AppGlobal.Log.InfoFormat("Token collection finish: {0}", sw.ElapsedMilliseconds);
                 return;
             }
             this._idMapAccountToken.Clear();
@@ -160,7 +164,8 @@ namespace RubbishRecycle.Controllers.Assets
                     this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 }
             });
-            AppGlobal.Log.InfoFormat("Token collection finish...New account token count: {0}", this._idMapAccountToken.Count);
+            sw.Stop();
+            AppGlobal.Log.InfoFormat("Token collection finish: {0}...New account token count: {1}", sw.ElapsedMilliseconds, this._idMapAccountToken.Count);
         }
 
         private Boolean IsValid(AccountToken token)
