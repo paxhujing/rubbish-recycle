@@ -145,8 +145,11 @@ namespace RubbishRecycle.Controllers.Assets
         {
             AccountToken[] accountTokens = this._idMapAccountToken.Values.ToArray();
             AppGlobal.Log.InfoFormat("Token collection launch...total count: {0}", accountTokens.Length);
-            if (accountTokens.Length == 0) return;
-
+            if (accountTokens.Length == 0)
+            {
+                AppGlobal.Log.InfoFormat("Token collection finish");
+                return;
+            }
             this._idMapAccountToken.Clear();
             this._tokenMapAccountToken.Clear();
             Parallel.ForEach(accountTokens, (accountToken) =>
@@ -157,7 +160,7 @@ namespace RubbishRecycle.Controllers.Assets
                     this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 }
             });
-            AppGlobal.Log.InfoFormat("New account token count: {0}", this._idMapAccountToken.Count);
+            AppGlobal.Log.InfoFormat("Token collection finish...New account token count: {0}", this._idMapAccountToken.Count);
         }
 
         private Boolean IsValid(AccountToken token)

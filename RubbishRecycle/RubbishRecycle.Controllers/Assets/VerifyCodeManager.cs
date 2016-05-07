@@ -113,7 +113,11 @@ namespace RubbishRecycle.Controllers.Assets
         {
             PhoneVerifyCode[] pvs = this._mapVerifyCode.Values.ToArray();
             AppGlobal.Log.InfoFormat("Verify code collection launch...total count: {0}", pvs.Length);
-            if (pvs.Length == 0) return;
+            if (pvs.Length == 0)
+            {
+                AppGlobal.Log.InfoFormat("Verify code collection finish");
+                return;
+            }
 
             this._mapVerifyCode.Clear();
             Parallel.ForEach(pvs, (pv) =>
@@ -123,7 +127,7 @@ namespace RubbishRecycle.Controllers.Assets
                     this._mapVerifyCode.Add(pv.Phone, pv);
                 }
             });
-            AppGlobal.Log.InfoFormat("New verify code count: {0}", this._mapVerifyCode.Count);
+            AppGlobal.Log.InfoFormat("Verify code collection finish...New verify code count: {0}", this._mapVerifyCode.Count);
         }
 
         private Boolean IsValid(PhoneVerifyCode pv)
