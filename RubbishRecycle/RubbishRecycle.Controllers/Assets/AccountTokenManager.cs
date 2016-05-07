@@ -88,6 +88,7 @@ namespace RubbishRecycle.Controllers.Assets
                 {
                     this._timer.Start();
                 }
+                AppGlobal.Log.InfoFormat("Account token count: {0}", this._tokenMapAccountToken.Count);
             }
         }
 
@@ -101,6 +102,7 @@ namespace RubbishRecycle.Controllers.Assets
                 {
                     this._timer.Stop();
                 }
+                AppGlobal.Log.InfoFormat("Account token count: {0}", this._tokenMapAccountToken.Count);
             }
         }
 
@@ -155,7 +157,7 @@ namespace RubbishRecycle.Controllers.Assets
                     this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 }
             });
-            AppGlobal.Log.InfoFormat("New map account token count: {0}", this._idMapAccountToken.Count);
+            AppGlobal.Log.InfoFormat("New account token count: {0}", this._idMapAccountToken.Count);
         }
 
         private Boolean IsValid(AccountToken token)

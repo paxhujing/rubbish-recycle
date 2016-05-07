@@ -73,6 +73,7 @@ namespace RubbishRecycle.Controllers.Assets
                         this._timer.Start();
                     }
                 }
+                AppGlobal.Log.InfoFormat("Verify code count: {0}", this._mapVerifyCode.Count);
             }
         }
 
@@ -88,6 +89,7 @@ namespace RubbishRecycle.Controllers.Assets
                     {
                         this._timer.Stop();
                     }
+                    AppGlobal.Log.InfoFormat("Verify code count: {0}", this._mapVerifyCode.Count);
                 }
             }
         }
@@ -121,7 +123,7 @@ namespace RubbishRecycle.Controllers.Assets
                     this._mapVerifyCode.Add(pv.Phone, pv);
                 }
             });
-            AppGlobal.Log.InfoFormat("New map verify code count: {0}", this._mapVerifyCode.Count);
+            AppGlobal.Log.InfoFormat("New verify code count: {0}", this._mapVerifyCode.Count);
         }
 
         private Boolean IsValid(PhoneVerifyCode pv)

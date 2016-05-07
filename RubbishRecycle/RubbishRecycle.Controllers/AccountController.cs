@@ -272,6 +272,7 @@ namespace RubbishRecycle.Controllers
             if (accountToken != null)
             {
                 AccountTokenManager.Manager.Remove(accountToken);
+                AppGlobal.Log.DebugFormat("Drop existed token: {0}", accountToken.Token);
             }
         }
 
