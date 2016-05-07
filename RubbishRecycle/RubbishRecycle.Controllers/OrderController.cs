@@ -40,12 +40,20 @@ namespace RubbishRecycle.Controllers
             return this._orderRepository.GetOrders(pageSize, pageSize);
         }
 
-        [RubbishRecycleAuthorize(Roles = "saler,buyer")]
-        [Route("GetOrders")]
+        [RubbishRecycleAuthorize(Roles = "saler")]
+        [Route("GetSalerOrders")]
         [HttpGet]
-        public IQueryable<Order> GetOrders(String salerId, Int32 pageNo, Int32 pageSize = 10)
+        public IQueryable<Order> GetSalerOrders(String salerId, Int32 pageNo, Int32 pageSize = 10)
         {
             return this._orderRepository.GetOrders(salerId, pageNo, pageSize);
+        }
+
+        [RubbishRecycleAuthorize(Roles = "buyer")]
+        [Route("GetBuyerOrders")]
+        [HttpGet]
+        public IQueryable<Order> GetBuyerOrders(String buyerId, Int32 pageNo, Int32 pageSize = 10)
+        {
+            return this._orderRepository.GetOrders(buyerId, pageNo, pageSize);
         }
 
         [RubbishRecycleAuthorize(Roles = "saler")]

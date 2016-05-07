@@ -45,7 +45,7 @@ namespace RubbishRecycle.Models
         [Column("description")]
         public String Description { get; set; }
 
-        public virtual ICollection<OrderStateTrace> States { get; set; }
+        public virtual ICollection<OrderOperationStateTrace> States { get; set; }
 
         [ForeignKey("SalerId")]
         public virtual Account Saler { get; set; }

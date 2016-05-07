@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    [Table("order_state_trace")]
-    public class OrderStateTrace
+    [Table("order_operation_state_trace")]
+    public class OrderOperationStateTrace
     {
         [Key]
         [MaxLength(36)]

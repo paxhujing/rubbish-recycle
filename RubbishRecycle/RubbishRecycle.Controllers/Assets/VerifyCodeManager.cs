@@ -61,10 +61,17 @@ namespace RubbishRecycle.Controllers.Assets
             lock(this._syncObj)
             {
                 PhoneVerifyCode pv = new PhoneVerifyCode(phone,code);
-                this._mapVerifyCode.Add(phone, pv);
-                if (!this._timer.Enabled)
+                if (this._mapVerifyCode.ContainsKey(phone))
                 {
-                    this._timer.Start();
+                    this._mapVerifyCode[phone] = pv;
+                }
+                else
+                {
+                    this._mapVerifyCode.Add(phone, pv);
+                    if (!this._timer.Enabled)
+                    {
+                        this._timer.Start();
+                    }
                 }
             }
         }

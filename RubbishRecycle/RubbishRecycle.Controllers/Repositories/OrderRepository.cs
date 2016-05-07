@@ -39,7 +39,7 @@ namespace RubbishRecycle.Controllers.Repositories
                 }
             }
             order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-            OrderStateTrace orderState = new OrderStateTrace();
+            OrderOperationStateTrace orderState = new OrderOperationStateTrace();
             orderState.Timestamp = DateTime.Now;
             orderState.State = OrderState.Reviewing;
             base.DbContext.Orders.Add(order);

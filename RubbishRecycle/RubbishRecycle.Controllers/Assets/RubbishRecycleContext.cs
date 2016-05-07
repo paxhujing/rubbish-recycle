@@ -65,7 +65,7 @@ namespace RubbishRecycle.Controllers.Assets
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
             //order_state_trace->order_id->order CASCADE
-            modelBuilder.Entity<OrderStateTrace>().HasRequired(x => x.Order).WithMany(x=>x.States).HasForeignKey(x=>x.OrderId).WillCascadeOnDelete(true);
+            modelBuilder.Entity<OrderOperationStateTrace>().HasRequired(x => x.Order).WithMany(x=>x.States).HasForeignKey(x=>x.OrderId).WillCascadeOnDelete(true);
             //order->saler_id->account CASCADE
             modelBuilder.Entity<Order>().HasRequired(x => x.Saler).WithMany(x => x.Orders).HasForeignKey(x => x.SalerId).WillCascadeOnDelete(true);
             base.OnModelCreating(modelBuilder);
@@ -83,7 +83,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<OrderStateTrace> OrderStates { get; set; }
+        public DbSet<OrderOperationStateTrace> OrderStates { get; set; }
 
         #endregion
     }

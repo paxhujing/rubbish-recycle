@@ -40,14 +40,14 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public AccountToken GetTokenById(String accountId)
+        public AccountToken GetAccountTokenById(String accountId)
         {
             lock(this._syncObj)
             {
                 if (this._idMapAccountToken.ContainsKey(accountId))
                 {
                     AccountToken accountToken = this._idMapAccountToken[accountId];
-                    AppGlobal.Log.DebugFormat("Get token by id: {0}; interval: {1}", accountId, accountToken.Timestamp);
+                    AppGlobal.Log.DebugFormat("Get account token by id: {0}; interval: {1}", accountId, DateTime.Now - accountToken.Timestamp);
                     if (IsValid(accountToken))
                     {
                         accountToken.Timestamp = DateTime.Now;
@@ -59,14 +59,14 @@ namespace RubbishRecycle.Controllers.Assets
             }
         }
 
-        public AccountToken GetTokenByToken(String token)
+        public AccountToken GetAccountTokenByToken(String token)
         {
             lock (this._syncObj)
             {
                 if (this._tokenMapAccountToken.ContainsKey(token))
                 {
                     AccountToken accountToken = this._tokenMapAccountToken[token];
-                    AppGlobal.Log.DebugFormat("Get token by token: {0}; interval: {1}", token, accountToken.Timestamp);
+                    AppGlobal.Log.DebugFormat("Get account token by token: {0}; interval: {1}", token, DateTime.Now - accountToken.Timestamp);
                     if (IsValid(accountToken))
                     {
                         accountToken.Timestamp = DateTime.Now;
@@ -77,13 +77,13 @@ namespace RubbishRecycle.Controllers.Assets
             }
         }
 
-        public void Add(AccountToken token)
+        public void Add(AccountToken accountToken)
         {
             lock(this._syncObj)
             {
-                token.Timestamp = DateTime.Now;
-                this._idMapAccountToken.Add(token.AccountId, token);
-                this._tokenMapAccountToken.Add(token.Token, token);
+                accountToken.Timestamp = DateTime.Now;
+                this._idMapAccountToken.Add(accountToken.AccountId, accountToken);
+                this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 if (!this._timer.Enabled)
                 {
                     this._timer.Start();
@@ -91,16 +91,26 @@ namespace RubbishRecycle.Controllers.Assets
             }
         }
 
-        public void Remove(AccountToken token)
+        public void Remove(AccountToken accountToken)
         {
             lock(this._syncObj)
             {
-                this._idMapAccountToken.Remove(token.AccountId);
-                this._tokenMapAccountToken.Remove(token.Token);
+                this._idMapAccountToken.Remove(accountToken.AccountId);
+                this._tokenMapAccountToken.Remove(accountToken.Token);
                 if (this._idMapAccountToken.Count == 0)
                 {
                     this._timer.Stop();
                 }
+            }
+        }
+
+        public void Remove(String token)
+        {
+            lock(this._syncObj)
+            {
+                AccountToken at = GetAccountTokenByToken(token);
+                if (at == null) return;
+                Remove(at);
             }
         }
 
