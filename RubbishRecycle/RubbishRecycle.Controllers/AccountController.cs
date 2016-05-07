@@ -103,7 +103,16 @@ namespace RubbishRecycle.Controllers
             if (IsLegalRequest(info.AppKey))
             {
                 String errorMessage;
-                String code = TaoBaoSms.SendVerifyCode(info.Data, out errorMessage);
+                String phone = info.Data;
+                String code = TaoBaoSms.SendVerifyCode(phone, out errorMessage);
+                if (String.IsNullOrWhiteSpace(code))
+                {
+                    return OperationResultHelper.GenerateErrorResult("发送给验证码失败");
+                }
+                else
+                {
+                    VerifyCodeManager.Manager.Add(phone, code);
+                }
                 return OperationResultHelper.GenerateSuccessResult();
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
