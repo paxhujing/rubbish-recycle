@@ -18,7 +18,7 @@ namespace RubbishRecycle.Models
         public String Id { get; set; }
 
         [MaxLength(36)]
-        [Column("saler_id")]
+        [ForeignKey("saler_id")]
         public String SalerId { get; set; }
 
         [Column("rubbish_type_id")]

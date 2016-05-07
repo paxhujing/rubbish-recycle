@@ -17,7 +17,7 @@ namespace RubbishRecycle.Models
         public String Id { get; set; }
 
         [MaxLength(36)]
-        [Column("order_id")]
+        [ForeignKey("order_id")]
         public String OrderId { get; set; }
 
         [Column("timestamp")]
@@ -30,8 +30,8 @@ namespace RubbishRecycle.Models
         /// 如果为NotPass，则表示未通过原因。
         /// 如果为Trading，则表示“交易确认码”。
         /// </summary>
-        [Column("extend")]
-        public String Extend { get; set; }
+        [Column("description")]
+        public String Description { get; set; }
 
         public virtual Order Order { get; set; }
     }
