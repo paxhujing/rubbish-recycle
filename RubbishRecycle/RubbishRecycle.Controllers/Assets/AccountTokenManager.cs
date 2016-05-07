@@ -15,7 +15,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         public static readonly AccountTokenManager Manager = new AccountTokenManager();
 
-        private readonly Dictionary<Int32, AccountToken> _idMapAccountToken;
+        private readonly Dictionary<String, AccountToken> _idMapAccountToken;
 
         private readonly Dictionary<String, AccountToken> _tokenMapAccountToken;
 
@@ -29,7 +29,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         private AccountTokenManager()
         {
-            this._idMapAccountToken = new Dictionary<Int32, AccountToken>();
+            this._idMapAccountToken = new Dictionary<String, AccountToken>();
             this._tokenMapAccountToken = new Dictionary<String, AccountToken>();
 
             this._timer = new Timer(TimeSpan.FromMinutes(3).TotalMilliseconds);
@@ -40,7 +40,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public AccountToken GetTokenById(Int32 accountId)
+        public AccountToken GetTokenById(String accountId)
         {
             lock(this._syncObj)
             {

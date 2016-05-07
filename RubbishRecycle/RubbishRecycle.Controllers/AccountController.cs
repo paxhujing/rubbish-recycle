@@ -225,7 +225,7 @@ namespace RubbishRecycle.Controllers
             }
             account = new Account();
             account.RoleId = roleId;
-            account.Id = Guid.NewGuid().GetHashCode();
+            account.Id = Guid.NewGuid().ToString().Replace("-",String.Empty);
             account.Name = name;
             account.BindingPhone = registerInfo.BindingPhone;
             account.Password = CryptoHelper.MD5Compute(registerInfo.Password);

@@ -23,7 +23,7 @@ namespace RubbishRecycle.Controllers.Assets
         /// </summary>
         /// <param name="accountId">账号Id。</param>
         /// <param name="cryptor">AES 加密/解密器。</param>
-        public AccountToken(Int32 accountId)
+        public AccountToken(String accountId)
         {
             this._accountId = accountId;
             this.Timestamp = DateTime.Now;
@@ -58,11 +58,11 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region AccountId
 
-        private readonly Int32 _accountId;
+        private readonly String _accountId;
         /// <summary>
         /// 账号Id。
         /// </summary>
-        public Int32 AccountId
+        public String AccountId
         {
             get { return this._accountId; }
         }

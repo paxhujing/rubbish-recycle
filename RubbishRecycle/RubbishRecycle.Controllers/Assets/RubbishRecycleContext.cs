@@ -47,6 +47,11 @@ namespace RubbishRecycle.Controllers.Assets
                 buyer.Description = "买家";
                 context.Roles.Add(buyer);
 
+                AppKeyInfo testAppKey = new AppKeyInfo();
+                testAppKey.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
+                testAppKey.CreateTime = DateTime.Now;
+                context.AppKeyInfos.Add(testAppKey);
+
                 context.SaveChanges();
             }
         }
@@ -59,6 +64,10 @@ namespace RubbishRecycle.Controllers.Assets
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+            //order_state_trace->order_id->order CASCADE
+            modelBuilder.Entity<OrderStateTrace>().HasRequired(x => x.Order).WithMany(x=>x.States).HasForeignKey(x=>x.OrderId).WillCascadeOnDelete(true);
+            //order->saler_id->account CASCADE
+            modelBuilder.Entity<Order>().HasRequired(x => x.Saler).WithMany(x => x.Orders).HasForeignKey(x => x.SalerId).WillCascadeOnDelete(true);
             base.OnModelCreating(modelBuilder);
         }
 

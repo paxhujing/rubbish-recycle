@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -15,7 +17,7 @@ namespace RubbishRecycle.Models
         /// </summary>
         [Key]
         [Column("id")]
-        public Int32 Id { get; set; }
+        public String Id { get; set; }
 
         /// <summary>
         /// 账户名称。
@@ -68,5 +70,7 @@ namespace RubbishRecycle.Models
 
         [Column("is_feezed")]
         public Boolean IsFreezed { get; set; }
+
+        public virtual ICollection<Order> Orders { get; set; }
     }
 }

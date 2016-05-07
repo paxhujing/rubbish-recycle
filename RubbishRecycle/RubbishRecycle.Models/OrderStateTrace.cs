@@ -17,7 +17,7 @@ namespace RubbishRecycle.Models
         public String Id { get; set; }
 
         [MaxLength(36)]
-        [ForeignKey("order_id")]
+        [Column("order_id")]
         public String OrderId { get; set; }
 
         [Column("timestamp")]
@@ -33,6 +33,7 @@ namespace RubbishRecycle.Models
         [Column("description")]
         public String Description { get; set; }
 
+        [ForeignKey("OrderId")]
         public virtual Order Order { get; set; }
     }
 }
