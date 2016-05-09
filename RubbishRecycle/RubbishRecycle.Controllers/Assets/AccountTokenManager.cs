@@ -41,14 +41,14 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public AccountToken GetAccountTokenById(String accountId)
+        public AccountToken GetAccountTokenById(String phone)
         {
             lock(this._syncObj)
             {
-                if (this._idMapAccountToken.ContainsKey(accountId))
+                if (this._idMapAccountToken.ContainsKey(phone))
                 {
-                    AccountToken accountToken = this._idMapAccountToken[accountId];
-                    AppGlobal.Log.DebugFormat("Get account token by id: {0}; interval: {1}", accountId, DateTime.Now - accountToken.Timestamp);
+                    AccountToken accountToken = this._idMapAccountToken[phone];
+                    AppGlobal.Log.DebugFormat("Get account token by id: {0}; interval: {1}", phone, DateTime.Now - accountToken.Timestamp);
                     if (IsValid(accountToken))
                     {
                         accountToken.Timestamp = DateTime.Now;
@@ -83,7 +83,7 @@ namespace RubbishRecycle.Controllers.Assets
             lock(this._syncObj)
             {
                 accountToken.Timestamp = DateTime.Now;
-                this._idMapAccountToken.Add(accountToken.AccountId, accountToken);
+                this._idMapAccountToken.Add(accountToken.Phone, accountToken);
                 this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 if (!this._timer.Enabled)
                 {
@@ -97,7 +97,7 @@ namespace RubbishRecycle.Controllers.Assets
         {
             lock(this._syncObj)
             {
-                this._idMapAccountToken.Remove(accountToken.AccountId);
+                this._idMapAccountToken.Remove(accountToken.Phone);
                 this._tokenMapAccountToken.Remove(accountToken.Token);
                 if (this._idMapAccountToken.Count == 0)
                 {
@@ -160,7 +160,7 @@ namespace RubbishRecycle.Controllers.Assets
             {
                 if (IsValid(accountToken))
                 {
-                    this._idMapAccountToken.Add(accountToken.AccountId, accountToken);
+                    this._idMapAccountToken.Add(accountToken.Phone, accountToken);
                     this._tokenMapAccountToken.Add(accountToken.Token, accountToken);
                 }
             });

@@ -7,18 +7,6 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models
 {
-    public struct OperationResult<T>
-    {
-        [JsonProperty("is_success")]
-        public Boolean IsSuccess;
-
-        [JsonProperty("data")]
-        public T Data;
-
-        [JsonProperty("error_message")]
-        public String ErrorMessage;
-    }
-
     public struct OperationResult
     {
         [JsonProperty("is_success")]
@@ -28,6 +16,6 @@ namespace RubbishRecycle.Models
         public String ErrorMessage;
 
         [JsonProperty("data")]
-        private Object Data;
+        public Object Data;
     }
 }

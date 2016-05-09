@@ -24,12 +24,25 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public static String SendVerifyCode(String bindingPhone,out String errorMessage)
+        public static String SendRegisterVerifyCode(String bindingPhone, out String errorMessage)
+        {
+            return SendVerifyCode(bindingPhone, "注册验证", out errorMessage);
+        }
+
+        public static String SendChangePasswordVerifyCode(String bindingPhone, out String errorMessage)
+        {
+            return SendVerifyCode(bindingPhone, "变更验证", out errorMessage);
+        }
+
+        private static String SendVerifyCode(String bindingPhone,String signName,out String errorMessage)
         {
             SmsConfigSection smsConfig = RCManager.SmsConfig;
             if (smsConfig == null) throw new MissingMemberException("miss section 'sms' in config file");
-            VerifyCodeSmsElement verifyCodeConfig = smsConfig.VerifyCodeSms;
-            if (verifyCodeConfig == null) throw new MissingMemberException("miss element 'verifyCodeSms' in config file");
+            CodeElement verifyCodeConfig = smsConfig.Codes[signName];
+            if (verifyCodeConfig == null)
+            {
+                throw new MissingMemberException(String.Format("miss element 'verifyCodeSms' in config file: {0}",signName));
+            }
             ITopClient client = new DefaultTopClient(smsConfig.ServerUrl, smsConfig.AppKey, smsConfig.AppSecretKey, smsConfig.Format);
 
             AlibabaAliqinFcSmsNumSendRequest request = new AlibabaAliqinFcSmsNumSendRequest();

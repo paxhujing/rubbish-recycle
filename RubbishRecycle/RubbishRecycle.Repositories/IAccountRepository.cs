@@ -28,43 +28,51 @@ namespace RubbishRecycle.Repositories
         /// <summary>
         /// 检查账户名是否已经被使用。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名。</param>
         /// <returns></returns>
         Boolean IsNameUsed(String name);
 
         /// <summary>
         /// 检查手机是否已经被绑定。
         /// </summary>
-        /// <param name="phone"></param>
+        /// <param name="phone">手机号。</param>
         /// <returns></returns>
         Boolean IsPhoneBinded(String phone);
 
         /// <summary>
         /// 查找账号。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
         Account FindAccount(String name);
 
         /// <summary>
         /// 验证账号。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名或手机号。</param>
         /// <param name="password"></param>
         /// <returns></returns>
         Account VerifyAccount(String name, String password);
 
         /// <summary>
+        /// 修改密码。
+        /// </summary>
+        /// <param name="name">账户名或手机号。</param>
+        /// <param name="newPassword"></param>
+        /// <returns>新密码。</returns>
+        Boolean ChangePassword(String name, String newPassword);
+
+        /// <summary>
         /// 冻结账号。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
         Boolean FreezeAccount(String name);
 
         /// <summary>
         /// 解冻账号。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
         Boolean UnfreezeAccount(String name);
 

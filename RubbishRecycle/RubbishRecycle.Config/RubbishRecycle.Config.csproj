@@ -44,8 +44,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RubbishRecycleConfigurationManager.cs" />
     <Compile Include="SmsConfigSection.cs" />
-    <Compile Include="SmsElementBase.cs" />
-    <Compile Include="VerifyCodeSmsElement.cs" />
+    <Compile Include="CodeElement.cs" />
+    <Compile Include="VerifyCodeElementCollection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="RubbishRecycle.config">

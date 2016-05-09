@@ -13,6 +13,12 @@ namespace RubbishRecycle.Controllers.Repositories
 {
     internal class AccountRepository : RepositoryBase<RubbishRecycleContext>, IAccountRepository<RubbishRecycleContext>
     {
+        #region Fields
+
+        private static readonly IList<AppKeyInfo> AppKeys = new List<AppKeyInfo>();
+
+        #endregion
+
         #region Constructors
 
         public AccountRepository(RubbishRecycleContext dbContext)
@@ -28,7 +34,16 @@ namespace RubbishRecycle.Controllers.Repositories
         public AppKeyInfo GetAppKeyInfo(String appKey)
         {
             if (String.IsNullOrWhiteSpace(appKey)) return null;
-            return base.DbContext.AppKeyInfos.FirstOrDefault(x => x.AppKey == appKey);
+            AppKeyInfo info = AppKeys.FirstOrDefault(x => x.AppKey == appKey);
+            if (info == null)
+            {
+                info = base.DbContext.AppKeyInfos.FirstOrDefault(x => x.AppKey == appKey);
+                if (info != null)
+                {
+                    AppKeys.Add(info);
+                }
+            }
+            return info;
         }
 
         public Account AddAccount(Account info)
@@ -98,6 +113,24 @@ namespace RubbishRecycle.Controllers.Repositories
         {
             if (String.IsNullOrWhiteSpace(phone)) return false;
             return base.DbContext.Accounts.Any(x => x.Name == phone);
+        }
+
+        public Boolean ChangePassword(String name, String newPassword)
+        {
+            if (String.IsNullOrWhiteSpace(name)) return false;
+            String md5Password = CryptoHelper.MD5Compute(newPassword);
+            Account account = FindAccount(name);
+            if (account != null)
+            {
+                if (account.Password != newPassword)
+                {
+                    account.Password = newPassword;
+                    base.DbContext.Accounts.Attach(account);
+                    base.DbContext.Entry(account).State = EntityState.Modified;
+                    return base.DbContext.SaveChanges() != 0;
+                }
+            }
+            return false;
         }
 
         #endregion

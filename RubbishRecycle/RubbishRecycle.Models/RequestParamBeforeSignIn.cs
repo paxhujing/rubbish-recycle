@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace RubbishRecycle.Models
 {
     /// <summary>
-    /// 登记之前的请求参数。
+    /// 登陆前的请求参数。
     /// </summary>
     /// <typeparam name="T">数据类型。</typeparam>
     public struct RequestParamBeforeSignIn<T>

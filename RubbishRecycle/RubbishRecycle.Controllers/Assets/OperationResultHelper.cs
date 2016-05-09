@@ -9,32 +9,7 @@ namespace RubbishRecycle.Controllers.Assets
 {
     internal static class OperationResultHelper
     {
-        public static OperationResult<T> GenerateResult<T>(T data, String errorMessage)
-        {
-            if (!String.IsNullOrWhiteSpace(errorMessage))
-            {
-                AppGlobal.Log.WarnFormat(errorMessage);
-            }
-            return new OperationResult<T>
-            {
-                Data = data,
-                ErrorMessage = errorMessage,
-                IsSuccess = String.IsNullOrWhiteSpace(errorMessage)
-            };
-        }
-
-        public static OperationResult<T> GenerateSuccessResult<T>(T data)
-        {
-            return new OperationResult<T> { Data = data, IsSuccess = true };
-        }
-
-        public static OperationResult<T> GenerateErrorResult<T>(String errorMessage)
-        {
-            AppGlobal.Log.WarnFormat(errorMessage);
-            return new OperationResult<T> { ErrorMessage = errorMessage, IsSuccess = false };
-        }
-
-        public static OperationResult GenerateResult(String errorMessage)
+        public static OperationResult GenerateResult(Object data, String errorMessage)
         {
             if (!String.IsNullOrWhiteSpace(errorMessage))
             {
@@ -42,20 +17,29 @@ namespace RubbishRecycle.Controllers.Assets
             }
             return new OperationResult
             {
+                Data = data,
                 ErrorMessage = errorMessage,
                 IsSuccess = String.IsNullOrWhiteSpace(errorMessage)
             };
         }
 
-        public static OperationResult GenerateSuccessResult()
+        public static OperationResult GenerateSuccessResult(Object data = null)
         {
-            return new OperationResult { IsSuccess = true };
+            return new OperationResult
+            {
+                IsSuccess = true,
+                Data = data
+            };
         }
 
         public static OperationResult GenerateErrorResult(String errorMessage)
         {
             AppGlobal.Log.WarnFormat(errorMessage);
-            return new OperationResult { ErrorMessage = errorMessage, IsSuccess = false };
+            return new OperationResult
+            {
+                ErrorMessage = errorMessage,
+                IsSuccess = false
+            };
         }
     }
 }

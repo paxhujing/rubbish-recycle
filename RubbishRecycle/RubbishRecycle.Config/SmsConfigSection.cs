@@ -9,6 +9,8 @@ namespace RubbishRecycle.Config
 {
     public class SmsConfigSection : ConfigurationSection
     {
+        #region Properties
+
         [ConfigurationProperty("serverUrl", IsRequired = true)]
         public String ServerUrl
         {
@@ -44,11 +46,12 @@ namespace RubbishRecycle.Config
             set { base["format"] = value; }
         }
 
-        [ConfigurationProperty("verifyCodeSms", IsRequired = false)]
-        public VerifyCodeSmsElement VerifyCodeSms
+        [ConfigurationProperty("", IsDefaultCollection = true)]
+        public VerifyCodeElementCollection Codes
         {
-            get { return base["verifyCodeSms"] as VerifyCodeSmsElement; }
-            set { base["verifyCodeSms"] = value; }
+            get { return (VerifyCodeElementCollection)base[""]; }
         }
+
+        #endregion
     }
 }

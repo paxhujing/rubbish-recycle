@@ -69,30 +69,45 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ActionName("IsNameUsed")]
-        public OperationResult<Boolean> IsNameUsed(RequestParamBeforeSignIn<String> info)
+        public OperationResult IsNameUsed(RequestParamBeforeSignIn<String> info)
         {
             if (IsLegalRequest(info.AppKey))
             {
                 Boolean isUsed = this._repository.IsNameUsed(info.Data);
-                OperationResult<Boolean> result = new OperationResult<Boolean>();
-                result.Data = isUsed;
-                return result;
+                return OperationResultHelper.GenerateSuccessResult(isUsed.ToString());
             }
-            return OperationResultHelper.GenerateErrorResult<Boolean>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpPost]
-        public OperationResult<Boolean> IsPhoneBinded(RequestParamBeforeSignIn<String> info)
+        public OperationResult IsPhoneBinded(RequestParamBeforeSignIn<String> info)
         {
             if (IsLegalRequest(info.AppKey))
             {
                 Boolean isUsed = this._repository.IsPhoneBinded(info.Data);
-                OperationResult<Boolean> result = new OperationResult<Boolean>();
-                result.Data = isUsed;
-                return result;
+                return OperationResultHelper.GenerateSuccessResult(isUsed.ToString());
             }
-            return OperationResultHelper.GenerateErrorResult<Boolean>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ActionName("Login")]
+        public OperationResult Login(LoginInfo loginInfo)
+        {
+            if (IsLegalRequest(loginInfo.AppKey))
+            {
+                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                if (account != null)
+                {
+                    DropIfAccountTokenExsited(account);
+                    String token = InitAccountToken(account);
+                    return OperationResultHelper.GenerateSuccessResult(token);
+                }
+                return OperationResultHelper.GenerateErrorResult("账户不存在");
+            }
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
 
         [AllowAnonymous]
@@ -102,54 +117,15 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                String errorMessage;
-                String phone = info.Data;
-                String code = TaoBaoSms.SendVerifyCode(phone, out errorMessage);
-                if (String.IsNullOrWhiteSpace(code))
-                {
-                    return OperationResultHelper.GenerateErrorResult("发送给验证码失败");
-                }
-                else
-                {
-                    VerifyCodeManager.Manager.Add(phone, code);
-                }
-                return OperationResultHelper.GenerateSuccessResult();
+                return SendVerifyCode(info.Data, VerifyCodeType.Register);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
 
         [AllowAnonymous]
         [HttpPost]
-        [ActionName("Login")]
-        public OperationResult<String> Login(LoginInfo loginInfo)
-        {
-            if (IsLegalRequest(loginInfo.AppKey))
-            {
-                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
-                if (account != null)
-                {
-                    DropIfAccountTokenExsited(account);
-                    String token = InitAccountToken(account);
-                    return OperationResultHelper.GenerateSuccessResult<String>(token);
-                }
-                return OperationResultHelper.GenerateErrorResult<String>("账户不存在");
-            }
-            return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
-        }
-
-        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
-        [HttpGet]
-        [ActionName("Logout")]
-        public OperationResult Logout(String token)
-        {
-            AccountTokenManager.Manager.Remove(token);
-            return OperationResultHelper.GenerateSuccessResult();
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
         [ActionName("RegisterSaler")]
-        public OperationResult<String> RegisterSaler(RegisterInfo registerInfo)
+        public OperationResult RegisterSaler(RegisterInfo registerInfo)
         {
             return Register("saler", registerInfo);
         }
@@ -157,9 +133,50 @@ namespace RubbishRecycle.Controllers
         [AllowAnonymous]
         [HttpPost]
         [ActionName("RegisterBuyer")]
-        public OperationResult<String> RegisterBuyer(RegisterInfo registerInfo)
+        public OperationResult RegisterBuyer(RegisterInfo registerInfo)
         {
             return Register("buyer", registerInfo);
+        }
+
+        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
+        [HttpGet]
+        [ActionName("Logout")]
+        public OperationResult Logout()
+        {
+            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
+            AccountTokenManager.Manager.Remove(at.Token);
+            return OperationResultHelper.GenerateSuccessResult();
+        }
+
+        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
+        [HttpGet]
+        [ActionName("GetChangePasswordVerifyCode")]
+        public OperationResult GetChangePasswordVerifyCode()
+        {
+            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
+            return SendVerifyCode(at.Phone, VerifyCodeType.ChangePassword);
+        }
+
+        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
+        [HttpPost]
+        [ActionName("ChangePassword")]
+        public OperationResult ChangePassword(ChangePasswordInfo info)
+        {
+            if (String.IsNullOrWhiteSpace(info.Password))
+            {
+                return OperationResultHelper.GenerateErrorResult("密码不能为空");
+            }
+            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
+            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(at.Phone);
+            if (verifyCode != info.VerifyCode)
+            {
+                return OperationResultHelper.GenerateErrorResult("验证码错误");
+            }
+            if (this._repository.ChangePassword(at.Phone, info.Password))
+            {
+                return OperationResultHelper.GenerateSuccessResult();
+            }
+            return OperationResultHelper.GenerateErrorResult("修改密码失败");
         }
 
         [RubbishRecycleAuthorize(Roles = "admin")]
@@ -173,22 +190,22 @@ namespace RubbishRecycle.Controllers
         [HttpGet]
         public Account GetAccount(String name)
         {
-            throw new NotImplementedException();
+            return this._repository.FindAccount(name);
         }
 
         #endregion
 
         #region Private
 
-        public OperationResult<String> Register(String roleId, RegisterInfo registerInfo)
+        private OperationResult Register(String roleId, RegisterInfo registerInfo)
         {
             if (IsLegalRequest(registerInfo.AppKey))
             {
                 String errorMessage;
                 String token = RegisterAndInitToken(registerInfo, roleId, out errorMessage);
-                return OperationResultHelper.GenerateResult<String>(token, errorMessage);
+                return OperationResultHelper.GenerateResult(token, errorMessage);
             }
-            return OperationResultHelper.GenerateErrorResult<String>("无法识别的客户端");
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
 
         /// <summary>
@@ -256,7 +273,7 @@ namespace RubbishRecycle.Controllers
         /// <returns>登陆Token。</returns>
         private String InitAccountToken(Account account)
         {
-            AccountToken accountToken = new AccountToken(account.Id);
+            AccountToken accountToken = new AccountToken(account.BindingPhone);
             accountToken.Role = account.RoleId;
             AccountTokenManager.Manager.Add(accountToken);
             return accountToken.Token;
@@ -268,7 +285,7 @@ namespace RubbishRecycle.Controllers
         /// <param name="account">账户信息。</param>
         private void DropIfAccountTokenExsited(Account account)
         {
-            AccountToken accountToken = AccountTokenManager.Manager.GetAccountTokenById(account.Id);
+            AccountToken accountToken = AccountTokenManager.Manager.GetAccountTokenById(account.BindingPhone);
             if (accountToken != null)
             {
                 AccountTokenManager.Manager.Remove(accountToken);
@@ -284,6 +301,38 @@ namespace RubbishRecycle.Controllers
         private Boolean IsLegalRequest(String appKey)
         {
             return this._repository.GetAppKeyInfo(appKey) != null;
+        }
+
+        /// <summary>
+        /// 发送验证码。
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <param name="type">验证码类型。</param>
+        /// <returns></returns>
+        private OperationResult SendVerifyCode(String phone, VerifyCodeType type)
+        {
+            String errorMessage;
+            String code = null;
+            switch (type)
+            {
+                case VerifyCodeType.Register:
+                    code = TaoBaoSms.SendRegisterVerifyCode(phone, out errorMessage);
+                    break;
+                case VerifyCodeType.ChangePassword:
+                    code = TaoBaoSms.SendChangePasswordVerifyCode(phone, out errorMessage);
+                    break;
+                default:
+                    break;
+            }
+            if (String.IsNullOrWhiteSpace(code))
+            {
+                return OperationResultHelper.GenerateErrorResult("发送给验证码失败");
+            }
+            else
+            {
+                VerifyCodeManager.Manager.Add(phone, code, VerifyCodeType.Register);
+            }
+            return OperationResultHelper.GenerateSuccessResult();
         }
 
         #endregion

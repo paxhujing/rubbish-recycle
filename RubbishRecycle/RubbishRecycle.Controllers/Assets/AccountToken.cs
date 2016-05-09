@@ -21,11 +21,11 @@ namespace RubbishRecycle.Controllers.Assets
         /// <summary>
         /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountToken 实例。
         /// </summary>
-        /// <param name="accountId">账号Id。</param>
+        /// <param name="phone">绑定的手机。</param>
         /// <param name="cryptor">AES 加密/解密器。</param>
-        public AccountToken(String accountId)
+        public AccountToken(String phone)
         {
-            this._accountId = accountId;
+            this._phone = phone;
             this.Timestamp = DateTime.Now;
             GenerateToken();
         }
@@ -58,13 +58,13 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region AccountId
 
-        private readonly String _accountId;
+        private readonly String _phone;
         /// <summary>
-        /// 账号Id。
+        /// 绑定的手机。
         /// </summary>
-        public String AccountId
+        public String Phone
         {
-            get { return this._accountId; }
+            get { return this._phone; }
         }
 
         #endregion

@@ -57,11 +57,11 @@ namespace RubbishRecycle.Controllers.Assets
             }
         }
 
-        public void Add(String phone, String code)
+        public void Add(String phone, String code, VerifyCodeType type)
         {
-            lock(this._syncObj)
+            lock (this._syncObj)
             {
-                PhoneVerifyCode pv = new PhoneVerifyCode(phone,code);
+                PhoneVerifyCode pv = new PhoneVerifyCode(phone, code, type);
                 if (this._mapVerifyCode.ContainsKey(phone))
                 {
                     this._mapVerifyCode[phone] = pv;
@@ -69,6 +69,7 @@ namespace RubbishRecycle.Controllers.Assets
                 else
                 {
                     this._mapVerifyCode.Add(phone, pv);
+                    AppGlobal.Log.InfoFormat("Add new verify code: {0};phone: {1};type: {2}", code, phone, type.ToString());
                     if (!this._timer.Enabled)
                     {
                         this._timer.Start();

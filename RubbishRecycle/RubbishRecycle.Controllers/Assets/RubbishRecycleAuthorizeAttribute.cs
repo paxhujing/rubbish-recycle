@@ -29,9 +29,10 @@ namespace RubbishRecycle.Controllers.Assets
 
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            AccountToken accountToken = actionContext.Request.GetTokenByRequestHeader();
+            AccountToken accountToken = actionContext.Request.GetAccountTokenByRequestHeader();
             if (accountToken != null)
             {
+                actionContext.ActionDescriptor.Properties.TryAdd("AccountToken", accountToken);
                 if (String.IsNullOrWhiteSpace(base.Roles))
                 {
                     IsAuthorized(actionContext);
