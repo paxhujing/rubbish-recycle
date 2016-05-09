@@ -122,9 +122,9 @@ namespace RubbishRecycle.Controllers.Repositories
             Account account = FindAccount(name);
             if (account != null)
             {
-                if (account.Password != newPassword)
+                if (account.Password != md5Password)
                 {
-                    account.Password = newPassword;
+                    account.Password = md5Password;
                     base.DbContext.Accounts.Attach(account);
                     base.DbContext.Entry(account).State = EntityState.Modified;
                     return base.DbContext.SaveChanges() != 0;
