@@ -105,7 +105,7 @@ namespace RubbishRecycle.Controllers
                     String token = InitAccountToken(account);
                     return OperationResultHelper.GenerateSuccessResult(token);
                 }
-                return OperationResultHelper.GenerateErrorResult("账户不存在密码错误");
+                return OperationResultHelper.GenerateErrorResult("账户不存在或密码错误");
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
