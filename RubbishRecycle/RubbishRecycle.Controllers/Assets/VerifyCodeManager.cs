@@ -41,7 +41,8 @@ namespace RubbishRecycle.Controllers.Assets
 
         public String GetCodeByPhone(String phone)
         {
-            lock(this._syncObj)
+            if (String.IsNullOrEmpty(phone)) return null;
+            lock (this._syncObj)
             {
                 if (this._mapVerifyCode.ContainsKey(phone))
                 {
@@ -59,6 +60,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         public void Add(String phone, String code, VerifyCodeType type)
         {
+            if (String.IsNullOrEmpty(phone) || String.IsNullOrEmpty(code)) return;
             lock (this._syncObj)
             {
                 PhoneVerifyCode pv = new PhoneVerifyCode(phone, code, type);
@@ -81,6 +83,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         public void Remove(String phone)
         {
+            if (String.IsNullOrEmpty(phone)) return;
             lock (this._syncObj)
             {
                 if (this._mapVerifyCode.ContainsKey(phone))

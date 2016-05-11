@@ -66,6 +66,8 @@ namespace RubbishRecycle.Controllers
 
         #region Actions
 
+        #region Register misc
+
         [AllowAnonymous]
         [HttpPost]
         [ActionName("IsNameUsed")]
@@ -74,7 +76,7 @@ namespace RubbishRecycle.Controllers
             if (IsLegalRequest(info.AppKey))
             {
                 Boolean isUsed = this._repository.IsNameUsed(info.Data);
-                return OperationResultHelper.GenerateSuccessResult(isUsed.ToString());
+                return OperationResultHelper.GenerateSuccessResult(isUsed);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
@@ -86,10 +88,14 @@ namespace RubbishRecycle.Controllers
             if (IsLegalRequest(info.AppKey))
             {
                 Boolean isUsed = this._repository.IsPhoneBinded(info.Data);
-                return OperationResultHelper.GenerateSuccessResult(isUsed.ToString());
+                return OperationResultHelper.GenerateSuccessResult(isUsed);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
+
+        #endregion
+
+        #region Login Logout
 
         [AllowAnonymous]
         [HttpPost]
@@ -109,6 +115,57 @@ namespace RubbishRecycle.Controllers
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
+
+        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
+        [HttpGet]
+        [ActionName("Logout")]
+        public OperationResult Logout()
+        {
+            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
+            AccountTokenManager.Manager.Remove(at.Token);
+            return OperationResultHelper.GenerateSuccessResult();
+        }
+
+        #endregion
+
+        #region Forget password
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ActionName("GetForgetPasswordVerifyCode")]
+        public OperationResult GetForgetPasswordVerifyCode(RequestParamBeforeSignIn<String> info)
+        {
+            if (IsLegalRequest(info.AppKey))
+            {
+                return SendVerifyCode(info.Data, VerifyCodeType.ChangePassword);
+            }
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        [ActionName("ForgetPassword")]
+        public OperationResult ForgetPassword(ForgetPasswordInfo info)
+        {
+            if (IsLegalRequest(info.AppKey))
+            {
+                String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(info.Phone);
+                if (verifyCode != info.VerifyCode)
+                {
+                    return OperationResultHelper.GenerateErrorResult("验证码错误");
+                }
+                if (this._repository.ChangePassword(info.Phone, info.Password))
+                {
+                    return OperationResultHelper.GenerateSuccessResult();
+                }
+                return OperationResultHelper.GenerateErrorResult("修改密码失败");
+            }
+            return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
+        }
+
+        #endregion
+
+        #region Register
 
         [AllowAnonymous]
         [HttpPost]
@@ -138,15 +195,9 @@ namespace RubbishRecycle.Controllers
             return Register("buyer", registerInfo);
         }
 
-        [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
-        [HttpGet]
-        [ActionName("Logout")]
-        public OperationResult Logout()
-        {
-            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
-            AccountTokenManager.Manager.Remove(at.Token);
-            return OperationResultHelper.GenerateSuccessResult();
-        }
+        #endregion
+
+        #region Change password
 
         [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
         [HttpGet]
@@ -178,6 +229,8 @@ namespace RubbishRecycle.Controllers
             }
             return OperationResultHelper.GenerateErrorResult("修改密码失败");
         }
+
+        #endregion
 
         [RubbishRecycleAuthorize(Roles = "admin")]
         [HttpGet]

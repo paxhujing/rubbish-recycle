@@ -47,6 +47,7 @@
     <Compile Include="Account.cs" />
     <Compile Include="AppKeyInfo.cs" />
     <Compile Include="ChangePasswordInfo.cs" />
+    <Compile Include="ForgetPasswordInfo.cs" />
     <Compile Include="LoginInfo.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="Order.cs" />
