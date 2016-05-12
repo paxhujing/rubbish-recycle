@@ -178,6 +178,10 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
+                if (this._repository.IsExisted(info.Data))
+                {
+                    return OperationResultHelper.GenerateErrorResult("手机号已被绑定");
+                }
                 return SendVerifyCode(info.Data, VerifyCodeType.Register);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
@@ -305,16 +309,10 @@ namespace RubbishRecycle.Controllers
                 errorMessage = "验证码错误";
                 return null;
             }
-            String name = registerInfo.Name ?? registerInfo.BindingPhone;
-            if (this._repository.IsExisted(name))
-            {
-                errorMessage = "此账户名已被使用，或者手机号已被绑定";
-                return null;
-            }
             Account account = new Account();
             account.RoleId = roleId;
             account.Id = Guid.NewGuid().ToString().Replace("-",String.Empty);
-            account.Name = name;
+            account.Name = registerInfo.Name ?? registerInfo.BindingPhone;
             account.BindingPhone = registerInfo.BindingPhone;
             account.Password = CryptoHelper.MD5Compute(registerInfo.Password);
             account.LastLogin = DateTime.Now;
