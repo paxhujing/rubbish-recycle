@@ -137,7 +137,11 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                return SendVerifyCode(info.Data, VerifyCodeType.ChangePassword);
+                if (this._repository.IsExisted(info.Data))
+                {
+                    return SendVerifyCode(info.Data, VerifyCodeType.ChangePassword);
+                }
+                return OperationResultHelper.GenerateErrorResult("账户不存在");
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
@@ -243,7 +247,7 @@ namespace RubbishRecycle.Controllers
         [HttpGet]
         public Account GetAccount(String name)
         {
-            return this._repository.FindAccount(name);
+            return this._repository.GetAccount(name);
         }
 
         #endregion
@@ -302,13 +306,12 @@ namespace RubbishRecycle.Controllers
                 return null;
             }
             String name = registerInfo.Name ?? registerInfo.BindingPhone;
-            Account account = this._repository.FindAccount(name);
-            if (account != null)
+            if (this._repository.IsExisted(name))
             {
                 errorMessage = "此账户名已被使用，或者手机号已被绑定";
                 return null;
             }
-            account = new Account();
+            Account account = new Account();
             account.RoleId = roleId;
             account.Id = Guid.NewGuid().ToString().Replace("-",String.Empty);
             account.Name = name;

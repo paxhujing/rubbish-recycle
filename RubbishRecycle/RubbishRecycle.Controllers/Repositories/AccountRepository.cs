@@ -56,7 +56,7 @@ namespace RubbishRecycle.Controllers.Repositories
             return null;
         }
 
-        public Account FindAccount(String name)
+        public Account GetAccount(String name)
         {
             if (String.IsNullOrWhiteSpace(name)) return null;
             return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name));
@@ -65,7 +65,7 @@ namespace RubbishRecycle.Controllers.Repositories
         public Boolean FreezeAccount(String name)
         {
             if (String.IsNullOrWhiteSpace(name)) return false;
-            Account account = FindAccount(name);
+            Account account = GetAccount(name);
             if (account != null)
             {
                 account.IsFreezed = true;
@@ -79,7 +79,7 @@ namespace RubbishRecycle.Controllers.Repositories
         public Boolean UnfreezeAccount(String name)
         {
             if (String.IsNullOrWhiteSpace(name)) return false;
-            Account account = FindAccount(name);
+            Account account = GetAccount(name);
             if (account != null)
             {
                 account.IsFreezed = false;
@@ -119,7 +119,7 @@ namespace RubbishRecycle.Controllers.Repositories
         {
             if (String.IsNullOrWhiteSpace(name)) return false;
             String md5Password = CryptoHelper.MD5Compute(newPassword);
-            Account account = FindAccount(name);
+            Account account = GetAccount(name);
             if (account != null)
             {
                 if (account.Password != md5Password)
@@ -131,6 +131,11 @@ namespace RubbishRecycle.Controllers.Repositories
                 }
             }
             return false;
+        }
+
+        public Boolean IsExisted(String name)
+        {
+            return base.DbContext.Accounts.Any(x => (x.Name == name) || (x.BindingPhone == name));
         }
 
         #endregion

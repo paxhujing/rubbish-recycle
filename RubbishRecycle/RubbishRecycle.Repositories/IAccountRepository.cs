@@ -44,7 +44,14 @@ namespace RubbishRecycle.Repositories
         /// </summary>
         /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
-        Account FindAccount(String name);
+        Account GetAccount(String name);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        Boolean IsExisted(String name);
 
         /// <summary>
         /// 验证账号。
