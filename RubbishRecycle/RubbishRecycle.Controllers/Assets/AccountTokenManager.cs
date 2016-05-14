@@ -46,16 +46,19 @@ namespace RubbishRecycle.Controllers.Assets
             return Guid.NewGuid().ToString().Replace("-", String.Empty);
         }
 
-        public Boolean TryGetTokenByPhone(String phone,out String token)
+        public Boolean TryGetTokenByPhone(String phone, out String token)
         {
-            if(this._phoneMapToken.ContainsKey(phone))
+            lock (this._syncObj)
             {
-                token = this._phoneMapToken[phone];
-                this._tokenMapAccountToken[token].Timestamp = DateTime.Now;
-                return true;
+                if (this._phoneMapToken.ContainsKey(phone))
+                {
+                    token = this._phoneMapToken[phone];
+                    this._tokenMapAccountToken[token].Timestamp = DateTime.Now;
+                    return true;
+                }
+                token = null;
+                return false;
             }
-            token = null;
-            return false;
         }
 
         public AccountToken GetAccountTokenByToken(String token)
@@ -106,6 +109,7 @@ namespace RubbishRecycle.Controllers.Assets
                     this._tokenMapAccountToken.Remove(oldToken);
                     accounToken.Token = token;
                     this._tokenMapAccountToken.Add(token, accounToken);
+                    this._phoneMapToken[accounToken.Phone] = token;
                     AppGlobal.Log.InfoFormat("Token changed for '{0}' from '{1}' to '{2}'", accounToken.Phone, oldToken, token);
                 }
             }

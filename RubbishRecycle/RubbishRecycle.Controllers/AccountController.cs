@@ -243,7 +243,7 @@ namespace RubbishRecycle.Controllers
             }
             if (this._repository.ChangePassword(phone, info.Password))
             {
-                AccountTokenManager.Manager.ChangeToken(base.ActionContext.GetToken());
+                AccountTokenManager.Manager.Remove(base.ActionContext.GetToken());
                 return OperationResultHelper.GenerateSuccessResult();
             }
             return OperationResultHelper.GenerateErrorResult("修改密码失败");
@@ -385,7 +385,7 @@ namespace RubbishRecycle.Controllers
             }
             else
             {
-                VerifyCodeManager.Manager.Add(phone, code, VerifyCodeType.Register);
+                VerifyCodeManager.Manager.Add(phone, code, type);
             }
             return OperationResultHelper.GenerateSuccessResult();
         }
