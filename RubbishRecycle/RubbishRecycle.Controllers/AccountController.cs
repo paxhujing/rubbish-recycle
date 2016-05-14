@@ -372,7 +372,11 @@ namespace RubbishRecycle.Controllers
         private OperationResult SendVerifyCode(String phone, VerifyCodeType type)
         {
             String errorMessage = null;
-            String code = null;
+            String code = VerifyCodeManager.Manager.GetCodeByPhone(phone, type);
+            if (!String.IsNullOrWhiteSpace(code))
+            {
+                return OperationResultHelper.GenerateErrorResult("验证码已发送");
+            }
             switch (type)
             {
                 case VerifyCodeType.Register:
