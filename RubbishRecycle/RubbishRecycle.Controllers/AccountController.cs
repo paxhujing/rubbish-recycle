@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using RubbishRecycle.Toolkit;
 using RubbishRecycle.Repositories;
 using RubbishRecycle.Controllers.Repositories;
+using RubbishRecycle.Models.ViewModels;
 
 namespace RubbishRecycle.Controllers
 {
@@ -262,9 +263,11 @@ namespace RubbishRecycle.Controllers
 
         [RubbishRecycleAuthorize(Roles ="admin;saler;buyer")]
         [HttpGet]
-        public Account GetAccount(String name)
+        [ActionName("GetAccountView")]
+        public AccountViewer GetAccountView()
         {
-            return this._repository.GetAccount(name);
+            String phone = base.ActionContext.GetPhone();
+            return this._repository.GetAccount(phone).ToViewer() ;
         }
 
         #endregion
@@ -366,7 +369,7 @@ namespace RubbishRecycle.Controllers
         /// <returns></returns>
         private OperationResult SendVerifyCode(String phone, VerifyCodeType type)
         {
-            String errorMessage;
+            String errorMessage = null;
             String code = null;
             switch (type)
             {
@@ -381,7 +384,7 @@ namespace RubbishRecycle.Controllers
             }
             if (String.IsNullOrWhiteSpace(code))
             {
-                return OperationResultHelper.GenerateErrorResult("发送给验证码失败");
+                return OperationResultHelper.GenerateErrorResult(String.Format("发送给验证码失败: {0}", errorMessage));
             }
             else
             {

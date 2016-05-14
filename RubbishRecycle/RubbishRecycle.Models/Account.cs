@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RubbishRecycle.Models.ViewModels;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,7 +11,7 @@ namespace RubbishRecycle.Models
     /// 账户。
     /// </summary>
     [Table("account")]
-    public class Account
+    public class Account : IConvertViewer<AccountViewer>
     {
         /// <summary>
         /// 账户表Id。
@@ -72,5 +73,17 @@ namespace RubbishRecycle.Models
         public Boolean IsFreezed { get; set; }
 
         public virtual ICollection<Order> Orders { get; set; }
+
+        public AccountViewer ToViewer()
+        {
+            AccountViewer viewer = new AccountViewer();
+            viewer.Auction = this.Auction;
+            viewer.BindingPhone = this.BindingPhone;
+            viewer.Credit = this.Credit;
+            viewer.IsFreezed = this.IsFreezed;
+            viewer.LastLogin = this.LastLogin;
+            viewer.Name = this.Name;
+            return viewer;
+        }
     }
 }
