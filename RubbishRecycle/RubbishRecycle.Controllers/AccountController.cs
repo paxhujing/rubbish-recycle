@@ -384,7 +384,7 @@ namespace RubbishRecycle.Controllers
             }
             if (String.IsNullOrWhiteSpace(code))
             {
-                return OperationResultHelper.GenerateErrorResult(String.Format("发送给验证码失败: {0}", errorMessage));
+                return OperationResultHelper.GenerateErrorResult(String.Format("发送验证码失败: {0}", errorMessage));
             }
             else
             {
