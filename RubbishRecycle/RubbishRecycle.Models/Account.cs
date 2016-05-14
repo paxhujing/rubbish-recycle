@@ -81,7 +81,7 @@ namespace RubbishRecycle.Models
             viewer.BindingPhone = this.BindingPhone;
             viewer.Credit = this.Credit;
             viewer.IsFreezed = this.IsFreezed;
-            viewer.LastLogin = this.LastLogin.ToString("yyyy-MM-dd hh-mm-ss");
+            viewer.LastLogin = this.LastLogin.ToString("yyyy-MM-dd hh:mm:ss");
             viewer.Name = this.Name;
             return viewer;
         }
