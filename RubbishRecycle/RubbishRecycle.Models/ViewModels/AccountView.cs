@@ -31,7 +31,7 @@ namespace RubbishRecycle.Models.ViewModels
         /// 最近登录日期。
         /// </summary>
         [JsonProperty("last_login")]
-        public DateTime LastLogin { get; set; }
+        public String LastLogin { get; set; }
 
         /// <summary>
         /// 信誉。
