@@ -39,7 +39,7 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Methods
 
-        public String GetCodeByPhone(String phone)
+        public String GetCodeByPhone(String phone,VerifyCodeType type)
         {
             if (String.IsNullOrEmpty(phone)) return null;
             lock (this._syncObj)
@@ -47,11 +47,14 @@ namespace RubbishRecycle.Controllers.Assets
                 if (this._mapVerifyCode.ContainsKey(phone))
                 {
                     PhoneVerifyCode pv = this._mapVerifyCode[phone];
-                    AppGlobal.Log.DebugFormat("Get verify code: {0}; Timestamp: {1}", pv.Phone, pv.Timestamp);
-                    this._mapVerifyCode.Remove(phone);
-                    if (IsValid(pv))
+                    if (pv.Type == type)
                     {
-                        return pv.Code;
+                        AppGlobal.Log.DebugFormat("Get verify code: {0}; interval: {1}", pv.Phone, (DateTime.Now - pv.Timestamp).Seconds);
+                        this._mapVerifyCode.Remove(phone);
+                        if (IsValid(pv))
+                        {
+                            return pv.Code;
+                        }
                     }
                 }
                 return null;
@@ -103,9 +106,9 @@ namespace RubbishRecycle.Controllers.Assets
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
         {
+            this._timer.Stop();
             lock (this._syncObj)
             {
-                this._timer.Stop();
                 Rebuild();
                 if (this._mapVerifyCode.Count != 0)
                 {

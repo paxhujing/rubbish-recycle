@@ -19,11 +19,15 @@ namespace RubbishRecycle.Controllers.Assets
 
         #endregion
 
+        #region Properties
+
         public IIdentity Identity
         {
             get;
             private set;
         }
+
+        #endregion
 
         public Boolean IsInRole(String role)
         {

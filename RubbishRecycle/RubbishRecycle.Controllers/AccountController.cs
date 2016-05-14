@@ -104,14 +104,24 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(loginInfo.AppKey))
             {
-                Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
-                if (account != null)
+                if(String.IsNullOrWhiteSpace(loginInfo.Name))
                 {
-                    DropIfAccountTokenExsited(account);
-                    String token = InitAccountToken(account);
-                    return OperationResultHelper.GenerateSuccessResult(token);
+                    return OperationResultHelper.GenerateErrorResult("账户不能为空");
                 }
-                return OperationResultHelper.GenerateErrorResult("账户不存在或密码错误");
+                String token = null;
+                if(!AccountTokenManager.Manager.TryGetTokenByPhone(loginInfo.Name,out token))
+                {
+                    Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                    if (account != null)
+                    {
+                        token = InitAccountToken(account);
+                    }
+                    else
+                    {
+                        return OperationResultHelper.GenerateErrorResult("账户不存在或密码错误");
+                    }
+                }
+                return OperationResultHelper.GenerateSuccessResult(token);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
         }
@@ -121,8 +131,8 @@ namespace RubbishRecycle.Controllers
         [ActionName("Logout")]
         public OperationResult Logout()
         {
-            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
-            AccountTokenManager.Manager.Remove(at.Token);
+            String token = base.ActionContext.GetToken();
+            AccountTokenManager.Manager.Remove(token);
             return OperationResultHelper.GenerateSuccessResult();
         }
 
@@ -153,7 +163,7 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(info.Phone);
+                String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(info.Phone, VerifyCodeType.ChangePassword);
                 if (verifyCode != info.VerifyCode)
                 {
                     return OperationResultHelper.GenerateErrorResult("验证码错误");
@@ -226,19 +236,22 @@ namespace RubbishRecycle.Controllers
                 return OperationResultHelper.GenerateErrorResult("密码不能为空");
             }
             String phone = base.ActionContext.GetPhone();
-            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(phone);
+            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(phone, VerifyCodeType.ChangePassword);
             if (verifyCode != info.VerifyCode)
             {
                 return OperationResultHelper.GenerateErrorResult("验证码错误");
             }
             if (this._repository.ChangePassword(phone, info.Password))
             {
+                AccountTokenManager.Manager.ChangeToken(base.ActionContext.GetToken());
                 return OperationResultHelper.GenerateSuccessResult();
             }
             return OperationResultHelper.GenerateErrorResult("修改密码失败");
         }
 
         #endregion
+
+        #region Account misc
 
         [RubbishRecycleAuthorize(Roles = "admin")]
         [HttpGet]
@@ -253,6 +266,8 @@ namespace RubbishRecycle.Controllers
         {
             return this._repository.GetAccount(name);
         }
+
+        #endregion
 
         #endregion
 
@@ -303,7 +318,7 @@ namespace RubbishRecycle.Controllers
                 return null;
             }
 
-            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(registerInfo.BindingPhone);
+            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(registerInfo.BindingPhone, VerifyCodeType.Register);
             if (verifyCode != registerInfo.VerifyCode)
             {
                 errorMessage = "验证码错误";
@@ -327,24 +342,10 @@ namespace RubbishRecycle.Controllers
         /// <returns>登陆Token。</returns>
         private String InitAccountToken(Account account)
         {
-            AccountToken accountToken = new AccountToken(account.BindingPhone);
-            accountToken.Role = account.RoleId;
-            AccountTokenManager.Manager.Add(accountToken);
-            return accountToken.Token;
-        }
-
-        /// <summary>
-        /// 如果AccountToken已经存在则删除。
-        /// </summary>
-        /// <param name="account">账户信息。</param>
-        private void DropIfAccountTokenExsited(Account account)
-        {
-            AccountToken accountToken = AccountTokenManager.Manager.GetAccountTokenById(account.BindingPhone);
-            if (accountToken != null)
-            {
-                AccountTokenManager.Manager.Remove(accountToken);
-                AppGlobal.Log.DebugFormat("Drop existed token: {0}", accountToken.Token);
-            }
+            AccountToken viewer = new AccountToken(account.BindingPhone);
+            viewer.Role = account.RoleId;
+            viewer.IsFreeze = account.IsFreezed;
+            return AccountTokenManager.Manager.Add(viewer);
         }
 
         /// <summary>

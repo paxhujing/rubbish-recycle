@@ -18,13 +18,14 @@ namespace RubbishRecycle.Controllers.Assets
 
         public override void OnAuthorization(HttpActionContext actionContext)
         {
-            AccountToken accountToken = actionContext.Request.GetAccountTokenByRequestHeader();
+            String token = null;
+            AccountToken accountToken = actionContext.Request.GetAccountTokenByRequestHeader(out token);
             if (accountToken != null)
             {
                 IPrincipal principal = new BaseAccountTokenPrincipal(accountToken);
                 if(principal.IsInRole(base.Roles))
                 {
-                    actionContext.RequestContext.Principal = new BaseAccountTokenPrincipal(accountToken);
+                    actionContext.RequestContext.Principal = principal;
                     IsAuthorized(actionContext);
                     return;
                 }

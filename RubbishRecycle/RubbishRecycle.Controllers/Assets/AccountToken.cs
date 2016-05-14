@@ -19,15 +19,13 @@ namespace RubbishRecycle.Controllers.Assets
         #region Constructors
 
         /// <summary>
-        /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountToken 实例。
+        /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountViewer 实例。
         /// </summary>
         /// <param name="phone">绑定的手机。</param>
         /// <param name="cryptor">AES 加密/解密器。</param>
         public AccountToken(String phone)
         {
             this._phone = phone;
-            this.Timestamp = DateTime.Now;
-            GenerateToken();
         }
 
         #endregion
@@ -43,20 +41,7 @@ namespace RubbishRecycle.Controllers.Assets
             set;
         }
 
-        #region Token
-
-        private String _token;
-        /// <summary>
-        /// 客户端令牌。
-        /// </summary>
-        public String Token
-        {
-            get { return this._token; }
-        }
-
-        #endregion
-
-        #region AccountId
+        #region Phone
 
         private readonly String _phone;
         /// <summary>
@@ -94,16 +79,15 @@ namespace RubbishRecycle.Controllers.Assets
 
         #endregion
 
-        #endregion
+        #region Token
 
-        #region Methods
-
-        public String GenerateToken()
+        public String Token
         {
-            String token = Guid.NewGuid().ToString().Replace("-", String.Empty);
-            this._token = token;
-            return token;
+            get;
+            set;
         }
+
+        #endregion
 
         #endregion
     }

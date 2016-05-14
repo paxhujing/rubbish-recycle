@@ -22,9 +22,8 @@ namespace RubbishRecycle.Controllers.Assets
             return !String.IsNullOrWhiteSpace(token);
         }
 
-        public static AccountToken GetAccountTokenByRequestHeader(this HttpRequestMessage request)
+        public static AccountToken GetAccountTokenByRequestHeader(this HttpRequestMessage request,out String token)
         {
-            String token = null;
             if (request.TryExtractToken(out token))
             {
                 return AccountTokenManager.Manager.GetAccountTokenByToken(token);
@@ -41,6 +40,12 @@ namespace RubbishRecycle.Controllers.Assets
         public static String GetPhone(this HttpActionContext actionContext)
         {
             return actionContext.RequestContext.Principal.Identity.Name;
+        }
+
+        public static String GetToken(this HttpActionContext actionContext)
+        {
+            BaseAccountTokenIdentity identity = (BaseAccountTokenIdentity)actionContext.RequestContext.Principal.Identity;
+            return identity.AccountToken.Token;
         }
     }
 }
