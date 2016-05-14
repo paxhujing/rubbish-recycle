@@ -212,8 +212,8 @@ namespace RubbishRecycle.Controllers
         [ActionName("GetChangePasswordVerifyCode")]
         public OperationResult GetChangePasswordVerifyCode()
         {
-            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
-            return SendVerifyCode(at.Phone, VerifyCodeType.ChangePassword);
+            String phone = base.ActionContext.GetPhone();
+            return SendVerifyCode(phone, VerifyCodeType.ChangePassword);
         }
 
         [RubbishRecycleAuthorize(Roles = "admin;saler;buyer")]
@@ -225,13 +225,13 @@ namespace RubbishRecycle.Controllers
             {
                 return OperationResultHelper.GenerateErrorResult("密码不能为空");
             }
-            AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
-            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(at.Phone);
+            String phone = base.ActionContext.GetPhone();
+            String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(phone);
             if (verifyCode != info.VerifyCode)
             {
                 return OperationResultHelper.GenerateErrorResult("验证码错误");
             }
-            if (this._repository.ChangePassword(at.Phone, info.Password))
+            if (this._repository.ChangePassword(phone, info.Password))
             {
                 return OperationResultHelper.GenerateSuccessResult();
             }

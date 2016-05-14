@@ -34,7 +34,13 @@ namespace RubbishRecycle.Controllers.Assets
 
         public static AccountToken GetAccountTokenFromActionContext(this HttpActionContext actionContext)
         {
-            return (AccountToken)actionContext.ActionDescriptor.Properties["AccountToken"];
+            BaseAccountTokenIdentity identity = (BaseAccountTokenIdentity)actionContext.RequestContext.Principal.Identity;
+            return identity.AccountToken;
+        }
+
+        public static String GetPhone(this HttpActionContext actionContext)
+        {
+            return actionContext.RequestContext.Principal.Identity.Name;
         }
     }
 }
