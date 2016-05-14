@@ -59,7 +59,7 @@ namespace RubbishRecycle.Controllers.Repositories
         public Account GetAccount(String name)
         {
             if (String.IsNullOrWhiteSpace(name)) return null;
-            return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name));
+            return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name) || (x.Id == name));
         }
 
         public Boolean FreezeAccount(String name)
@@ -136,6 +136,19 @@ namespace RubbishRecycle.Controllers.Repositories
         public Boolean IsExisted(String name)
         {
             return base.DbContext.Accounts.Any(x => (x.Name == name) || (x.BindingPhone == name));
+        }
+
+        public Boolean UpdateLastLoginTime(String id)
+        {
+            Account account = GetAccount(id);
+            if (account != null)
+            {
+                account.LastLogin = DateTime.Now;
+                base.DbContext.Accounts.Attach(account);
+                base.DbContext.Entry(account).State = EntityState.Modified;
+                return base.DbContext.SaveChanges() != 0;
+            }
+            return false;
         }
 
         #endregion

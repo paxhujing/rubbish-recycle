@@ -11,7 +11,7 @@ namespace RubbishRecycle.Models
     /// 账户。
     /// </summary>
     [Table("account")]
-    public class Account : IConvertViewer<AccountViewer>
+    public class Account : IConvertViewer<AccountView>
     {
         /// <summary>
         /// 账户表Id。
@@ -74,9 +74,9 @@ namespace RubbishRecycle.Models
 
         public virtual ICollection<Order> Orders { get; set; }
 
-        public AccountViewer ToViewer()
+        public AccountView ToViewer()
         {
-            AccountViewer viewer = new AccountViewer();
+            AccountView viewer = new AccountView();
             viewer.Auction = this.Auction;
             viewer.BindingPhone = this.BindingPhone;
             viewer.Credit = this.Credit;

@@ -264,10 +264,11 @@ namespace RubbishRecycle.Controllers
         [RubbishRecycleAuthorize(Roles ="admin;saler;buyer")]
         [HttpGet]
         [ActionName("GetAccountView")]
-        public AccountViewer GetAccountView()
+        public OperationResult GetAccountView()
         {
             String phone = base.ActionContext.GetPhone();
-            return this._repository.GetAccount(phone).ToViewer() ;
+            AccountView view = this._repository.GetAccount(phone).ToViewer();
+            return OperationResultHelper.GenerateSuccessResult(view);
         }
 
         #endregion
@@ -348,6 +349,7 @@ namespace RubbishRecycle.Controllers
             AccountToken viewer = new AccountToken(account.BindingPhone);
             viewer.Role = account.RoleId;
             viewer.IsFreeze = account.IsFreezed;
+            this._repository.UpdateLastLoginTime(account.Id);
             return AccountTokenManager.Manager.Add(viewer);
         }
 

@@ -84,6 +84,12 @@ namespace RubbishRecycle.Repositories
         Boolean UnfreezeAccount(String name);
 
         /// <summary>
+        /// 更新最近一次登陆时间。
+        /// </summary>
+        /// <returns></returns>
+        Boolean UpdateLastLoginTime(String name);
+
+        /// <summary>
         /// 获取所有账号。
         /// </summary>
         /// <returns></returns>
