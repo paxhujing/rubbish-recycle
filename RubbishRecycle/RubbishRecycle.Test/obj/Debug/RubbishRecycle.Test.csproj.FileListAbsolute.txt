@@ -1,9 +1,0 @@
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\RubbishRecycle.Test.dll.config
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\RubbishRecycle.Test.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\RubbishRecycle.Test.pdb
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\nunit.framework.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\TechTalk.SpecFlow.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\bin\Debug\nunit.framework.xml
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\obj\Debug\RubbishRecycle.Test.csprojResolveAssemblyReference.cache
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\obj\Debug\RubbishRecycle.Test.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Test\obj\Debug\RubbishRecycle.Test.pdb
