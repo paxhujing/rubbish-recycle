@@ -1,9 +1,0 @@
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\RubbishRecycle.Controllers.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\RubbishRecycle.Controllers.pdb
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\RubbishRecycle.Models.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\System.Web.Http.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\RubbishRecycle.Models.pdb
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\bin\Debug\System.Web.Http.xml
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\obj\Debug\RubbishRecycle.Controllers.csprojResolveAssemblyReference.cache
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\obj\Debug\RubbishRecycle.Controllers.dll
-F:\rubbish-recycle\RubbishRecycle\RubbishRecycle.Controllers\obj\Debug\RubbishRecycle.Controllers.pdb
