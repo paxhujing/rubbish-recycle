@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // 有关程序集的一般信息由以下
 // 控制。更改这些特性值可修改
 // 与程序集关联的信息。
-[assembly: AssemblyTitle("RubbishRecycle.Models")]
+[assembly: AssemblyTitle("RubbishRecycle.SelfHost")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("RubbishRecycle.Models")]
+[assembly: AssemblyProduct("RubbishRecycle.SelfHost")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // 如果此项目向 COM 公开，则下列 GUID 用于类型库的 ID
-[assembly: Guid("0d3991e1-cf5c-4b6d-ab87-e2cbd724f3e8")]
+[assembly: Guid("75e040fd-75f5-48b0-9288-5882a654c882")]
 
 // 程序集的版本信息由下列四个值组成: 
 //
