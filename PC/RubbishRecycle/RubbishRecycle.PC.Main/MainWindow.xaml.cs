@@ -37,5 +37,40 @@ namespace RubbishRecycle.PC.Main
         {
             //Account account = this._proxy.GetAccount(App.Token,App.AESProvider);
         }
+
+        private void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            OperationResult result = this._proxy.Logout(App.Token);
+            if (result.IsSuccess)
+            {
+                Close();
+            }
+        }
+
+        private void ChangePassword_Click(object sender, RoutedEventArgs e)
+        {
+            e.Handled = true;
+            OperationResult result = this._proxy.GetChangePasswordVerifyCode(App.Token);
+            if (result.IsSuccess)
+            {
+                ChangePasswordInfo info = new ChangePasswordInfo();
+                info.Password = "654321";
+                info.VerifyCode = String.Empty;
+                result = this._proxy.ChangePassword(info, App.Token);
+                if (result.IsSuccess)
+                {
+                    MessageBox.Show("修改密码成功");
+                }
+                else
+                {
+                    MessageBox.Show("修改密码失败");
+                }
+            }
+            else
+            {
+                MessageBox.Show("获取验证码失败");
+            }
+        }
     }
 }

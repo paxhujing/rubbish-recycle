@@ -38,9 +38,6 @@
     <Reference Include="RubbishRecycle.Models">
       <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Models.dll</HintPath>
     </Reference>
-    <Reference Include="RubbishRecycle.Toolkit">
-      <HintPath>..\..\..\RubbishRecycle\RubbishRecycle.Main\bin\RubbishRecycle.Toolkit.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -85,6 +82,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ForgetPasswordWin.xaml.cs">
+      <DependentUpon>ForgetPasswordWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="RegisterWin.xaml.cs">
+      <DependentUpon>RegisterWin.xaml</DependentUpon>
+    </Compile>
+    <Page Include="ForgetPasswordWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -104,6 +111,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="RegisterWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -134,6 +145,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\RubbishRecycle\RubbishRecycle.Toolkit\RubbishRecycle.Toolkit.csproj">
+      <Project>{87590789-af8d-4fa3-8484-7c6b5fb3e80b}</Project>
+      <Name>RubbishRecycle.Toolkit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\RubbishRecycle.PC.Communication\RubbishRecycle.PC.Communication.csproj">
       <Project>{736c658f-63ad-41ac-b0a2-9c55df645f8a}</Project>
       <Name>RubbishRecycle.PC.Communication</Name>

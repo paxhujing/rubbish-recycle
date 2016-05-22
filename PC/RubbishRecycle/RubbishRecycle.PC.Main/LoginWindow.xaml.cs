@@ -36,78 +36,42 @@ namespace RubbishRecycle.PC.Main
             Util.SetCertificatePolicy();
         }
 
-        #region Methods
-
-        #region Login
-
         private void StartLogin_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            DialogResult = true;
-            RegisterInfo ri = new RegisterInfo();
-            ri.BindingPhone = "18284559968";
-            ri.Name = "hujing";
-            ri.Password = "123456";
-            OperationResult<String> result = this._proxy.RegisterBuyer(ri);
+            LoginInfo ri = new LoginInfo();
+            ri.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
+            ri.Name = UserId.Text;
+            ri.Password = Password.Password;
+            OperationResult result = this._proxy.Login(ri);
             if (result.IsSuccess)
             {
-                App.Token = result.Data;
+                App.Token = result.Data.ToString();
                 DialogResult = true;
             }
             else
             {
                 MessageBox.Show(result.ErrorMessage);
+                DialogResult = false;
             }
         }
-
-        #endregion
-
-        #endregion
 
         private void ForgetPassword_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
+            ForgetPasswordWin win = new ForgetPasswordWin();
+            win.Owner = this;
+            win.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            win.Show();
         }
 
         private void Register_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            RequestParamBeforeSignIn<String> arg = new RequestParamBeforeSignIn<String>();
-            arg.Data = "18284559968";
-            arg.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
-            OperationResult result = this._proxy.GetRegisterVerifyCode(arg);
-            if (!result.IsSuccess)
-            {
-                MessageBox.Show(result.ErrorMessage);
-                return;
-            }
-            Prompt.BusyContent = "注册中...";
-            Prompt.IsBusy = true;
-            RegisterInfo ri = new RegisterInfo();
-            ri.AppKey = "EDF6D00C74DB486880835FD2AEE8CB71";
-            ri.VerifyCode = String.Empty;
-            ri.BindingPhone = "18284559968";
-            ri.Name = "hujing";
-            ri.Password = "123456";
-            this._proxy.RegisterBuyerAsync(ri, RegisterCallback);
-        }
-
-        private void RegisterCallback(OperationResult<String> result)
-        {
-            Prompt.Dispatcher.Invoke(() =>
-            {
-                Prompt.IsBusy = false;
-                if (result.IsSuccess)
-                {
-                    App.Token = result.Data;
-                    DialogResult = true;
-                }
-                else
-                {
-                    MessageBox.Show(result.ErrorMessage);
-                    return;
-                }
-            });
+            RegisterWin win = new RegisterWin();
+            win.Owner = this;
+            win.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            win.Show();
         }
     }
 }

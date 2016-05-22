@@ -46,6 +46,7 @@
                     <ColumnDefinition Width="90" />
                 </Grid.ColumnDefinitions>
                 <ComboBox x:Name="UserId"
+                          Text="18284559968"
                           Grid.Row="0"
                           FontSize="16"
                           Grid.Column="0"
@@ -57,6 +58,7 @@
                              FontSize="16"
                              Grid.Row="2"
                              Grid.Column="0"
+                             Password="123456"
                              VerticalContentAlignment="Center" />
                 <TextBlock Grid.Row="0"
                            Grid.Column="1"

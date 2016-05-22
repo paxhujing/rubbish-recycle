@@ -19,27 +19,28 @@ namespace RubbishRecycle.Toolkit
 
         private static bool RemoteCertificateValidationCallback(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
         {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-            {
-                return true;
-            }
-            else
-            {
-                if ((SslPolicyErrors.RemoteCertificateNameMismatch & sslPolicyErrors) == SslPolicyErrors.RemoteCertificateNameMismatch)
-                {
-                    Debug.WriteLine("证书名称不匹配：{0}", sslPolicyErrors);
-                }
-                if ((SslPolicyErrors.RemoteCertificateChainErrors & sslPolicyErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
-                {
-                    StringBuilder sb = new StringBuilder();
-                    foreach (X509ChainStatus status in chain.ChainStatus)
-                    {
-                        sb.AppendFormat("status code: {0};info: {1}\n", status.Status, status.StatusInformation);
-                    }
-                    Debug.WriteLine("证书链错误：{0}", sb.ToString());
-                }
-                return false;
-            }
+            return true;
+            //if (sslPolicyErrors == SslPolicyErrors.None)
+            //{
+            //    return true;
+            //}
+            //else
+            //{
+            //    if ((SslPolicyErrors.RemoteCertificateNameMismatch & sslPolicyErrors) == SslPolicyErrors.RemoteCertificateNameMismatch)
+            //    {
+            //        Debug.WriteLine("证书名称不匹配：{0}", sslPolicyErrors);
+            //    }
+            //    if ((SslPolicyErrors.RemoteCertificateChainErrors & sslPolicyErrors) == SslPolicyErrors.RemoteCertificateChainErrors)
+            //    {
+            //        StringBuilder sb = new StringBuilder();
+            //        foreach (X509ChainStatus status in chain.ChainStatus)
+            //        {
+            //            sb.AppendFormat("status code: {0};info: {1}\n", status.Status, status.StatusInformation);
+            //        }
+            //        Debug.WriteLine("证书链错误：{0}", sb.ToString());
+            //    }
+            //    return false;
+            //}
         }
     }
 }

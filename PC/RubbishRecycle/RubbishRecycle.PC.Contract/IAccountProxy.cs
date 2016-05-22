@@ -13,17 +13,29 @@ namespace RubbishRecycle.PC.Contract
     {
         #region Sync
 
-        OperationResult<String> RegisterBuyer(RegisterInfo info);
+        OperationResult RegisterBuyer(RegisterInfo info);
 
-        OperationResult<Account> GetAccount(String token);
+        OperationResult Login(LoginInfo info);
+
+        OperationResult Logout(String token);
+
+        OperationResult GetAccount(String token);
 
         OperationResult GetRegisterVerifyCode(RequestParamBeforeSignIn<String> requestParam);
+
+        OperationResult GetChangePasswordVerifyCode(String token);
+
+        OperationResult ChangePassword(ChangePasswordInfo info, String token);
+
+        OperationResult GetForgetPasswordVerifyCode(RequestParamBeforeSignIn<String> info);
+
+        OperationResult ForegetPassword(ForgetPasswordInfo info);
 
         #endregion
 
         #region Async
 
-        void RegisterBuyerAsync(RegisterInfo info, Action<OperationResult<String>> callback);
+        void RegisterBuyerAsync(RegisterInfo info, Action<OperationResult> callback);
 
         #endregion
     }
