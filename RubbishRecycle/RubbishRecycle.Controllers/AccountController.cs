@@ -11,6 +11,7 @@ using RubbishRecycle.Toolkit;
 using RubbishRecycle.Repositories;
 using RubbishRecycle.Controllers.Repositories;
 using RubbishRecycle.Models.ViewModels;
+using System.Net.Http;
 
 namespace RubbishRecycle.Controllers
 {
