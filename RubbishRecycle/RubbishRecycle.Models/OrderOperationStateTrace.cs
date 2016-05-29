@@ -11,6 +11,12 @@ namespace RubbishRecycle.Models
     [Table("order_operation_state_trace")]
     public class OrderOperationStateTrace
     {
+        public OrderOperationStateTrace(String orderId)
+        {
+            Timestamp = DateTime.Now;
+            OrderId = orderId;
+        }
+
         [Key]
         [MaxLength(36)]
         [Column("id")]
@@ -18,10 +24,10 @@ namespace RubbishRecycle.Models
 
         [MaxLength(36)]
         [Column("order_id")]
-        public String OrderId { get; set; }
+        public String OrderId { get; private set; }
 
         [Column("timestamp")]
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; private set; }
 
         [Column("state")]
         public OrderState State { get; set; }

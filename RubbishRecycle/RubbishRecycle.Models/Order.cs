@@ -12,6 +12,11 @@ namespace RubbishRecycle.Models
     [Table("order")]
     public class Order
     {
+        public Order()
+        {
+            CreateTime = DateTime.Now;
+        }
+
         [Key]
         [MaxLength(36)]
         [Column("id")]
@@ -21,12 +26,15 @@ namespace RubbishRecycle.Models
         [Column("saler_id")]
         public String SalerId { get; set; }
 
-        [Column("rubbish_type_id")]
-        public Int32 RubbishTypeId { get; set; }
+        [MaxLength(100)]
+        [Column("type")]
+        public String Type { get; set; }
 
-        [Column("quantity_unit_id")]
-        public Int32 QuantityUnitId { get; set; }
+        [MaxLength(10)]
+        [Column("unit")]
+        public String Unit { get; set; }
 
+        [MaxLength(10)]
         [Column("quantity")]
         public Double Quantity { get; set; }
 
@@ -34,11 +42,15 @@ namespace RubbishRecycle.Models
         public Byte[] Photo { get; set; }
 
         [Column("create_time")]
-        public DateTime CreateTime { get; set; }
+        public DateTime CreateTime { get; private set; }
 
         [MaxLength(255)]
-        [Column("trading_address")]
-        public String TradingAddress { get; set; }
+        [Column("address")]
+        public String Address { get; set; }
+
+        [MaxLength(255)]
+        [Column("detail_address")]
+        public String DetailAddress { get; set; }
 
         [MaxLength(100)]
         [Required(AllowEmptyStrings = false)]
@@ -49,5 +61,15 @@ namespace RubbishRecycle.Models
 
         [ForeignKey("SalerId")]
         public virtual Account Saler { get; set; }
+
+        public OrderOperationStateTrace AddOrderStarteTrace(OrderState state,String description = null)
+        {
+            if (States.Any(x => x.State == state)) return null;
+            OrderOperationStateTrace stateTrace = new OrderOperationStateTrace(this.Id);
+            stateTrace.State = state;
+            stateTrace.Description = description;
+            States.Add(stateTrace);
+            return stateTrace;
+        }
     }
 }
