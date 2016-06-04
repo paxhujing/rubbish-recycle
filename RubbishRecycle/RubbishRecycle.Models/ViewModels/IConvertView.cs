@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Models.ViewModels
 {
-    public interface IConvertViewer<T>
+    public interface IConvertView<T>
     {
-        T ToViewer();
+        T ToView();
     }
 }

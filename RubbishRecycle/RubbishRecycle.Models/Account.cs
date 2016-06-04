@@ -11,7 +11,7 @@ namespace RubbishRecycle.Models
     /// 账户。
     /// </summary>
     [Table("account")]
-    public class Account : IConvertViewer<AccountView>
+    public class Account : IConvertView<AccountView>
     {
         /// <summary>
         /// 账户表Id。
@@ -57,10 +57,16 @@ namespace RubbishRecycle.Models
         public DateTime LastLogin { get; set; }
 
         /// <summary>
-        /// 信誉。
+        /// 信誉评分。
         /// </summary>
-        [Column("credit")]
-        public Int32 Credit { get; set; }
+        [Column("credit_score")]
+        public Single CreditScore { get; set; }
+
+        /// <summary>
+        /// 态度评分。
+        /// </summary>
+        [Column("attitude_score")]
+        public Single AttitudeScore { get; set; }
 
         /// <summary>
         /// 角色Id。
@@ -74,12 +80,13 @@ namespace RubbishRecycle.Models
 
         public virtual ICollection<Order> Orders { get; set; }
 
-        public AccountView ToViewer()
+        public AccountView ToView()
         {
             AccountView viewer = new AccountView();
             viewer.Auction = this.Auction;
             viewer.BindingPhone = this.BindingPhone;
-            viewer.Credit = this.Credit;
+            viewer.CreditScore = this.CreditScore;
+            viewer.AttitudeScore = this.AttitudeScore;
             viewer.IsFreezed = this.IsFreezed;
             viewer.LastLogin = this.LastLogin.ToString("yyyy-MM-dd hh:mm:ss");
             viewer.Name = this.Name;

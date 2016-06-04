@@ -46,21 +46,22 @@
   <ItemGroup>
     <Compile Include="Account.cs" />
     <Compile Include="AppKeyInfo.cs" />
+    <Compile Include="Auction.cs" />
     <Compile Include="ChangePasswordInfo.cs" />
     <Compile Include="ForgetPasswordInfo.cs" />
     <Compile Include="LoginInfo.cs" />
     <Compile Include="OperationResult.cs" />
     <Compile Include="Order.cs" />
-    <Compile Include="OrderConfirm.cs" />
+    <Compile Include="OrderSummary.cs" />
     <Compile Include="OrderState.cs" />
-    <Compile Include="OrderOperationStateTrace.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RegisterInfo.cs" />
     <Compile Include="RequestParamBeforeSignIn.cs" />
     <Compile Include="Role.cs" />
     <Compile Include="SmsResult.cs" />
     <Compile Include="ViewModels\AccountView.cs" />
-    <Compile Include="ViewModels\IConvertViewer.cs" />
+    <Compile Include="ViewModels\IConvertView.cs" />
+    <Compile Include="ViewModels\OrderView.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

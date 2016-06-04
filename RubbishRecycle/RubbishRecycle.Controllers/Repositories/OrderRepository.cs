@@ -6,10 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using RubbishRecycle.Models;
+using System.Data.Entity;
+using RubbishRecycle.Models.ViewModels;
 
 namespace RubbishRecycle.Controllers.Repositories
 {
-    public class OrderRepository : RepositoryBase<RubbishRecycleContext>, IOrderRepository<RubbishRecycleContext>
+    public class OrderRepository : RepositoryBase<RubbishRecycleContext>, ISalerOrderRepository<RubbishRecycleContext>
     {
         #region Constructors
 
@@ -22,57 +24,77 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #endregion
 
-        #region IOrderRepository<TKey>接口
+        #region Saler
 
-        [RubbishRecycleAuthorize(Roles = "saler")]
-        public Order PublishOrder(Order order, out String message)
+        public Boolean AddOrder(Order order)
         {
-            Order existedOrder = base.DbContext.Orders.FirstOrDefault(x => x.SalerId == order.SalerId);
-            if (existedOrder != null)
+            if (base.DbContext.Orders.Any(x => IsOrderFinished(x)))
             {
-                if (existedOrder.States.Any(x => (x.State != OrderState.Finish)))
+                order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
+                order.State = OrderState.NotPay;
+                order.Timestamp = DateTime.Now.Date;
+                base.DbContext.Orders.Add(order);
+                if (base.DbContext.SaveChanges() > 1)
                 {
-                    message = "存在未结束的交易.您可以删除该订单或修改后重新提交";
-                    return null;
+                    return true;
                 }
             }
-            order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-            base.DbContext.Orders.Add(order);
-            if (base.DbContext.SaveChanges() > 1)
+            return false;
+        }
+
+        public Boolean DeleteOrder(String orderId)
+        {
+            Order order = base.DbContext.Orders.SingleOrDefault(x => x.Id == orderId);
+            if (orderId == null) return false;
+            if (IsOrderExpired(order) || IsOrderFinished(order))
             {
-                OrderOperationStateTrace stateTrace = order.AddOrderStarteTrace(OrderState.NotPay);
-                base.DbContext.OrderStates.Add(stateTrace);
-                base.DbContext.SaveChanges();
-                message = "创建订单成功";
-                return order;
+                base.DbContext.Entry(order).State = EntityState.Deleted;
+                return base.DbContext.SaveChanges() > 1;
             }
-            message = "创建订单失败";
-            return null;
+            return false;
         }
 
-        [RubbishRecycleAuthorize(Roles = "saler")]
-        public Boolean DeletetPublishOrder(String id, String salerId)
+        public bool ModifyOrder(Order order)
         {
-            Order order = base.DbContext.Orders.FirstOrDefault(x => (x.Id == id) && (x.SalerId == salerId));
-            if (order == null) return true;
-            base.DbContext.Orders.Remove(order);
-            return base.DbContext.SaveChanges() != 0;
+            throw new NotImplementedException();
         }
 
-        public Order GetMyPublishOrder(String id, String salerId)
+        public IEnumerable<OrderView> GetOrderViewsByPage(Int32 pageNo, Int32 pageSize)
         {
-            return base.DbContext.Orders.FirstOrDefault(x => (x.Id == id) && (x.SalerId == salerId));
+            throw new NotImplementedException();
         }
 
-        public IQueryable<Order> GetMyPublishOrders(String salerId, Int32 pageNo, Int32 pageSize)
-        {
-            return base.DbContext.Orders.Where(x => x.SalerId == salerId).OrderByDescending(y => y.CreateTime).Skip(pageNo * pageSize).Take(pageSize);
+        #endregion
 
+        #region Misc
+
+        private Boolean IsOrderFinished(Order order)
+        {
+            if (order.State == OrderState.Finish) return true;
+            if(order.State == OrderState.Trading)
+            {
+                if ((DateTime.Now.Date - order.Timestamp).Days > 7)
+                {
+                    order.State = OrderState.Finish;
+                    return true;
+                }
+            }
+            return false;
         }
 
-        public IQueryable<Order> GetPublishOrders(Int32 pageNo, Int32 pageSize)
+        private Boolean IsOrderExpired(Order order)
         {
-            return base.DbContext.Orders.OrderByDescending(x => x.CreateTime).Skip(pageNo * pageSize).Take(pageSize);
+            if ((order.State != OrderState.NotPay)
+                || (order.State != OrderState.NotPass)
+                || (order.State != OrderState.Waiting))
+            {
+                if((DateTime.Now.Date - order.Timestamp).Days > 3)
+                {
+                    order.State = OrderState.Expire;
+                    return true;
+                }
+            }
+            return false;
         }
 
         #endregion

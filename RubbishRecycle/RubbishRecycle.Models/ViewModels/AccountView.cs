@@ -34,10 +34,16 @@ namespace RubbishRecycle.Models.ViewModels
         public String LastLogin { get; set; }
 
         /// <summary>
-        /// 信誉。
+        /// 信誉评分。
         /// </summary>
-        [JsonProperty("credit")]
-        public Int32 Credit { get; set; }
+        [JsonProperty("credit_score")]
+        public Single CreditScore { get; set; }
+
+        /// <summary>
+        /// 态度评分。
+        /// </summary>
+        [JsonProperty("attitude_score")]
+        public Single AttitudeScore { get; set; }
 
         [JsonProperty("is_freezed")]
         public Boolean IsFreezed { get; set; }

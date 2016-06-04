@@ -268,7 +268,7 @@ namespace RubbishRecycle.Controllers
         public OperationResult GetAccountView()
         {
             String phone = base.ActionContext.GetPhone();
-            AccountView view = this._repository.GetAccount(phone).ToViewer();
+            AccountView view = this._repository.GetAccount(phone).ToView();
             return OperationResultHelper.GenerateSuccessResult(view);
         }
 

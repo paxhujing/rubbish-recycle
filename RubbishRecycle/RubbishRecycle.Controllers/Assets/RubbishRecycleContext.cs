@@ -64,10 +64,13 @@ namespace RubbishRecycle.Controllers.Assets
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
-            //order_state_trace->order_id->order CASCADE
-            modelBuilder.Entity<OrderOperationStateTrace>().HasRequired(x => x.Order).WithMany(x=>x.States).HasForeignKey(x=>x.OrderId).WillCascadeOnDelete(true);
-            //order->saler_id->account CASCADE
+            #region Saler
             modelBuilder.Entity<Order>().HasRequired(x => x.Saler).WithMany(x => x.Orders).HasForeignKey(x => x.SalerId).WillCascadeOnDelete(true);
+            modelBuilder.Entity<Auction>().HasRequired(x => x.Order).WithMany(x => x.Auctions).HasForeignKey(x => x.OrderId).WillCascadeOnDelete(true);
+            #endregion
+            #region Buyer
+
+            #endregion
             base.OnModelCreating(modelBuilder);
         }
 
@@ -75,15 +78,35 @@ namespace RubbishRecycle.Controllers.Assets
 
         #region Properties
 
+        /// <summary>
+        /// AppKey库。
+        /// </summary>
         public DbSet<AppKeyInfo> AppKeyInfos { get; set; }
 
+        /// <summary>
+        /// 账号库。
+        /// </summary>
         public DbSet<Account> Accounts { get; set; }
 
+        /// <summary>
+        /// 角色库。
+        /// </summary>
         public DbSet<Role> Roles { get; set; }
 
+        /// <summary>
+        /// 卖家的订单库。
+        /// </summary>
         public DbSet<Order> Orders { get; set; }
 
-        public DbSet<OrderOperationStateTrace> OrderStates { get; set; }
+        /// <summary>
+        /// 订单的竞价库。
+        /// </summary>
+        public DbSet<Auction> Auctions { get; set; }
+
+        /// <summary>
+        /// 买家的订单摘要库。
+        /// </summary>
+        public DbSet<OrderSummary> OrderSummaries { get; set; }
 
         #endregion
     }

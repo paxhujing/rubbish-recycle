@@ -17,7 +17,7 @@ namespace RubbishRecycle.Controllers
     {
         #region Fields
 
-        private readonly IOrderRepository<RubbishRecycleContext> _orderRepository;
+        private readonly ISalerOrderRepository<RubbishRecycleContext> _orderRepository;
 
         #endregion
 
@@ -30,56 +30,36 @@ namespace RubbishRecycle.Controllers
 
         #endregion
 
-        //#region Actions
+        #region Actions
 
-        //[RubbishRecycleAuthorize(Roles = "admin")]
-        //[Route("GetOrders")]
-        //[HttpGet]
-        //public IQueryable<Order> GetOrders(Int32 pageNo, Int32 pageSize =10)
-        //{
-        //    return this._orderRepository.GetOrders(pageSize, pageSize);
-        //}
+        #region Saler
 
-        //[RubbishRecycleAuthorize(Roles = "saler")]
-        //[Route("GetSalerOrders")]
-        //[HttpGet]
-        //public IQueryable<Order> GetSalerOrders(String salerId, Int32 pageNo, Int32 pageSize = 10)
-        //{
-        //    return this._orderRepository.GetOrders(salerId, pageNo, pageSize);
-        //}
+        [RubbishRecycleAuthorize(Roles = "saler")]
+        public OperationResult CreatePublishOrder(Order order)
+        {
+            if (this._orderRepository.AddOrder(order))
+            {
+                return OperationResultHelper.GenerateSuccessResult(order);
+            }
+            return OperationResultHelper.GenerateErrorResult("发布订单失败。请检查是否存在未完成的订单，或无效的订单数据");
+        }
 
-        //[RubbishRecycleAuthorize(Roles = "buyer")]
-        //[Route("GetBuyerOrders")]
-        //[HttpGet]
-        //public IQueryable<Order> GetBuyerOrders(String buyerId, Int32 pageNo, Int32 pageSize = 10)
-        //{
-        //    return this._orderRepository.GetOrders(buyerId, pageNo, pageSize);
-        //}
+        [RubbishRecycleAuthorize(Roles = "saler")]
+        public OperationResult DeletePublishOrder(String orderId)
+        {
+            if(this._orderRepository.DeleteOrder(orderId))
+            {
+                return OperationResultHelper.GenerateSuccessResult();
+            }
+            return OperationResultHelper.GenerateErrorResult("无法删除订单。请检查是否存在未完成的订单");
+        }
 
-        //[RubbishRecycleAuthorize(Roles = "saler")]
-        //[Route("GetOrder")]
-        //[HttpGet]
-        //public Order GetOrder(String id, String salerId)
-        //{
-        //    return this._orderRepository.GetOrder(id, salerId);
-        //}
+        #endregion
 
-        //[RubbishRecycleAuthorize(Roles = "saler")]
-        //[Route("RemoveOrder")]
-        //[HttpDelete]
-        //public Boolean RemoveOrder(String id, String salerId)
-        //{
-        //    return this._orderRepository.DeleteOrder(id, salerId);
-        //}
+        #region Buyer
 
-        //[RubbishRecycleAuthorize(Roles = "saler")]
-        //[Route("CreateOrder")]
-        //[HttpPost]
-        //public Order CreateOrder(Order order, out String message)
-        //{
-        //    return this._orderRepository.CreateOrder(order, out message);
-        //}
+        #endregion
 
-        //#endregion
+        #endregion
     }
 }
