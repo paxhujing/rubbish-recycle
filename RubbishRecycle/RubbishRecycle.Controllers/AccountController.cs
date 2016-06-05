@@ -380,7 +380,7 @@ namespace RubbishRecycle.Controllers
             AccountToken viewer = new AccountToken(account.BindingPhone);
             viewer.Role = account.RoleId;
             viewer.IsFreeze = account.IsFreezed;
-            this._accountRepository.UpdateLastLoginTime(account.Id);
+            this._accountRepository.UpdateLastLoginTime(account.BindingPhone);
             return AccountTokenManager.Manager.Add(viewer);
         }
 

@@ -60,7 +60,7 @@ namespace RubbishRecycle.Controllers.Repositories
             {
                 return base.DbContext.Buyers.SingleOrDefault(predicate);
             }
-            return null;
+            return saler;
         }
 
         public Boolean FreezeAccount(String name)
