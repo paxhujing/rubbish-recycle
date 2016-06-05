@@ -60,7 +60,6 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 数量。
         /// </summary>
-        [MaxLength(10)]
         [Required]
         [Column("quantity")]
         public Single Quantity { get; set; }

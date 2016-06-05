@@ -25,7 +25,7 @@ namespace RubbishRecycle.Models.ViewModels
         /// 积分。
         /// </summary>
         [JsonProperty("auction")]
-        public Single Auction { get; set; }
+        public Double Auction { get; set; }
 
         /// <summary>
         /// 最近登录日期。
@@ -37,13 +37,13 @@ namespace RubbishRecycle.Models.ViewModels
         /// 信誉评分。
         /// </summary>
         [JsonProperty("credit_score")]
-        public Single CreditScore { get; set; }
+        public Double CreditScore { get; set; }
 
         /// <summary>
         /// 态度评分。
         /// </summary>
         [JsonProperty("attitude_score")]
-        public Single AttitudeScore { get; set; }
+        public Double AttitudeScore { get; set; }
 
         [JsonProperty("is_freezed")]
         public Boolean IsFreezed { get; set; }
