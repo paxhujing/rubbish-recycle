@@ -34,7 +34,7 @@ namespace RubbishRecycle.Models
         /// 所属卖家的账号。
         /// </summary>
         [ForeignKey("SalerId")]
-        public virtual Account Saler { get; set; }
+        public virtual Saler Saler { get; set; }
 
         /// <summary>
         /// 类型。

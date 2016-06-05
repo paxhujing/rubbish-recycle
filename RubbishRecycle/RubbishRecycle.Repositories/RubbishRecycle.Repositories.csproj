@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAccountRepository.cs" />
+    <Compile Include="IAppKeyRepository.cs" />
     <Compile Include="IBuyerOrderRepository.cs" />
     <Compile Include="ISalerOrderRepository.cs" />
     <Compile Include="IRepository.cs" />

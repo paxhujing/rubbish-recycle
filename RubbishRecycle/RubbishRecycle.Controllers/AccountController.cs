@@ -21,23 +21,25 @@ namespace RubbishRecycle.Controllers
 
         #region 非对称加密
 
-        private static readonly RSACryptoServiceProvider RSAProvider;
+        //private static readonly RSACryptoServiceProvider RSAProvider;
 
-        private static readonly String GlobalPrivateKey;
+        //private static readonly String GlobalPrivateKey;
 
-        private static readonly String GlobalPublicKey;
+        //private static readonly String GlobalPublicKey;
 
         #endregion
 
         #region 对称加密
 
-        private static readonly RijndaelManaged AESProvider;
+        //private static readonly RijndaelManaged AESProvider;
 
         #endregion
 
         private static readonly MD5CryptoServiceProvider MD5Provider;
 
-        private readonly IAccountRepository<RubbishRecycleContext> _repository;
+        private readonly IAccountRepository<RubbishRecycleContext> _accountRepository;
+
+        private readonly IAppKeyRepository<RubbishRecycleContext> _appKeyRepository;
 
         #endregion
 
@@ -45,21 +47,22 @@ namespace RubbishRecycle.Controllers
 
         static AccountController()
         {
-            RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(2048);
-            AccountController.RSAProvider = rsaProvider;
-            AccountController.GlobalPrivateKey = rsaProvider.ToXmlString(true);
-            AccountController.RSAProvider.FromXmlString(AccountController.GlobalPrivateKey);
-            AccountController.GlobalPublicKey = rsaProvider.ToXmlString(false);
+            //RSACryptoServiceProvider rsaProvider = new RSACryptoServiceProvider(2048);
+            //AccountController.RSAProvider = rsaProvider;
+            //AccountController.GlobalPrivateKey = rsaProvider.ToXmlString(true);
+            //AccountController.RSAProvider.FromXmlString(AccountController.GlobalPrivateKey);
+            //AccountController.GlobalPublicKey = rsaProvider.ToXmlString(false);
 
-            RijndaelManaged aesProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
-            AccountController.AESProvider = aesProvider;
+            //RijndaelManaged aesProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
+            //AccountController.AESProvider = aesProvider;
 
             AccountController.MD5Provider = new MD5CryptoServiceProvider();
         }
 
         public AccountController()
         {
-            this._repository = new AccountRepository(AppGlobal.DbContext);
+            this._accountRepository = new AccountRepository(AppGlobal.DbContext);
+            this._appKeyRepository = new AppKeyRepository(AppGlobal.DbContext);
         }
 
         #endregion
@@ -77,7 +80,11 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                Boolean isUsed = this._repository.IsNameUsed(info.Data);
+                if(String.IsNullOrWhiteSpace(info.Data))
+                {
+                    return OperationResultHelper.GenerateErrorResult("用户名不能为空");
+                }
+                Boolean isUsed = this._accountRepository.IsNameUsed(info.Data);
                 return OperationResultHelper.GenerateSuccessResult(isUsed);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
@@ -89,7 +96,11 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                Boolean isUsed = this._repository.IsPhoneBinded(info.Data);
+                if (String.IsNullOrWhiteSpace(info.Data))
+                {
+                    return OperationResultHelper.GenerateErrorResult("手机号不能为空");
+                }
+                Boolean isUsed = this._accountRepository.IsPhoneBinded(info.Data);
                 return OperationResultHelper.GenerateSuccessResult(isUsed);
             }
             return OperationResultHelper.GenerateErrorResult("无法识别的客户端");
@@ -106,14 +117,14 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(loginInfo.AppKey))
             {
-                if(String.IsNullOrWhiteSpace(loginInfo.Name))
+                if(String.IsNullOrWhiteSpace(loginInfo.Name) || String.IsNullOrWhiteSpace(loginInfo.Password))
                 {
-                    return OperationResultHelper.GenerateErrorResult("账户不能为空");
+                    return OperationResultHelper.GenerateErrorResult("账户或密码不能为空");
                 }
                 String token = null;
                 if(!AccountTokenManager.Manager.TryGetTokenByPhone(loginInfo.Name,out token))
                 {
-                    Account account = this._repository.VerifyAccount(loginInfo.Name, loginInfo.Password);
+                    Account account = this._accountRepository.VerifyAccount(loginInfo.Name, loginInfo.Password);
                     if (account != null)
                     {
                         token = InitAccountToken(account);
@@ -149,7 +160,11 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                if (this._repository.IsExisted(info.Data))
+                if (String.IsNullOrWhiteSpace(info.Data))
+                {
+                    return OperationResultHelper.GenerateErrorResult("手机号不能为空");
+                }
+                if (this._accountRepository.IsExisted(info.Data))
                 {
                     return SendVerifyCode(info.Data, VerifyCodeType.ChangePassword);
                 }
@@ -165,12 +180,16 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
+                if(String.IsNullOrWhiteSpace(info.Phone) || String.IsNullOrWhiteSpace(info.Password))
+                {
+                    return OperationResultHelper.GenerateErrorResult("手机号或密码不能为空");
+                }
                 String verifyCode = VerifyCodeManager.Manager.GetCodeByPhone(info.Phone, VerifyCodeType.ChangePassword);
                 if (verifyCode != info.VerifyCode)
                 {
                     return OperationResultHelper.GenerateErrorResult("验证码错误");
                 }
-                if (this._repository.ChangePassword(info.Phone, info.Password))
+                if (this._accountRepository.ChangePassword(info.Phone, info.Password))
                 {
                     return OperationResultHelper.GenerateSuccessResult();
                 }
@@ -190,7 +209,11 @@ namespace RubbishRecycle.Controllers
         {
             if (IsLegalRequest(info.AppKey))
             {
-                if (this._repository.IsExisted(info.Data))
+                if (String.IsNullOrWhiteSpace(info.Data))
+                {
+                    return OperationResultHelper.GenerateErrorResult("手机号不能为空");
+                }
+                if (this._accountRepository.IsExisted(info.Data))
                 {
                     return OperationResultHelper.GenerateErrorResult("手机号已被绑定");
                 }
@@ -243,7 +266,7 @@ namespace RubbishRecycle.Controllers
             {
                 return OperationResultHelper.GenerateErrorResult("验证码错误");
             }
-            if (this._repository.ChangePassword(phone, info.Password))
+            if (this._accountRepository.ChangePassword(phone, info.Password))
             {
                 AccountTokenManager.Manager.Remove(base.ActionContext.GetToken());
                 return OperationResultHelper.GenerateSuccessResult();
@@ -259,16 +282,16 @@ namespace RubbishRecycle.Controllers
         [HttpGet]
         public IQueryable<Account> GetAllAccounts()
         {
-            return this._repository.GetAllAccounts();
+            return this._accountRepository.GetAllAccounts();
         }
 
-        [RubbishRecycleAuthorize(Roles ="admin;saler;buyer")]
+        [RubbishRecycleAuthorize(Roles ="saler;buyer")]
         [HttpGet]
         [ActionName("GetAccountView")]
         public OperationResult GetAccountView()
         {
             String phone = base.ActionContext.GetPhone();
-            AccountView view = this._repository.GetAccount(phone).ToView();
+            AccountView view = this._accountRepository.GetAccount(phone).ToView();
             return OperationResultHelper.GenerateSuccessResult(view);
         }
 
@@ -329,14 +352,21 @@ namespace RubbishRecycle.Controllers
                 errorMessage = "验证码错误";
                 return null;
             }
-            Account account = new Account();
-            account.RoleId = roleId;
-            account.Id = Guid.NewGuid().ToString().Replace("-",String.Empty);
+            Account account = null;
+            if (roleId == Account.Saler)
+            {
+                account = new Saler();
+            }
+            else
+            {
+                account = new Buyer();
+            }
+            account.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
             account.Name = registerInfo.Name ?? registerInfo.BindingPhone;
             account.BindingPhone = registerInfo.BindingPhone;
             account.Password = CryptoHelper.MD5Compute(registerInfo.Password);
             account.LastLogin = DateTime.Now;
-            account = this._repository.AddAccount(account);
+            account = this._accountRepository.AddAccount(account);
             return account;
         }
 
@@ -350,7 +380,7 @@ namespace RubbishRecycle.Controllers
             AccountToken viewer = new AccountToken(account.BindingPhone);
             viewer.Role = account.RoleId;
             viewer.IsFreeze = account.IsFreezed;
-            this._repository.UpdateLastLoginTime(account.Id);
+            this._accountRepository.UpdateLastLoginTime(account.Id);
             return AccountTokenManager.Manager.Add(viewer);
         }
 
@@ -361,7 +391,7 @@ namespace RubbishRecycle.Controllers
         /// <returns>合法返回true；否则返回false。</returns>
         private Boolean IsLegalRequest(String appKey)
         {
-            return this._repository.GetAppKeyInfo(appKey) != null;
+            return this._appKeyRepository.GetAppKeyInfo(appKey) != null;
         }
 
         /// <summary>

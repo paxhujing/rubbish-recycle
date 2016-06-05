@@ -36,9 +36,10 @@ namespace RubbishRecycle.Repositories
         /// <summary>
         /// 分页获取订单视图列表。
         /// </summary>
+        /// <param name="salerId"></param>
         /// <param name="pageNo"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        IEnumerable<OrderView> GetOrderViewsByPage(Int32 pageNo, Int32 pageSize);
+        IEnumerable<OrderView> GetOrderViewsByPage(String salerId, Int32 pageNo, Int32 pageSize);
     }
 }

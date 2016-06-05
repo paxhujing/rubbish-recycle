@@ -8,15 +8,9 @@ using System.Threading.Tasks;
 
 namespace RubbishRecycle.Repositories
 {
-    public interface IAccountRepository<TKey> : IRepository<TKey>
-        where TKey : DbContext
+    public interface IAccountRepository<TDbContext> : IRepository<TDbContext>
+        where TDbContext : DbContext
     {
-        /// <summary>
-        /// 获取AppKey的信息。
-        /// </summary>
-        /// <param name="appKey">应用程序的AppKey字符串。</param>
-        /// <returns></returns>
-        AppKeyInfo GetAppKeyInfo(String appKey);
 
         /// <summary>
         /// 添加账号。
@@ -47,9 +41,9 @@ namespace RubbishRecycle.Repositories
         Account GetAccount(String name);
 
         /// <summary>
-        /// 
+        /// 账户是否存在。
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
         Boolean IsExisted(String name);
 
@@ -86,6 +80,7 @@ namespace RubbishRecycle.Repositories
         /// <summary>
         /// 更新最近一次登陆时间。
         /// </summary>
+        /// <param name="name">账户名或手机号。</param>
         /// <returns></returns>
         Boolean UpdateLastLoginTime(String name);
 

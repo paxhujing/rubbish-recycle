@@ -13,7 +13,8 @@ using System.Web.Http;
 
 namespace RubbishRecycle.Controllers
 {
-    public class OrderController : ApiController
+    [RubbishRecycleAuthorize(Roles = "saler")]
+    public class SalerOrderController : ApiController
     {
         #region Fields
 
@@ -23,19 +24,16 @@ namespace RubbishRecycle.Controllers
 
         #region Constructors
 
-        public OrderController()
+        public SalerOrderController()
         {
-            this._orderRepository = new OrderRepository(AppGlobal.DbContext);
+            this._orderRepository = new SalerOrderRepository(AppGlobal.DbContext);
         }
 
         #endregion
 
         #region Actions
 
-        #region Saler
-
-        [RubbishRecycleAuthorize(Roles = "saler")]
-        public OperationResult CreatePublishOrder(Order order)
+        public OperationResult PublishOrder(Order order)
         {
             if (this._orderRepository.AddOrder(order))
             {
@@ -44,8 +42,7 @@ namespace RubbishRecycle.Controllers
             return OperationResultHelper.GenerateErrorResult("发布订单失败。请检查是否存在未完成的订单，或无效的订单数据");
         }
 
-        [RubbishRecycleAuthorize(Roles = "saler")]
-        public OperationResult DeletePublishOrder(String orderId)
+        public OperationResult DeleteOrder(String orderId)
         {
             if(this._orderRepository.DeleteOrder(orderId))
             {
@@ -53,12 +50,6 @@ namespace RubbishRecycle.Controllers
             }
             return OperationResultHelper.GenerateErrorResult("无法删除订单。请检查是否存在未完成的订单");
         }
-
-        #endregion
-
-        #region Buyer
-
-        #endregion
 
         #endregion
     }

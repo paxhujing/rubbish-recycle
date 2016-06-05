@@ -11,11 +11,11 @@ using RubbishRecycle.Models.ViewModels;
 
 namespace RubbishRecycle.Controllers.Repositories
 {
-    public class OrderRepository : RepositoryBase<RubbishRecycleContext>, ISalerOrderRepository<RubbishRecycleContext>
+    public class SalerOrderRepository : RepositoryBase<RubbishRecycleContext>, ISalerOrderRepository<RubbishRecycleContext>
     {
         #region Constructors
 
-        public OrderRepository(RubbishRecycleContext dbContext)
+        public SalerOrderRepository(RubbishRecycleContext dbContext)
             : base(dbContext)
         {
 
@@ -28,16 +28,13 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean AddOrder(Order order)
         {
-            if (base.DbContext.Orders.Any(x => IsOrderFinished(x)))
+            order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
+            order.State = OrderState.NotPay;
+            order.Timestamp = DateTime.Now.Date;
+            base.DbContext.Orders.Add(order);
+            if (base.DbContext.SaveChanges() > 1)
             {
-                order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-                order.State = OrderState.NotPay;
-                order.Timestamp = DateTime.Now.Date;
-                base.DbContext.Orders.Add(order);
-                if (base.DbContext.SaveChanges() > 1)
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -46,22 +43,24 @@ namespace RubbishRecycle.Controllers.Repositories
         {
             Order order = base.DbContext.Orders.SingleOrDefault(x => x.Id == orderId);
             if (orderId == null) return false;
-            if (IsOrderExpired(order) || IsOrderFinished(order))
-            {
-                base.DbContext.Entry(order).State = EntityState.Deleted;
-                return base.DbContext.SaveChanges() > 1;
-            }
-            return false;
+            base.DbContext.Entry(order).State = EntityState.Deleted;
+            return base.DbContext.SaveChanges() > 1;
         }
 
         public bool ModifyOrder(Order order)
         {
-            throw new NotImplementedException();
+            base.DbContext.Entry(order).State = EntityState.Modified;
+            return base.DbContext.SaveChanges() > 1;
         }
 
-        public IEnumerable<OrderView> GetOrderViewsByPage(Int32 pageNo, Int32 pageSize)
+        public IEnumerable<OrderView> GetOrderViewsByPage(String salerId, Int32 pageNo, Int32 pageSize = 10)
         {
-            throw new NotImplementedException();
+            IQueryable<OrderView> pageResult = (from v in base.DbContext.Orders
+                                                where (v.SalerId == salerId) && (v.State == OrderState.Waiting)
+                                                orderby v.Timestamp descending
+                                                select v.ToView()).Skip((pageNo - 1) * pageSize).Take(pageSize);
+
+            return pageResult;
         }
 
         #endregion

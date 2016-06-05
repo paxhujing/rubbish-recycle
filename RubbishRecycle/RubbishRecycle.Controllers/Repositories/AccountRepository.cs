@@ -14,9 +14,6 @@ namespace RubbishRecycle.Controllers.Repositories
     internal class AccountRepository : RepositoryBase<RubbishRecycleContext>, IAccountRepository<RubbishRecycleContext>
     {
         #region Fields
-
-        private static readonly IList<AppKeyInfo> AppKeys = new List<AppKeyInfo>();
-
         #endregion
 
         #region Constructors
@@ -31,24 +28,16 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #region IAccountRepository<TKey>接口
 
-        public AppKeyInfo GetAppKeyInfo(String appKey)
-        {
-            if (String.IsNullOrWhiteSpace(appKey)) return null;
-            AppKeyInfo info = AppKeys.FirstOrDefault(x => x.AppKey == appKey);
-            if (info == null)
-            {
-                info = base.DbContext.AppKeyInfos.FirstOrDefault(x => x.AppKey == appKey);
-                if (info != null)
-                {
-                    AppKeys.Add(info);
-                }
-            }
-            return info;
-        }
-
         public Account AddAccount(Account info)
         {
-            base.DbContext.Accounts.Add(info);
+            if (info.RoleId == Account.Saler)
+            {
+                base.DbContext.Salers.Add((Saler)info);
+            }
+            else
+            {
+                base.DbContext.Buyers.Add((Buyer)info);
+            }
             if (base.DbContext.SaveChanges() != 0)
             {
                 return info;
@@ -56,20 +45,35 @@ namespace RubbishRecycle.Controllers.Repositories
             return null;
         }
 
+        private Boolean FindAccountByName(Account account, String name)
+        {
+            return (account.Name == name) || (account.BindingPhone == name);
+        }
+
         public Account GetAccount(String name)
         {
-            if (String.IsNullOrWhiteSpace(name)) return null;
-            return base.DbContext.Accounts.FirstOrDefault(x => (x.Name == name) || (x.BindingPhone == name) || (x.Id == name));
+            Saler saler = base.DbContext.Salers.SingleOrDefault(x => FindAccountByName(x, name));
+            if (saler == null)
+            {
+                return base.DbContext.Buyers.SingleOrDefault(x => FindAccountByName(x, name));
+            }
+            return null;
         }
 
         public Boolean FreezeAccount(String name)
         {
-            if (String.IsNullOrWhiteSpace(name)) return false;
             Account account = GetAccount(name);
             if (account != null)
             {
                 account.IsFreezed = true;
-                base.DbContext.Accounts.Attach(account);
+                if(account.RoleId == Account.Saler)
+                {
+                    base.DbContext.Salers.Attach((Saler)account);
+                }
+                else
+                {
+                    base.DbContext.Buyers.Attach((Buyer)account);
+                }
                 base.DbContext.Entry(account).State = EntityState.Modified;
                 return base.DbContext.SaveChanges() != 0;
             }
@@ -78,12 +82,18 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean UnfreezeAccount(String name)
         {
-            if (String.IsNullOrWhiteSpace(name)) return false;
             Account account = GetAccount(name);
             if (account != null)
             {
                 account.IsFreezed = false;
-                base.DbContext.Accounts.Attach(account);
+                if (account.RoleId == Account.Saler)
+                {
+                    base.DbContext.Salers.Attach((Saler)account);
+                }
+                else
+                {
+                    base.DbContext.Buyers.Attach((Buyer)account);
+                }
                 base.DbContext.Entry(account).State = EntityState.Modified;
                 return base.DbContext.SaveChanges() != 0;
             }
@@ -92,42 +102,45 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public IQueryable<Account> GetAllAccounts()
         {
-            return base.DbContext.Accounts;
-        }
-
-        public Account VerifyAccount(String name, String password)
-        {
-            if (String.IsNullOrWhiteSpace(name) || String.IsNullOrWhiteSpace(password)) return null;
-            String md5Password = CryptoHelper.MD5Compute(password);
-            Account account = base.DbContext.Accounts.FirstOrDefault(x => ((x.Name == name) || (x.BindingPhone == name)) && (x.Password == md5Password));
-            return account;
+            throw new NotImplementedException();
         }
 
         public Boolean IsNameUsed(String name)
         {
-            if (String.IsNullOrWhiteSpace(name)) return false;
-            return base.DbContext.Accounts.Any(x => x.Name == name);
+            return base.DbContext.Salers.Any(x => x.Name == name) 
+                || base.DbContext.Buyers.Any(x => x.Name == name);
         }
 
         public Boolean IsPhoneBinded(String phone)
         {
-            if (String.IsNullOrWhiteSpace(phone)) return false;
-            return base.DbContext.Accounts.Any(x => x.Name == phone);
+            return base.DbContext.Salers.Any(x => x.Name == phone)
+                || base.DbContext.Buyers.Any(x => x.Name == phone);
+        }
+
+        public Account VerifyAccount(String name, String password)
+        {
+            Account account = GetAccount(name);
+            if (account != null)
+            {
+                String md5Password = CryptoHelper.MD5Compute(password);
+                if (account.Password == md5Password)
+                {
+                    return account;
+                }
+            }
+            return null;
         }
 
         public Boolean ChangePassword(String name, String newPassword)
         {
-            if (String.IsNullOrWhiteSpace(name)) return false;
-            String md5Password = CryptoHelper.MD5Compute(newPassword);
             Account account = GetAccount(name);
             if (account != null)
             {
+                String md5Password = CryptoHelper.MD5Compute(newPassword);
                 if (account.Password != md5Password)
                 {
                     account.Password = md5Password;
-                    base.DbContext.Accounts.Attach(account);
-                    base.DbContext.Entry(account).State = EntityState.Modified;
-                    return base.DbContext.SaveChanges() != 0;
+                    return UpdateAccount(account);
                 }
             }
             return false;
@@ -135,7 +148,7 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean IsExisted(String name)
         {
-            return base.DbContext.Accounts.Any(x => (x.Name == name) || (x.BindingPhone == name));
+            return GetAccount(name) != null;
         }
 
         public Boolean UpdateLastLoginTime(String id)
@@ -144,11 +157,23 @@ namespace RubbishRecycle.Controllers.Repositories
             if (account != null)
             {
                 account.LastLogin = DateTime.Now;
-                base.DbContext.Accounts.Attach(account);
-                base.DbContext.Entry(account).State = EntityState.Modified;
-                return base.DbContext.SaveChanges() != 0;
+                return UpdateAccount(account);
             }
             return false;
+        }
+
+        public Boolean UpdateAccount(Account account)
+        {
+            if (account.RoleId == Account.Saler)
+            {
+                base.DbContext.Salers.Attach((Saler)account);
+            }
+            else
+            {
+                base.DbContext.Buyers.Attach((Buyer)account);
+            }
+            base.DbContext.Entry(account).State = EntityState.Modified;
+            return base.DbContext.SaveChanges() != 0;
         }
 
         #endregion

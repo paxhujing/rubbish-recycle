@@ -47,6 +47,7 @@
     <Compile Include="Account.cs" />
     <Compile Include="AppKeyInfo.cs" />
     <Compile Include="Auction.cs" />
+    <Compile Include="Buyer.cs" />
     <Compile Include="ChangePasswordInfo.cs" />
     <Compile Include="ForgetPasswordInfo.cs" />
     <Compile Include="LoginInfo.cs" />
@@ -58,6 +59,7 @@
     <Compile Include="RegisterInfo.cs" />
     <Compile Include="RequestParamBeforeSignIn.cs" />
     <Compile Include="Role.cs" />
+    <Compile Include="Saler.cs" />
     <Compile Include="SmsResult.cs" />
     <Compile Include="ViewModels\AccountView.cs" />
     <Compile Include="ViewModels\IConvertView.cs" />

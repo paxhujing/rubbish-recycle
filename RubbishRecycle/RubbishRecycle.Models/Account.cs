@@ -10,9 +10,27 @@ namespace RubbishRecycle.Models
     /// <summary>
     /// 账户。
     /// </summary>
-    [Table("account")]
-    public class Account : IConvertView<AccountView>
+    public abstract class Account : IConvertView<AccountView>
     {
+        #region Fields
+
+        public static readonly String Saler = "saler";
+
+        public static readonly String Buyer = "buyer";
+
+        #endregion
+
+        #region Constructors
+
+        protected Account()
+        {
+
+        }
+
+        #endregion
+
+        #region Properties
+
         /// <summary>
         /// 账户表Id。
         /// </summary>
@@ -47,8 +65,8 @@ namespace RubbishRecycle.Models
         /// <summary>
         /// 积分。
         /// </summary>
-        [Column("auction")]
-        public Single Auction { get; set; }
+        [Column("membership_point")]
+        public Single MembershipPoint { get; set; }
 
         /// <summary>
         /// 最近登录日期。
@@ -68,22 +86,24 @@ namespace RubbishRecycle.Models
         [Column("attitude_score")]
         public Single AttitudeScore { get; set; }
 
+        [Column("is_feezed")]
+        public Boolean IsFreezed { get; set; }
+
         /// <summary>
         /// 角色Id。
         /// </summary>
         [StringLength(20)]
         [Column("role_id")]
-        public String RoleId { get; set; }
+        public abstract String RoleId { get; }
 
-        [Column("is_feezed")]
-        public Boolean IsFreezed { get; set; }
+        #endregion
 
-        public virtual ICollection<Order> Orders { get; set; }
+        #region Methods
 
         public AccountView ToView()
         {
             AccountView viewer = new AccountView();
-            viewer.Auction = this.Auction;
+            viewer.Auction = this.MembershipPoint;
             viewer.BindingPhone = this.BindingPhone;
             viewer.CreditScore = this.CreditScore;
             viewer.AttitudeScore = this.AttitudeScore;
@@ -92,5 +112,7 @@ namespace RubbishRecycle.Models
             viewer.Name = this.Name;
             return viewer;
         }
+
+        #endregion
     }
 }

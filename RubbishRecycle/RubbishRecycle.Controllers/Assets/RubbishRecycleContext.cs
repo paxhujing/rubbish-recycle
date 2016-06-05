@@ -64,6 +64,7 @@ namespace RubbishRecycle.Controllers.Assets
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Conventions.Remove<PluralizingTableNameConvention>();
+
             #region Saler
             modelBuilder.Entity<Order>().HasRequired(x => x.Saler).WithMany(x => x.Orders).HasForeignKey(x => x.SalerId).WillCascadeOnDelete(true);
             modelBuilder.Entity<Auction>().HasRequired(x => x.Order).WithMany(x => x.Auctions).HasForeignKey(x => x.OrderId).WillCascadeOnDelete(true);
@@ -71,6 +72,11 @@ namespace RubbishRecycle.Controllers.Assets
             #region Buyer
 
             #endregion
+
+            #region Buyer
+            modelBuilder.Entity<OrderSummary>().HasRequired(x => x.Buyer).WithMany(x => x.OrderSummaries).HasForeignKey(x => x.BuyerId).WillCascadeOnDelete(true);
+            #endregion
+
             base.OnModelCreating(modelBuilder);
         }
 
@@ -84,9 +90,14 @@ namespace RubbishRecycle.Controllers.Assets
         public DbSet<AppKeyInfo> AppKeyInfos { get; set; }
 
         /// <summary>
-        /// 账号库。
+        /// 卖家库。
         /// </summary>
-        public DbSet<Account> Accounts { get; set; }
+        public DbSet<Saler> Salers { get; set; }
+
+        /// <summary>
+        /// 买家库。
+        /// </summary>
+        public DbSet<Buyer> Buyers { get; set; }
 
         /// <summary>
         /// 角色库。
