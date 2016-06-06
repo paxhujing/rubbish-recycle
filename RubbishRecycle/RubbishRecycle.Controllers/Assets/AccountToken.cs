@@ -22,10 +22,11 @@ namespace RubbishRecycle.Controllers.Assets
         /// 初始化类型 RubbishRecycle.Controllers.Assets.AccountViewer 实例。
         /// </summary>
         /// <param name="phone">绑定的手机。</param>
-        /// <param name="cryptor">AES 加密/解密器。</param>
-        public AccountToken(String phone)
+        /// <param name="cryptor">账号的Id。</param>
+        public AccountToken(String phone,String accountId)
         {
             this._phone = phone;
+            this._accountId = accountId;
         }
 
         #endregion
@@ -40,6 +41,19 @@ namespace RubbishRecycle.Controllers.Assets
             get;
             set;
         }
+
+        #region AccountId
+
+        private readonly String _accountId;
+        /// <summary>
+        /// 账号的的Id。
+        /// </summary>
+        public String AccountId
+        {
+            get { return this._accountId; }
+        }
+
+        #endregion
 
         #region Phone
 

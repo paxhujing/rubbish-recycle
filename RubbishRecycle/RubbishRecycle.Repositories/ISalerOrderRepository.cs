@@ -4,8 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace RubbishRecycle.Repositories
 {
@@ -15,31 +13,41 @@ namespace RubbishRecycle.Repositories
         /// <summary>
         /// 添加订单。
         /// </summary>
-        /// <param name="order"></param>
-        /// <returns></returns>
+        /// <param name="order">新建的订单信息。</param>
+        /// <returns>成功返回true；否则返回false。</returns>
         Boolean AddOrder(Order order);
 
         /// <summary>
         /// 删除订单。
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        Boolean DeleteOrder(String id);
+        /// <param name="orderId">要删除的订单Id。</param>
+        /// <param name="salerId">发布者的Id。</param>
+        /// <returns>成功返回true；否则返回false。</returns>
+        Boolean DeleteOrder(String salerId, String orderId);
 
         /// <summary>
         /// 修改订单。
         /// </summary>
-        /// <param name="order"></param>
-        /// <returns></returns>
-        Boolean ModifyOrder(Order order);
+        /// <param name="salerId">发布者的Id。</param>
+        /// <param name="order">要修改的订单。</param>
+        /// <returns>成功返回true；否则返回false。</returns>
+        Boolean ModifyOrder(String salerId, Order order);
 
         /// <summary>
-        /// 分页获取订单视图列表。
+        /// 分页获取指定发布者的订单列表。
         /// </summary>
-        /// <param name="salerId"></param>
-        /// <param name="pageNo"></param>
-        /// <param name="pageSize"></param>
-        /// <returns></returns>
-        IEnumerable<OrderView> GetOrderViewsByPage(String salerId, Int32 pageNo, Int32 pageSize);
+        /// <param name="salerId">发布者的Id。</param>
+        /// <param name="pageNo">从1开始的页号。</param>
+        /// <param name="pageSize">每页大小。</param>
+        /// <returns>订单列表。</returns>
+        IQueryable<Order> GetOrdersByPage(String salerId, Int32 pageNo, Int32 pageSize);
+
+        /// <summary>
+        /// 分页获取所有订单的视图列表。
+        /// </summary>
+        /// <param name="pageNo">从1开始的页号。</param>
+        /// <param name="pageSize">每页大小。</param>
+        /// <returns>订单视图列表。</returns>
+        IEnumerable<OrderView> GetOrderViewsByPage(Int32 pageNo, Int32 pageSize);
     }
 }

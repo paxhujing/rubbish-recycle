@@ -377,7 +377,7 @@ namespace RubbishRecycle.Controllers
         /// <returns>登陆Token。</returns>
         private String InitAccountToken(Account account)
         {
-            AccountToken viewer = new AccountToken(account.BindingPhone);
+            AccountToken viewer = new AccountToken(account.BindingPhone, account.Id);
             viewer.Role = account.RoleId;
             viewer.IsFreeze = account.IsFreezed;
             this._accountRepository.UpdateLastLoginTime(account.Id);
