@@ -40,7 +40,7 @@ namespace RubbishRecycle.Models.ViewModels
         /// 数量。
         /// </summary>
         [JsonProperty("quantity")]
-        public Single Quantity { get; set; }
+        public Double Quantity { get; set; }
 
         /// <summary>
         /// 照片。
@@ -58,7 +58,7 @@ namespace RubbishRecycle.Models.ViewModels
         /// 卖家的综合评分。
         /// </summary>
         [JsonProperty("comprehensive_score")]
-        public Single ComprehensiveScore { get; set; }
+        public Double ComprehensiveScore { get; set; }
 
     }
 }

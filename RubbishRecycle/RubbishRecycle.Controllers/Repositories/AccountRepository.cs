@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using RubbishRecycle.Models;
 using System.Data.Entity;
 using RubbishRecycle.Toolkit;
+using System.Linq.Expressions;
 
 namespace RubbishRecycle.Controllers.Repositories
 {
@@ -52,12 +53,14 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Account GetAccount(String name)
         {
-            Saler saler = base.DbContext.Salers.SingleOrDefault(x => FindAccountByName(x, name));
+            Expression<Func<Account, Boolean>> f = x => FindAccountByName(x, name);
+            Func<Account, Boolean> predicate = f.Compile();
+            Account saler = base.DbContext.Salers.SingleOrDefault(predicate);
             if (saler == null)
             {
-                return base.DbContext.Buyers.SingleOrDefault(x => FindAccountByName(x, name));
+                return base.DbContext.Buyers.SingleOrDefault(predicate);
             }
-            return null;
+            return saler;
         }
 
         public Boolean FreezeAccount(String name)
