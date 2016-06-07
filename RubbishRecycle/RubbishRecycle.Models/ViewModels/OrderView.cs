@@ -55,6 +55,12 @@ namespace RubbishRecycle.Models.ViewModels
         public DateTime Timestamp { get; set; }
 
         /// <summary>
+        /// 期望交易日期。
+        /// </summary>
+        [JsonProperty("except_trade_date")]
+        public DateTime ExceptTradeDate { get; set; }
+
+        /// <summary>
         /// 卖家的综合评分。
         /// </summary>
         [JsonProperty("comprehensive_score")]
