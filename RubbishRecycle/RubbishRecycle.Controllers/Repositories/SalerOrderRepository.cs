@@ -26,56 +26,54 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public Boolean AddOrder(Order order)
         {
+            TimeSpan ts = order.ExceptTradeDate.Date - DateTime.Now.Date;
+            if ((ts.Days < 0) || (ts.Days > 3)) return false;
             Order unfinishOrder = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == order.SalerId) && (x.State == OrderState.Trading));
             if (unfinishOrder != null)
             {
-                if ((DateTime.Now.Date - unfinishOrder.Timestamp).Days > 7)
+                if (IsTradeExpire(unfinishOrder))
                 {
                     unfinishOrder.State = OrderState.Finish;
                     base.DbContext.Entry(unfinishOrder).State = EntityState.Modified;
-
-                    order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-                    order.State = OrderState.NotPay;
-                    order.Timestamp = DateTime.Now.Date;
-                    base.DbContext.Orders.Add(order);
-                    return base.DbContext.SaveChanges() > 1;
+                }
+                else
+                {
+                    return false;
                 }
             }
-            return false;
+            order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
+            order.State = OrderState.NotPay;
+            order.Timestamp = DateTime.Now.Date;
+            base.DbContext.Orders.Add(order);
+            return base.DbContext.SaveChanges() > 0;
         }
 
         public Boolean DeleteOrder(String salerId, String orderId)
         {
             Order order = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == salerId) && (x.Id == orderId));
             if (order == null) return true;
-            if (order.State == OrderState.Trading)
+            if(IsTradeExpire(order))
             {
-                if ((DateTime.Now.Date - order.Timestamp).Days > 7)
-                {
-                    order.State = OrderState.Finish;
-                }
+                order.State = OrderState.Finish;
             }
             if (order.State == OrderState.Trading) return false;
             base.DbContext.Entry(order).State = EntityState.Deleted;
-            return base.DbContext.SaveChanges() > 1;
+            return base.DbContext.SaveChanges() > 0;
         }
 
         public Boolean ModifyOrder(String salerId, Order order)
         {
             if (order.SalerId != salerId) return false;
-            if (order.State == OrderState.Waiting)
+            if (IsWaitExpire(order))
             {
-                if ((DateTime.Now.Date - order.Timestamp).Days > 3)
-                {
-                    order.State = OrderState.Expire;
-                }
+                order.State = OrderState.Expire;
             }
             if ((order.State == OrderState.NotPay)
                 || (order.State == OrderState.NotPass)
                 ||(order.State == OrderState.Expire))
             {
                 base.DbContext.Entry(order).State = EntityState.Modified;
-                return base.DbContext.SaveChanges() > 1;
+                return base.DbContext.SaveChanges() > 0;
             }
             return false;
         }
@@ -104,6 +102,24 @@ namespace RubbishRecycle.Controllers.Repositories
         #endregion
 
         #region Misc
+
+        private Boolean IsTradeExpire(Order order)
+        {
+            if (order.State == OrderState.Trading)
+            {
+                return (DateTime.Now.Date - order.ExceptTradeDate.Date).Days > 3;
+            }
+            return false;
+        }
+
+        private Boolean IsWaitExpire(Order order)
+        {
+            if (order.State == OrderState.Waiting)
+            {
+                return (DateTime.Now.Date - order.Timestamp.Date).Days > 3;
+            }
+            return false;
+        }
 
         #endregion
     }

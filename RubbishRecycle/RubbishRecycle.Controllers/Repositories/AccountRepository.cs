@@ -39,7 +39,7 @@ namespace RubbishRecycle.Controllers.Repositories
             {
                 base.DbContext.Buyers.Add((Buyer)info);
             }
-            if (base.DbContext.SaveChanges() != 0)
+            if (base.DbContext.SaveChanges() > 0)
             {
                 return info;
             }
@@ -78,7 +78,7 @@ namespace RubbishRecycle.Controllers.Repositories
                     base.DbContext.Buyers.Attach((Buyer)account);
                 }
                 base.DbContext.Entry(account).State = EntityState.Modified;
-                return base.DbContext.SaveChanges() != 0;
+                return base.DbContext.SaveChanges() > 0;
             }
             return false;
         }
@@ -98,7 +98,7 @@ namespace RubbishRecycle.Controllers.Repositories
                     base.DbContext.Buyers.Attach((Buyer)account);
                 }
                 base.DbContext.Entry(account).State = EntityState.Modified;
-                return base.DbContext.SaveChanges() != 0;
+                return base.DbContext.SaveChanges() > 0;
             }
             return false;
         }
@@ -176,7 +176,7 @@ namespace RubbishRecycle.Controllers.Repositories
                 base.DbContext.Buyers.Attach((Buyer)account);
             }
             base.DbContext.Entry(account).State = EntityState.Modified;
-            return base.DbContext.SaveChanges() != 0;
+            return base.DbContext.SaveChanges() > 0;
         }
 
         #endregion
