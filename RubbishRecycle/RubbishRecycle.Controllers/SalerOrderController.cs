@@ -35,6 +35,7 @@ namespace RubbishRecycle.Controllers
 
         [RubbishRecycleAuthorize(Roles = "saler")]
         [ActionName("PublishOrder")]
+        [HttpPost]
         public OperationResult PublishOrder(Order order)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
@@ -48,6 +49,7 @@ namespace RubbishRecycle.Controllers
 
         [RubbishRecycleAuthorize(Roles = "saler")]
         [ActionName("DeleteOrder")]
+        [HttpDelete]
         public OperationResult DeleteOrder(String orderId)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
@@ -60,6 +62,7 @@ namespace RubbishRecycle.Controllers
 
         [RubbishRecycleAuthorize(Roles = "saler")]
         [ActionName("ModifyOrder")]
+        [HttpPatch]
         public OperationResult ModifyOrder(Order order)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
@@ -73,6 +76,7 @@ namespace RubbishRecycle.Controllers
 
         [RubbishRecycleAuthorize(Roles = "saler")]
         [ActionName("QueryOrdersByPage")]
+        [HttpGet]
         public OperationResult QueryOrdersByPage(Int32 pageNo, Int32 pageSize = 10)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
@@ -82,6 +86,7 @@ namespace RubbishRecycle.Controllers
 
         [AllowAnonymous]
         [ActionName("QueryOrderViewsByPage")]
+        [HttpGet]
         public OperationResult QueryOrderViewsByPage(Int32 pageNo, Int32 pageSize = 10)
         {
             IEnumerable<OrderView> orderViews = this._orderRepository.GetOrderViewsByPage(pageNo, pageSize);

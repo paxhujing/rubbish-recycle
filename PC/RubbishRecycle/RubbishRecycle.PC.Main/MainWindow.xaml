@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RubbishRecycle.PC.Main"
+        xmlns:lc="clr-namespace:RubbishRecycle.PC.Main.Converters"
+        x:Name="RubbishMain"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525"
         Loaded="Window_Loaded">
@@ -13,13 +15,26 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="Logout"
+            <StackPanel.Resources>
+                <lc:TokenToVisibilityConverter x:Key="TokenToVisibilityConverter"/>
+            </StackPanel.Resources>
+            <Button x:Name="Login"
+                    Content="登录"
+                    Visibility="{Binding AppToken,ElementName=RubbishMain,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource TokenToVisibilityConverter},ConverterParameter=revert}"
+                    Click="Login_Click"/>
+            <StackPanel x:Name="SystemPanel" 
+                        Orientation="Horizontal"
+                        Visibility="{Binding AppToken,ElementName=RubbishMain,UpdateSourceTrigger=PropertyChanged,Converter={StaticResource TokenToVisibilityConverter}}">
+                <Button x:Name="Logout"
                     Content="注销"
                     Click="Logout_Click" />
-
-            <Button x:Name="ChangePassword"
+                <Button x:Name="ChangePassword"
                     Content="修改密码"
                     Click="ChangePassword_Click" />
+            </StackPanel>
         </StackPanel>
+        <DataGrid x:Name="OrderViewList" Grid.Row="1">
+            
+        </DataGrid>
     </Grid>
 </Window>

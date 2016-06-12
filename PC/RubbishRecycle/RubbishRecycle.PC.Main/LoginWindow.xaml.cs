@@ -46,7 +46,8 @@ namespace RubbishRecycle.PC.Main
             OperationResult result = this._proxy.Login(ri);
             if (result.IsSuccess)
             {
-                App.Token = result.Data.ToString();
+                MainWindow mwin = (MainWindow)this.Owner;
+                mwin.AppToken = result.Data.ToString();
                 DialogResult = true;
             }
             else

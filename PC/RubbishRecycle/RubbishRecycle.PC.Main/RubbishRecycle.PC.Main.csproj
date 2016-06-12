@@ -82,6 +82,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\TokenToVisibilityConverter.cs" />
     <Compile Include="ForgetPasswordWin.xaml.cs">
       <DependentUpon>ForgetPasswordWin.xaml</DependentUpon>
     </Compile>
