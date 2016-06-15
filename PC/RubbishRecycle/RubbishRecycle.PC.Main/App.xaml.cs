@@ -11,7 +11,7 @@ namespace RubbishRecycle.PC.Main
     {
         //internal static readonly RijndaelManaged AESProvider = new RijndaelManaged() { Mode = CipherMode.CBC, Padding = PaddingMode.Zeros };
 
-        internal static String Token;
+        //internal static String Token;
 
         //protected override void OnStartup(StartupEventArgs e)
         //{

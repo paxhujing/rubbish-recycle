@@ -48,7 +48,8 @@ namespace RubbishRecycle.PC.Main
         {
             if (result.IsSuccess)
             {
-                App.Token = result.Data.ToString();
+                MainWindow mwin = (MainWindow)this.Owner.Owner;
+                mwin.AppToken = result.Data.ToString();
                 MessageBox.Show("注册成功");
             }
             else

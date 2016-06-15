@@ -1,6 +1,8 @@
 ﻿using RubbishRecycle.Models;
 using RubbishRecycle.PC.Communication;
+using RubbishRecycle.Toolkit;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -25,7 +27,7 @@ namespace RubbishRecycle.PC.Main
     {
         #region Fields
 
-        private readonly AccountProxy _proxy = new AccountProxy();
+        private readonly SalerOrderProxy _salerOrderProxy = new SalerOrderProxy();
 
         #endregion
 
@@ -34,6 +36,7 @@ namespace RubbishRecycle.PC.Main
         public MainWindow()
         {
             InitializeComponent();
+            Util.SetCertificatePolicy();
         }
 
         #endregion
@@ -68,26 +71,29 @@ namespace RubbishRecycle.PC.Main
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            //Account account = this._proxy.GetAccount(App.Token,App.AESProvider);
+            OperationResult result = this._salerOrderProxy.QueryOrderViewsByPage(1);
+            this.OrderViewList.ItemsSource = result.Data as IEnumerable;
         }
 
         private void Logout_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            OperationResult result = this._proxy.Logout(App.Token);
+            AccountProxy proxy = new AccountProxy();
+            OperationResult result = proxy.Logout(this.AppToken);
             AppToken = null;
         }
 
         private void ChangePassword_Click(object sender, RoutedEventArgs e)
         {
             e.Handled = true;
-            OperationResult result = this._proxy.GetChangePasswordVerifyCode(App.Token);
+            AccountProxy proxy = new AccountProxy();
+            OperationResult result = proxy.GetChangePasswordVerifyCode(this.AppToken);
             if (result.IsSuccess)
             {
                 ChangePasswordInfo info = new ChangePasswordInfo();
                 info.Password = "654321";
                 info.VerifyCode = String.Empty;
-                result = this._proxy.ChangePassword(info, App.Token);
+                result = proxy.ChangePassword(info, this.AppToken);
                 if (result.IsSuccess)
                 {
                     MessageBox.Show("修改密码成功");

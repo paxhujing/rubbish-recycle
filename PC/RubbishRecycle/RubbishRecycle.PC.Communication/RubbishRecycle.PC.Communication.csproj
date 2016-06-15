@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccountProxy.cs" />
+    <Compile Include="SalerOrderProxy.cs" />
     <Compile Include="WebApiProxy.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

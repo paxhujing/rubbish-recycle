@@ -1,21 +1,6 @@
 ﻿using RubbishRecycle.Models;
 using RubbishRecycle.PC.Communication;
-using RubbishRecycle.Toolkit;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace RubbishRecycle.PC.Main
 {
@@ -33,7 +18,6 @@ namespace RubbishRecycle.PC.Main
         public LoginWindow()
         {
             InitializeComponent();
-            Util.SetCertificatePolicy();
         }
 
         private void StartLogin_Click(object sender, RoutedEventArgs e)
