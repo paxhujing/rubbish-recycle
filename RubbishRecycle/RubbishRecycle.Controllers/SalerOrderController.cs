@@ -36,7 +36,7 @@ namespace RubbishRecycle.Controllers
         [RubbishRecycleAuthorize(Roles = "saler")]
         [ActionName("PublishOrder")]
         [HttpPost]
-        public OperationResult PublishOrder(Order order)
+        public OperationResult PublishOrder(PublishOrderData order)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
             if (this._orderRepository.AddOrder(at.AccountId, order))
