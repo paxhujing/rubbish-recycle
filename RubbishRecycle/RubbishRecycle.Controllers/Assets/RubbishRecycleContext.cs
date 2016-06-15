@@ -69,9 +69,6 @@ namespace RubbishRecycle.Controllers.Assets
             modelBuilder.Entity<Order>().HasRequired(x => x.Saler).WithMany(x => x.Orders).HasForeignKey(x => x.SalerId).WillCascadeOnDelete(true);
             modelBuilder.Entity<Auction>().HasRequired(x => x.Order).WithMany(x => x.Auctions).HasForeignKey(x => x.OrderId).WillCascadeOnDelete(true);
             #endregion
-            #region Buyer
-
-            #endregion
 
             #region Buyer
             modelBuilder.Entity<OrderSummary>().HasRequired(x => x.Buyer).WithMany(x => x.OrderSummaries).HasForeignKey(x => x.BuyerId).WillCascadeOnDelete(true);

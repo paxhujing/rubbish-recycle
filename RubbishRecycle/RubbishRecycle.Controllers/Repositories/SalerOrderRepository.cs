@@ -6,6 +6,8 @@ using System.Linq;
 using RubbishRecycle.Models;
 using System.Data.Entity;
 using RubbishRecycle.Models.ViewModels;
+using System.Linq.Expressions;
+using System.Data.Entity.SqlServer;
 
 namespace RubbishRecycle.Controllers.Repositories
 {
@@ -24,11 +26,11 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #region Saler
 
-        public Boolean AddOrder(Order order)
+        public Boolean AddOrder(String salerId, PublishOrderData order)
         {
             TimeSpan ts = order.ExceptTradeDate.Date - DateTime.Now.Date;
             if ((ts.Days < 0) || (ts.Days > 3)) return false;
-            Order unfinishOrder = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == order.SalerId) && (x.State == OrderState.Trading));
+            Order unfinishOrder = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == salerId) && (x.State == OrderState.Trading));
             if (unfinishOrder != null)
             {
                 if (IsTradeExpire(unfinishOrder))
@@ -41,10 +43,20 @@ namespace RubbishRecycle.Controllers.Repositories
                     return false;
                 }
             }
-            order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-            order.State = OrderState.NotPay;
-            order.Timestamp = DateTime.Now.Date;
-            base.DbContext.Orders.Add(order);
+            Order newOrder = new Order();
+            newOrder.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
+            newOrder.SalerId = salerId;
+            newOrder.State = OrderState.NotPay;
+            newOrder.Timestamp = DateTime.Now.Date;
+            newOrder.Photo = order.Photo;
+            newOrder.Quantity = order.Quantity;
+            newOrder.RubbishDescription = order.RubbishDescription;
+            newOrder.Type = order.Type;
+            newOrder.Unit = order.Unit;
+            newOrder.ExceptTradeDate = order.ExceptTradeDate;
+            newOrder.DetailAddress = order.DetailAddress;
+            newOrder.Address = order.Address;
+            base.DbContext.Orders.Add(newOrder);
             return base.DbContext.SaveChanges() > 0;
         }
 
@@ -78,7 +90,7 @@ namespace RubbishRecycle.Controllers.Repositories
             return false;
         }
 
-        public IQueryable<Order> GetOrdersByPage(String salerId, Int32 pageNo, Int32 pageSize = 10)
+        public IQueryable<Order> GetOrdersByPage(String salerId, Int32 pageNo, Int32 pageSize = 10) 
         {
             IQueryable<Order> pageResult = (from o in base.DbContext.Orders
                                             where o.SalerId == salerId
@@ -90,12 +102,19 @@ namespace RubbishRecycle.Controllers.Repositories
 
         public IEnumerable<OrderView> GetOrderViewsByPage(Int32 pageNo, Int32 pageSize = 10)
         {
-            IQueryable<OrderView> pageResult = (from v in base.DbContext.Orders
-                                                where (v.State == OrderState.Waiting)
-                                                && ((DateTime.Now.Date - v.Timestamp).Days <= 3)
-                                                orderby v.Timestamp descending
-                                                select v.ToView()).Skip((pageNo - 1) * pageSize).Take(pageSize);
-
+            Expression<Func<Order, Boolean>> exp = o => (o.State == OrderState.Waiting) && !IsWaitExpire(o);
+            Func<Order, Boolean> fun = exp.Compile();
+            IEnumerable<OrderView> pageResult = base.DbContext.Orders.Where(fun).Select(x => new OrderView
+            {
+                OrderId = x.Id,
+                Type = x.Type,
+                RubbishDescription = x.RubbishDescription,
+                Unit = x.Unit,
+                Quantity = x.Quantity,
+                Photo = x.Photo,
+                Timestamp = x.Timestamp,
+                ComprehensiveScore = x.ComprehensiveScore,
+            }).ToArray();
             return pageResult;
         }
 
@@ -107,7 +126,7 @@ namespace RubbishRecycle.Controllers.Repositories
         {
             if (order.State == OrderState.Trading)
             {
-                return (DateTime.Now.Date - order.ExceptTradeDate.Date).Days > 3;
+                return SqlFunctions.DateDiff("d", order.ExceptTradeDate, DateTime.Now) > 3;
             }
             return false;
         }
@@ -116,7 +135,7 @@ namespace RubbishRecycle.Controllers.Repositories
         {
             if (order.State == OrderState.Waiting)
             {
-                return (DateTime.Now.Date - order.Timestamp.Date).Days > 3;
+                return SqlFunctions.DateDiff("d", order.Timestamp, DateTime.Now) > 3;
             }
             return false;
         }
