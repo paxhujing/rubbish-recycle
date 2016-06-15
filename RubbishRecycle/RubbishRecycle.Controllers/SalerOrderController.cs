@@ -39,8 +39,7 @@ namespace RubbishRecycle.Controllers
         public OperationResult PublishOrder(Order order)
         {
             AccountToken at = base.ActionContext.GetAccountTokenFromActionContext();
-            order.SalerId = at.AccountId;
-            if (this._orderRepository.AddOrder(order))
+            if (this._orderRepository.AddOrder(at.AccountId, order))
             {
                 return OperationResultHelper.GenerateSuccessResult(order);
             }

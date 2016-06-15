@@ -26,11 +26,11 @@ namespace RubbishRecycle.Controllers.Repositories
 
         #region Saler
 
-        public Boolean AddOrder(Order order)
+        public Boolean AddOrder(String salerId, PublishOrderData order)
         {
             TimeSpan ts = order.ExceptTradeDate.Date - DateTime.Now.Date;
             if ((ts.Days < 0) || (ts.Days > 3)) return false;
-            Order unfinishOrder = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == order.SalerId) && (x.State == OrderState.Trading));
+            Order unfinishOrder = base.DbContext.Orders.SingleOrDefault(x => (x.SalerId == salerId) && (x.State == OrderState.Trading));
             if (unfinishOrder != null)
             {
                 if (IsTradeExpire(unfinishOrder))
@@ -43,10 +43,20 @@ namespace RubbishRecycle.Controllers.Repositories
                     return false;
                 }
             }
-            order.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
-            order.State = OrderState.NotPay;
-            order.Timestamp = DateTime.Now.Date;
-            base.DbContext.Orders.Add(order);
+            Order newOrder = new Order();
+            newOrder.Id = Guid.NewGuid().ToString().Replace("-", String.Empty);
+            newOrder.SalerId = salerId;
+            newOrder.State = OrderState.NotPay;
+            newOrder.Timestamp = DateTime.Now.Date;
+            newOrder.Photo = order.Photo;
+            newOrder.Quantity = order.Quantity;
+            newOrder.RubbishDescription = order.RubbishDescription;
+            newOrder.Type = order.Type;
+            newOrder.Unit = order.Unit;
+            newOrder.ExceptTradeDate = order.ExceptTradeDate;
+            newOrder.DetailAddress = order.DetailAddress;
+            newOrder.Address = order.Address;
+            base.DbContext.Orders.Add(newOrder);
             return base.DbContext.SaveChanges() > 0;
         }
 

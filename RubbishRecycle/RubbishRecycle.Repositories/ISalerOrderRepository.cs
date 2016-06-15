@@ -13,9 +13,10 @@ namespace RubbishRecycle.Repositories
         /// <summary>
         /// 添加订单。
         /// </summary>
+        /// <param name="salerId">发布者的Id。</param>
         /// <param name="order">新建的订单信息。</param>
         /// <returns>成功返回true；否则返回false。</returns>
-        Boolean AddOrder(Order order);
+        Boolean AddOrder(String salerId, PublishOrderData order);
 
         /// <summary>
         /// 删除订单。

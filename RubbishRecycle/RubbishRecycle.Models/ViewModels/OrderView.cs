@@ -27,7 +27,7 @@ namespace RubbishRecycle.Models.ViewModels
         /// <summary>
         /// 类型描述。
         /// </summary>
-        [JsonProperty("name")]
+        [JsonProperty("rubbish_description")]
         public String RubbishDescription { get; set; }
 
         /// <summary>
